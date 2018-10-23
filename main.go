@@ -2,8 +2,6 @@ package main
 
 import (
 	"math/rand"
-	"os"
-	"strconv"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -12,25 +10,29 @@ import (
 )
 
 func main() {
-	rand.Seed(int64(0))
+	//rand.Seed(int64(0))
 
 	p, err := plot.New()
 	if err != nil {
 		panic(err)
 	}
 
+	device := "xrs-mi001"
 	p.Title.Text = "Plotutil example"
 	p.X.Label.Text = "X"
 	p.Y.Label.Text = "Y"
 
-	n := os.Args[1]
-	num, _ := strconv.Atoi(n)
-	sample := randomPoints(num)
+	values := recuperajson(device)
+
+	sample := elaborapunti(values)
+
+	var t []float64
+	for i := 0; i < len(values); i++ {
+		t = append(t, values[i].Value)
+	}
+	elaboraserie(t)
 
 	err = plotutil.AddLinePoints(p,
-		"First", randomPoints(num),
-		"Second", randomPoints(num),
-		"Third", randomPoints(num),
 		"pippo", sample)
 	if err != nil {
 		panic(err)
@@ -40,6 +42,19 @@ func main() {
 	if err := p.Save(4*vg.Inch, 4*vg.Inch, "points.png"); err != nil {
 		panic(err)
 	}
+}
+
+func elaborapunti(values TDATA) plotter.XYs {
+	pts := make(plotter.XYs, len(values))
+	for i := range pts {
+		if i == 0 {
+			pts[i].X = values[0].Time
+		} else {
+			pts[i].X = values[i].Time
+		}
+		pts[i].Y = values[i].Value
+	}
+	return pts
 }
 
 // randomPoints returns some random x, y points.
