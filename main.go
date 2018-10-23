@@ -2,6 +2,8 @@ package main
 
 import (
 	"math/rand"
+	"os"
+	"strconv"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -21,10 +23,15 @@ func main() {
 	p.X.Label.Text = "X"
 	p.Y.Label.Text = "Y"
 
+	n := os.Args[1]
+	num, _ := strconv.Atoi(n)
+	sample := randomPoints(num)
+
 	err = plotutil.AddLinePoints(p,
-		"First", randomPoints(15),
-		"Second", randomPoints(15),
-		"Third", randomPoints(15))
+		"First", randomPoints(num),
+		"Second", randomPoints(num),
+		"Third", randomPoints(num),
+		"pippo", sample)
 	if err != nil {
 		panic(err)
 	}
