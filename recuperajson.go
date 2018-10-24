@@ -22,7 +22,9 @@ func recuperavariabile(variabile string) (result string, err error) {
 //Perchè la concorrency non si incasini serve un bel waitgroup
 //var wg sync.WaitGroup
 
-func recuperajson(device string) (values TDATA) {
+var test XrsMi001Stru
+
+func recuperajson(device, choisedinterface string) (values TDATA) {
 
 	//Recupera la variabile d'ambiente
 	username, err := recuperavariabile("username")
@@ -71,13 +73,36 @@ func recuperajson(device string) (values TDATA) {
 
 	body, _ := ioutil.ReadAll(res.Body)
 	defer res.Body.Close()
-	var test XrsMi001Stru
+
 	if err := json.Unmarshal([]byte(body), &test); err != nil {
 		log.Fatal(err.Error())
 	}
 
-	values = test.NetThroughputOut.XrsMi001.Five11100GigEthernetICRC0023878MetropolitanoHNE500CMICLD50SEABONELAG100.Data
+	//device = "XrsMi001"
+	//choisedinterface = "Lag99LAGGroup00000000LOGICORMI595Ae5OFFRAMPToRMI595200G"
+	// jsonstring := "test.NetThroughputOut." + device + "." + choisedinterface + ".Data"
+	// fmt.Println(jsonstring)
+	var result map[string]interface{}
+	err = json.Unmarshal([]byte(body), &result)
+	if err != nil {
+		log.Println("errore: ", err.Error())
+	}
+	strs := result["NetThroughputOut"].([]interface{})
+	str1 := strs[0].(string)
+	fmt.Println(str1)
+	// st := refle.sct.TypeOf(test)
+	// field := st.Field(0)
+	// v := field.Tag.Get("2/1/2-100-Gig-Ethernet-ICR-C00228/05-Metropolitano-HNE500C-MI-CLD50-SEABONE-LAG100-")
+	// fmt.Println(v)
+	//fmt.Println(result["2/1/2-100-Gig-Ethernet-ICR-C00228/05-Metropolitano-HNE500C-MI-CLD50-SEABONE-LAG100-"])
+	// e := reflect.TypeOf(&test).Elem()
+	// getValues(e, device, choisedinterface)
+	// s := structs.New(test)
+	// p := s.Field("NetThroughputOut").Field("XrsMi001").Field("A110100EthernetTX").Field("Data").Fields()
+	// fmt.Println(p)
+	//values = "test.NetThroughputOut." + device + "." + choisedinterface + ".Data"
 
+	//values = structpath
 	// tlen := len(t) - 1
 	// for i := 0; i <= tlen; i++ {
 	// 	values[i] = t[i].Value

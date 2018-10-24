@@ -17,7 +17,9 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
+//Dove salvere il nome delle interfacce
 var listainterfacce []string
+var listainterfacce2 = make(map[string]string)
 
 func printTags(t reflect.Type) {
 	for i := 0; i < t.NumField(); i++ {
@@ -25,6 +27,8 @@ func printTags(t reflect.Type) {
 
 		if field.Type.Kind() == reflect.Struct {
 			column := field.Tag.Get("json")
+			column2 := field.Name
+			listainterfacce2[column] = column2
 			listainterfacce = append(listainterfacce, column)
 
 			//fmt.Printf("interface: %v\n", column)
@@ -41,20 +45,15 @@ func printTags(t reflect.Type) {
 }
 
 func main() {
-	//rand.Seed(int64(0))
 
+	//dev è un type dell'apparato scelto
 	dev := XrsMi001Stru{}
 
+	//Questo serve a recuperare dallo struct il nome delle interfacce
 	e := reflect.TypeOf(&dev).Elem()
-
 	printTags(e)
-	//fmt.Println(len(listainterfacce))
-
-	// for i := 1; i < len(listainterfacce); i++ {
-	// 	fmt.Println(listainterfacce[i])
-
-	// }
-
+	//fmt.Println(listainterfacce2)
+	//Stampa tutte le interfacce con il numero
 	for n, i := range listainterfacce {
 		fmt.Println(n, i)
 	}
@@ -62,9 +61,10 @@ func main() {
 	//Crea un lettore di input da tastiera
 CHOISE:
 	var choise int
+	//choise = 6
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() == false {
-		fmt.Println(scanner.Text())
+		//fmt.Println(scanner.Text())
 	}
 	if govalidator.IsInt(scanner.Text()) == false {
 		goto CHOISE
@@ -74,11 +74,11 @@ CHOISE:
 		log.Println(err.Error())
 	}
 
-	fmt.Println("hai scelto:", choise)
+	fmt.Println("hai scelto:", listainterfacce[choise])
 
-	if scanner.Err() != nil {
-		// handle error.
-	}
+	choisedinterface := listainterfacce2[listainterfacce[choise]]
+
+	fmt.Println(choisedinterface)
 
 	p, err := plot.New()
 	if err != nil {
@@ -90,7 +90,8 @@ CHOISE:
 	p.X.Label.Text = "X"
 	p.Y.Label.Text = "Y"
 
-	values := recuperajson(device)
+	values := recuperajson(device, choisedinterface)
+	fmt.Println(values) //debug
 
 	sample := elaborapunti(values)
 

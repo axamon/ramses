@@ -1,8 +1,6 @@
 package main
 
 import (
-	"sort"
-
 	"github.com/Pallinder/go-randomdata"
 
 	//"github.com/spf13/viper"
@@ -36,15 +34,15 @@ func elaboraserie(lista []float64) {
 	//mean, _ := stat.Mode(speeds, nil)
 
 	//fmt.Printf("Moda: %.3f\n", mode)
-	nums := speeds
+	//nums := speeds
 	//fmt.Println(len(nums))
 	//entropy := stat.Entropy(nums)
-	sort.Float64s(nums) //Mette in ordine nums
+	//sort.Float64s(nums) //Mette in ordine nums
 	//fmt.Printf("Mediana: %.3f\n", stat.Quantile(0.5, stat.Empirical, nums, nil))
 	//median := stat.Quantile(0.5, stat.Empirical, nums, nil)
 	//percentile95 := stat.Quantile(0.95, stat.Empirical, nums, nil)
 
-	stdev := stat.StdDev(speeds, nil)
+	//stdev := stat.StdDev(speeds, nil)
 	//stderr := stat.StdErr(stdev, float64(numchunks))
 	//fmt.Printf("StDev: %.3f\n", stat.StdDev(speeds, nil))
 	//skew := stat.Skew(speeds, nil)
@@ -57,13 +55,13 @@ func elaboraserie(lista []float64) {
 		log.Println(err.Error())
 	}
 	fmt.Println(string(l)) */
-	kalmansample(speeds, stdev)
+	// 	kalmansample(speeds, stdev)
 
-	return
+	// 	return
 
-}
+	// }
 
-func kalmansample(speeds []float64, stdev float64) {
+	// func kalmansample(speeds []float64, stdev float64) {
 
 	sma3 := ma.ThreadSafe(ma.NewSMA(3))   //creo una moving average a 3
 	sma7 := ma.ThreadSafe(ma.NewSMA(7))   //creo una moving average a 7
@@ -90,6 +88,7 @@ func kalmansample(speeds []float64, stdev float64) {
 	// }
 
 	n := len(speeds)
+	fmt.Println(n)
 	//s := mat64.NewDense(1, n, nil)
 	x, dx := 0.0, 0.01
 	xary := make([]float64, 0, n)
