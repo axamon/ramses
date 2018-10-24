@@ -49,10 +49,6 @@ func main() {
 
 	}
 
-	// for i := 0; i < e.NumField(); i++ {
-	// 	varName := e.Type().Field(i).Name
-	// 	fmt.Printf("%v\n", varName)
-	// }
 
 	p, err := plot.New()
 	if err != nil {
