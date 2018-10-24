@@ -1,9 +1,15 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"log"
 	"math/rand"
+	"os"
 	"reflect"
+	"strconv"
+
+	"github.com/asaskevich/govalidator"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -42,13 +48,37 @@ func main() {
 	e := reflect.TypeOf(&dev).Elem()
 
 	printTags(e)
-	fmt.Println(len(listainterfacce))
+	//fmt.Println(len(listainterfacce))
 
-	for i := 0; i < len(listainterfacce); i++ {
-		fmt.Println(listainterfacce[i])
+	// for i := 1; i < len(listainterfacce); i++ {
+	// 	fmt.Println(listainterfacce[i])
 
+	// }
+
+	for n, i := range listainterfacce {
+		fmt.Println(n, i)
 	}
 
+	//Crea un lettore di input da tastiera
+CHOISE:
+	var choise int
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() == false {
+		fmt.Println(scanner.Text())
+	}
+	if govalidator.IsInt(scanner.Text()) == false {
+		goto CHOISE
+	}
+	choise, err := strconv.Atoi(scanner.Text())
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	fmt.Println("hai scelto:", choise)
+
+	if scanner.Err() != nil {
+		// handle error.
+	}
 
 	p, err := plot.New()
 	if err != nil {
