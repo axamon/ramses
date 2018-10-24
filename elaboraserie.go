@@ -155,13 +155,13 @@ func kalmansample(speeds []float64, stdev float64) {
 	//yaryFilt := mat64.Row(nil, 0, filtered)
 
 	err = plotutil.AddLinePoints(p,
-		"Original", generatePoints(xary, yaryOrig[len(yaryOrig)-120:]),
+		"Original", generatePoints(xary, yaryOrig[len(yaryOrig)-120:len(yaryOrig)-1]),
 		//"Filtered", generatePoints(xary, yaryFilt[len(yaryFilt)-120:]),
 		//"MA3", generatePoints(xary, ma3),
 		//"MA7", generatePoints(xary, ma7),
 		//"MA20", generatePoints(xary, ma20[len(ma20)-120:]),
-		"UpBollinger", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:]),
-		"LowBollinger", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:]),
+		"UpBollinger", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:len(ma20Upperband)-1]),
+		"LowBollinger", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:len(ma20Lowerband)-1]),
 	)
 	if err != nil {
 		log.Println(err)
@@ -176,7 +176,7 @@ func kalmansample(speeds []float64, stdev float64) {
 
 func generatePoints(x []float64, y []float64) plotter.XYs {
 	//pts := make(plotter.XYs, len(x))
-	pts := make(plotter.XYs, 120)
+	pts := make(plotter.XYs, 119)
 
 	for i := range pts {
 		pts[i].X = x[i]

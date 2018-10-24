@@ -76,7 +76,7 @@ func recuperajson(device string) (values TDATA) {
 		log.Fatal(err.Error())
 	}
 
-	values = test.NetThroughputOut.XrsMi001.Five21100GigEthernetICRC0023876MetropolitanoHNE500CMICLD50Hu1204SEABONELAG100.Data
+	values = test.NetThroughputOut.XrsMi001.Five11100GigEthernetICRC0023878MetropolitanoHNE500CMICLD50SEABONELAG100.Data
 
 	// tlen := len(t) - 1
 	// for i := 0; i <= tlen; i++ {

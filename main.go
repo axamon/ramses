@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
+	"reflect"
 
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -9,8 +11,48 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
+var listainterfacce []string
+
+func printTags(t reflect.Type) {
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+
+		if field.Type.Kind() == reflect.Struct {
+			column := field.Tag.Get("json")
+			listainterfacce = append(listainterfacce, column)
+
+			//fmt.Printf("interface: %v\n", column)
+			printTags(field.Type)
+			continue
+		}
+
+		// column := field.Tag.Get("json")
+
+		// fmt.Printf("interface: %v\n", column)
+
+	}
+	return
+}
+
 func main() {
 	//rand.Seed(int64(0))
+
+	dev := XrsMi001Stru{}
+
+	e := reflect.TypeOf(&dev).Elem()
+
+	printTags(e)
+	fmt.Println(len(listainterfacce))
+
+	for i := 0; i < len(listainterfacce); i++ {
+		fmt.Println(listainterfacce[i])
+
+	}
+
+	// for i := 0; i < e.NumField(); i++ {
+	// 	varName := e.Type().Field(i).Name
+	// 	fmt.Printf("%v\n", varName)
+	// }
 
 	p, err := plot.New()
 	if err != nil {
