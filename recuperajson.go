@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 func recuperavariabile(variabile string) (result string, err error) {
@@ -24,7 +25,7 @@ func recuperavariabile(variabile string) (result string, err error) {
 
 var test XrsMi001Stru
 
-func recuperajson(device, choisedinterface string) (values TDATA) {
+func recuperajson(device, choisedinterface string) (values []float64) {
 
 	//Recupera la variabile d'ambiente
 	username, err := recuperavariabile("username")
@@ -74,11 +75,10 @@ func recuperajson(device, choisedinterface string) (values TDATA) {
 	body, _ := ioutil.ReadAll(res.Body)
 	defer res.Body.Close()
 
-	if err := json.Unmarshal([]byte(body), &test); err != nil {
-		log.Fatal(err.Error())
-	}
+	// if err := json.Unmarshal([]byte(body), &test); err != nil {
+	// 	log.Fatal(err.Error())
+	// }
 
-	//device = "XrsMi001"
 	//choisedinterface = "Lag99LAGGroup00000000LOGICORMI595Ae5OFFRAMPToRMI595200G"
 	// jsonstring := "test.NetThroughputOut." + device + "." + choisedinterface + ".Data"
 	// fmt.Println(jsonstring)
@@ -87,9 +87,24 @@ func recuperajson(device, choisedinterface string) (values TDATA) {
 	if err != nil {
 		log.Println("errore: ", err.Error())
 	}
-	strs := result["NetThroughputOut"].([]interface{})
-	str1 := strs[0].(string)
-	fmt.Println(str1)
+
+	device = "xrs-mi001"
+	NET := result["net.throughput.out"].(map[string]interface{})
+	DEVICE := NET[device].(map[string]interface{})
+	INT := DEVICE[choisedinterface].(map[string]interface{})
+	DATA := INT["data"].([]interface{})
+
+	for k, v := range DATA {
+		fmt.Println(k, v.(map[string]interface{})["time"], v.(map[string]interface{})["value"])
+		value := fmt.Sprint(v.(map[string]interface{})["value"])
+		val, err := strconv.ParseFloat(value, 64)
+		if err != nil {
+			log.Println("value non converitibile in float64", err.Error())
+		}
+
+		values = append(values, val)
+	}
+	//fmt.Println(detail)
 	// st := refle.sct.TypeOf(test)
 	// field := st.Field(0)
 	// v := field.Tag.Get("2/1/2-100-Gig-Ethernet-ICR-C00228/05-Metropolitano-HNE500C-MI-CLD50-SEABONE-LAG100-")
