@@ -75,8 +75,7 @@ CHOISE:
 	// choisedinterface := listainterfacce2[listainterfacce[choise]]
 	choisedinterface := listainterfacce[choise]
 
-	// nameICR := regexp.MustCompile("(ICR-.[0-9]+/[0-9]+)")
-	// fmt.Println(choisedinterface)
+	
 
 	p, err := plot.New()
 	if err != nil {

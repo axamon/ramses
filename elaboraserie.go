@@ -169,14 +169,15 @@ func elaboraserie(lista []float64, interfaccia string) {
 	//yaryFilt := mat64.Row(nil, 0, filtered)
 
 	err = plotutil.AddLinePoints(p,
-		"Original", generatePoints(xary, yaryOrig[len(yaryOrig)-120:len(yaryOrig)-1]),
+
 		//"Filtered", generatePoints(xary, yaryFilt[len(yaryFilt)-120:]),
 		//"MA3", generatePoints(xary, ma3),
 		//"MA7", generatePoints(xary, ma7),
-		"MA20", generatePoints(xary, ma20[len(ma20)-120:]),
-		"MA100", generatePoints(xary, ma100[len(ma20)-120:]),
-		"UpBollinger", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:len(ma20Upperband)-1]),
-		"LowBollinger", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:len(ma20Lowerband)-1]),
+		"Up 2 sigma", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:len(ma20Upperband)-1]),
+		"Original", generatePoints(xary, yaryOrig[len(yaryOrig)-120:len(yaryOrig)-1]),
+		"Media mobile 20", generatePoints(xary, ma20[len(ma20)-120:]),
+		"Media mobile 100", generatePoints(xary, ma100[len(ma20)-120:]),
+		"Low 2 sigma", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:len(ma20Lowerband)-1]),
 	)
 	if err != nil {
 		log.Println(err)
