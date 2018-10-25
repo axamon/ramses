@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Pallinder/go-randomdata"
+	"regexp"
 
 	//"github.com/spf13/viper"
 
@@ -19,9 +19,17 @@ import (
 	"os"
 )
 
-func elaboraserie(lista []float64) {
+func elaboraserie(lista []float64, interfaccia string) {
 
 	speeds := lista
+
+	re := regexp.MustCompile("(ICR-.[0-9]+/[0-9]+)")
+	nameICR := re.FindStringSubmatch(interfaccia)[0]
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	nomeimmagine := reg.ReplaceAllString(nameICR, "")
+
+	// fmt.Println(choisedinterface)
+
 	//var numchunks int
 	//numchunks = len(speeds)
 
@@ -66,7 +74,7 @@ func elaboraserie(lista []float64) {
 	sma3 := ma.ThreadSafe(ma.NewSMA(3))   //creo una moving average a 3
 	sma7 := ma.ThreadSafe(ma.NewSMA(7))   //creo una moving average a 7
 	sma20 := ma.ThreadSafe(ma.NewSMA(20)) //creo una moving average a 20
-
+	sma100 := ma.ThreadSafe(ma.NewSMA(100))
 	//
 	// kalman filter
 	//
@@ -96,6 +104,7 @@ func elaboraserie(lista []float64) {
 	ma3 := make([]float64, 0, n)
 	ma7 := make([]float64, 0, n)
 	ma20 := make([]float64, 0, n)
+	ma100 := make([]float64, 0, n)
 	ma20Upperband := make([]float64, 0, n)
 	ma20Lowerband := make([]float64, 0, n)
 
@@ -118,34 +127,40 @@ func elaboraserie(lista []float64) {
 
 		xary = append(xary, x)
 
-		ma3 = append(ma3, sma3.Add(y))    //aggiung alla media mobile il nuovo valore e storo la media
-		ma7 = append(ma7, sma7.Add(y))    //aggiung alla media mobile il nuovo valore e storo la media
-		ma20 = append(ma20, sma20.Add(y)) //aggiung alla media mobile il nuovo valore e storo la media
-		yaryOrig = append(yaryOrig, y-ma20[i])
+		ma3 = append(ma3, sma3.Add(y))       //aggiung alla media mobile il nuovo valore e storo la media
+		ma7 = append(ma7, sma7.Add(y))       //aggiung alla media mobile il nuovo valore e storo la media
+		ma20 = append(ma20, sma20.Add(y))    //aggiung alla media mobile il nuovo valore e storo la media
+		ma100 = append(ma100, sma100.Add(y)) //aggiung alla media mobile il nuovo valore e storo la media
+		//yaryOrig = append(yaryOrig, y-ma20[i])
+		yaryOrig = append(yaryOrig, y)
 
 		var devstdBands float64
-		if i >= 20 {
-			devstdBands = stat.StdDev(speeds[i-19:i], nil)
+		if i >= 100 {
+			devstdBands = stat.StdDev(speeds[i-99:i], nil)
 		}
 		// ma20Upperband = append(ma20Upperband, sma20.Avg()+3*devstdBands)
 		// ma20Lowerband = append(ma20Lowerband, sma20.Avg()-3*devstdBands)
-
-		ma20Upperband = append(ma20Upperband, yaryOrig[i]+2*devstdBands)
-		ma20Lowerband = append(ma20Lowerband, yaryOrig[i]-2*devstdBands)
+		var sigma float64
+		sigma = 2
+		ma20Upperband = append(ma20Upperband, sma20.Avg()+sigma*devstdBands)
+		ma20Lowerband = append(ma20Lowerband, sma20.Avg()-sigma*devstdBands)
 
 		//Verifica anomalia
-		if yaryOrig[i] > ma20Upperband[i] {
-			fmt.Fprint(os.Stderr, "violazione soglia:", yaryOrig[i], xary[i], "\n")
-			// if i >= len(yaryOrig)-120 {
+		if i > len(speeds)-120 {
+			if yaryOrig[i] > ma20Upperband[i] {
+				fmt.Fprint(os.Stderr, "violazione soglia:", yaryOrig[i], xary[i], "\n")
+				// if i >= len(yaryOrig)-120 {
 
-			// 	ptp := make([]plotter.XYer, 120)
-			// 	xys := make(plotter.XYs, 120)
-			// 	ptp[i] = xys
-			// 	xys[i].X = xary[i]
-			// 	xys[i].Y = yaryOrig[i]
-			// 	plotutil.AddScatters(p, ptp[i])
+				// 	ptp := make([]plotter.XYer, 120)
+				// 	xys := make(plotter.XYs, 120)
+				// 	ptp[i] = xys
+				// 	xys[i].X = xary[i]
+				// 	xys[i].Y = yaryOrig[i]
+				// 	plotutil.AddScatters(p, ptp[i]
+				//)
 
-			// }
+				// }
+			}
 		}
 
 	}
@@ -158,7 +173,8 @@ func elaboraserie(lista []float64) {
 		//"Filtered", generatePoints(xary, yaryFilt[len(yaryFilt)-120:]),
 		//"MA3", generatePoints(xary, ma3),
 		//"MA7", generatePoints(xary, ma7),
-		//"MA20", generatePoints(xary, ma20[len(ma20)-120:]),
+		"MA20", generatePoints(xary, ma20[len(ma20)-120:]),
+		"MA100", generatePoints(xary, ma100[len(ma20)-120:]),
 		"UpBollinger", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:len(ma20Upperband)-1]),
 		"LowBollinger", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:len(ma20Lowerband)-1]),
 	)
@@ -167,8 +183,7 @@ func elaboraserie(lista []float64) {
 	}
 
 	// Save the plot to a PNG file.
-	name := randomdata.FirstName(1) //da cambiare
-	if err := p.Save(8*vg.Inch, 4*vg.Inch, name+".png"); err != nil {
+	if err := p.Save(8*vg.Inch, 4*vg.Inch, nomeimmagine+".png"); err != nil {
 		panic(err)
 	}
 }

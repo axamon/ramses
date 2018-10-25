@@ -94,8 +94,8 @@ func recuperajson(device, choisedinterface string) (values []float64) {
 	INT := DEVICE[choisedinterface].(map[string]interface{})
 	DATA := INT["data"].([]interface{})
 
-	for k, v := range DATA {
-		fmt.Println(k, v.(map[string]interface{})["time"], v.(map[string]interface{})["value"])
+	for _, v := range DATA {
+		//fmt.Println(k, v.(map[string]interface{})["time"], v.(map[string]interface{})["value"])
 		value := fmt.Sprint(v.(map[string]interface{})["value"])
 		val, err := strconv.ParseFloat(value, 64)
 		if err != nil {

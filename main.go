@@ -75,7 +75,8 @@ CHOISE:
 	// choisedinterface := listainterfacce2[listainterfacce[choise]]
 	choisedinterface := listainterfacce[choise]
 
-	fmt.Println(choisedinterface)
+	// nameICR := regexp.MustCompile("(ICR-.[0-9]+/[0-9]+)")
+	// fmt.Println(choisedinterface)
 
 	p, err := plot.New()
 	if err != nil {
@@ -89,7 +90,7 @@ CHOISE:
 
 	values := recuperajson(device, choisedinterface)
 	//fmt.Println(values) //debug
-	elaboraserie(values)
+	elaboraserie(values, choisedinterface)
 }
 
 // 	sample := elaborapunti(values)
