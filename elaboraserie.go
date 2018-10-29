@@ -20,6 +20,8 @@ import (
 )
 
 func elaboraserie(lista []float64, device, interfaccia string) {
+
+	//Finita la funzione notifica il waitgroup
 	defer wg.Done()
 
 	speeds := lista
@@ -35,17 +37,20 @@ func elaboraserie(lista []float64, device, interfaccia string) {
 	// 	nameICR := subnames[0]
 	// }
 
+	//Crea un nome per l'immagine che sia più contenuto del nomee interfaccia
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	nomeimmagine := reg.ReplaceAllString(interfaccia, "")
 
-	sma3 := ma.ThreadSafe(ma.NewSMA(3))   //creo una moving average a 3
-	sma7 := ma.ThreadSafe(ma.NewSMA(7))   //creo una moving average a 7
-	sma20 := ma.ThreadSafe(ma.NewSMA(20)) //creo una moving average a 20
-	sma100 := ma.ThreadSafe(ma.NewSMA(100))
+	//Creazione medie mobili di interesse
+	sma3 := ma.ThreadSafe(ma.NewSMA(3))     //creo una moving average a 3
+	sma7 := ma.ThreadSafe(ma.NewSMA(7))     //creo una moving average a 7
+	sma20 := ma.ThreadSafe(ma.NewSMA(20))   //creo una moving average a 20
+	sma100 := ma.ThreadSafe(ma.NewSMA(100)) //creo una moving average a 100
 
 	n := len(speeds)
 	//fmt.Println(n)
 
+	//Crea contenitori parametrizzati al numero n di elementi in entrata
 	x, dx := 0.0, 0.01
 	xary := make([]float64, 0, n)
 	yaryOrig := make([]float64, 0, n)
@@ -60,12 +65,15 @@ func elaboraserie(lista []float64, device, interfaccia string) {
 	// plot
 	//
 
+	//Inzializza il grafico
 	p, err := plot.New()
 	if err != nil {
 		panic(err)
 	}
 
+	//inzializza il puntatore
 	var i int
+
 	//aryOrig := speeds
 	for i = 0; i < n; i++ {
 		//y := math.Sin(x) + 0.1*(rand.NormFloat64()-0.5)
@@ -97,10 +105,12 @@ func elaboraserie(lista []float64, device, interfaccia string) {
 		if i > len(speeds)-3 { //Confronto solo gli ultimi3 valori per un ROPL di 15 minuti
 			if yaryOrig[i] > ma20Upperband[i] {
 				fmt.Fprint(os.Stderr, "violazione soglia alta:", device, interfaccia, yaryOrig[i], xary[i], "\n")
+				//TODO inviare alert
 			}
 
 			if yaryOrig[i] < ma20Lowerband[i] {
 				fmt.Fprint(os.Stderr, "violazione soglia bassa:", device, interfaccia, yaryOrig[i], xary[i], "\n")
+				//TODO inviare alert
 			}
 		}
 	}
@@ -124,7 +134,11 @@ func elaboraserie(lista []float64, device, interfaccia string) {
 	}
 
 	// Save the plot to a PNG file.
+
+	//imposta su due righe del grafico nome apparato e interfaccia
 	p.Title.Text = device + "\n " + interfaccia
+
+	//SALVA IL GRAFICO
 	if err := p.Save(8*vg.Inch, 4*vg.Inch, nomeimmagine+".png"); err != nil {
 		panic(err)
 	}
