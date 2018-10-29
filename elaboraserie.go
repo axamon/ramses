@@ -19,7 +19,7 @@ import (
 	"os"
 )
 
-func elaboraserie(lista []float64, device, interfaccia string) {
+func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 
 	//Finita la funzione notifica il waitgroup
 	defer wg.Done()
@@ -136,10 +136,10 @@ func elaboraserie(lista []float64, device, interfaccia string) {
 	// Save the plot to a PNG file.
 
 	//imposta su due righe del grafico nome apparato e interfaccia
-	p.Title.Text = device + "\n " + interfaccia
+	p.Title.Text = device + "\n " + interfaccia + "\n" + metrica
 
 	//SALVA IL GRAFICO
-	if err := p.Save(8*vg.Inch, 4*vg.Inch, nomeimmagine+".png"); err != nil {
+	if err := p.Save(8*vg.Inch, 4*vg.Inch, nomeimmagine+metrica+".png"); err != nil {
 		panic(err)
 	}
 	return
