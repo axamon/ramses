@@ -138,8 +138,21 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 	//imposta su due righe del grafico nome apparato e interfaccia
 	p.Title.Text = device + "\n " + interfaccia + "\n" + metrica
 
+	path1 := "./grafici"
+	path2 := path1 + "/" + device
+	path3 := path2 + "/" + metrica
+
+	paths := []string{path1, path2, path3}
+
+	for _, path := range paths {
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			os.Mkdir(path, 664)
+		}
+	}
+	fmt.Println(path3)
+
 	//SALVA IL GRAFICO
-	if err := p.Save(8*vg.Inch, 4*vg.Inch, nomeimmagine+metrica+".png"); err != nil {
+	if err := p.Save(8*vg.Inch, 4*vg.Inch, path3+"/"+nomeimmagine+".png"); err != nil {
 		panic(err)
 	}
 	return

@@ -4,4 +4,6 @@ Attingendo ai dati di IPDOM Ramses elabora un grafico delle ultime 10 ore per tu
 
 Forse avrei dovuto mettere qualche virgola nel periodo di prima...
 
-Enjoy dal vostro amichevole Gopher di quartiere.
+Enjoy! 
+
+Dal vostro amichevole Gopher di quartiere.

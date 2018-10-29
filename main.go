@@ -25,11 +25,15 @@ var metriche = []string{
 var listainterfacce []string
 
 //Waitgroupche gestisce il throtteling
-var wg = sizedwaitgroup.New(8)
+var wg = sizedwaitgroup.New(20)
 
 //var wg waitgroup //waitgroup vecchio stile
 
 func main() {
+
+	if _, err := os.Stat("./grafici"); os.IsNotExist(err) {
+		os.Mkdir("./grafici", 664)
+	}
 
 	device := os.Args[1]
 
