@@ -26,7 +26,7 @@ func ifNames(device string) (interfacce []string) {
 		return
 	}
 
-	url := "https://ipw.telecomitalia.it/ipwmetrics/api/v1/metrics/net.throughput.out/" + device
+	url := ipdomainurl + device
 
 	req, _ := http.NewRequest("GET", url, nil)
 
@@ -55,11 +55,11 @@ func ifNames(device string) (interfacce []string) {
 		log.Println("errore: ", err.Error())
 	}
 
-	//device = "xrs-mi001"
+	//device = "xrs-mi001" //Debug esempio di devise esistente su ipdom
 	NET := result["net.throughput.out"].(map[string]interface{})
 	DEVICE := NET[device].(map[string]interface{})
 
-	for ifname, _ := range DEVICE {
+	for ifname := range DEVICE {
 		//fmt.Println(k, v.(map[string]interface{})["time"], v.(map[string]interface{})["value"])
 		interfacce = append(interfacce, ifname)
 	}
@@ -79,8 +79,6 @@ func recuperavariabile(variabile string) (result string, err error) {
 //Perchè la concorrency non si incasini serve un bel waitgroup
 //var wg sync.WaitGroup
 
-var test XrsMi001Stru
-
 func recuperajson(device string, ifnames []string) {
 
 	//Recupera la variabile d'ambiente
@@ -90,17 +88,15 @@ func recuperajson(device string, ifnames []string) {
 		return
 	}
 
+	//Recupera la variabile d'ambiente
 	password, err := recuperavariabile("password")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	url := "https://ipw.telecomitalia.it/ipwmetrics/api/v1/metrics/net.throughput.out/" + device
+	url := ipdomainurl + device
 	file := device + ".json"
-
-	//getxml scarica il file in "url" e lo salva in locale con nome "file"
-	//func getxml(url string, file string)  {
 
 	req, _ := http.NewRequest("GET", url, nil)
 
@@ -123,62 +119,43 @@ func recuperajson(device string, ifnames []string) {
 	body, _ := ioutil.ReadAll(res.Body)
 	defer res.Body.Close()
 
-	// if err := json.Unmarshal([]byte(body), &test); err != nil {
-	// 	log.Fatal(err.Error())
-	// }
-
-	//choisedinterface = "Lag99LAGGroup00000000LOGICORMI595Ae5OFFRAMPToRMI595200G"
-	// jsonstring := "test.NetThroughputOut." + device + "." + choisedinterface + ".Data"
-	// fmt.Println(jsonstring)
+	//recupera il risultato della query a ipdom
 	var result map[string]interface{}
 	err = json.Unmarshal([]byte(body), &result)
 	if err != nil {
 		log.Println("errore: ", err.Error())
 	}
 
+	//Viene preso in considerazione solo il throughput.out ma si può gestire anche altre metriche
 	NET := result["net.throughput.out"].(map[string]interface{})
 	DEVICE := NET[device].(map[string]interface{})
 
+	//Prendo una interfaccia alla volta ed eseguo il for
 	for _, ifname := range ifnames {
 		log.Printf("Inzio elaborazione %s\n", ifname)
+
+		//Ripulisco la variabile values per ingestare i nuovi valori della nuova interfaccia
 		var values []float64
 		INT := DEVICE[ifname].(map[string]interface{})
 		DATA := INT["data"].([]interface{})
 
+		//Estraggo i valori per ogni interfaccia
 		for _, v := range DATA {
 			//fmt.Println(k, v.(map[string]interface{})["time"], v.(map[string]interface{})["value"])
 			value := fmt.Sprint(v.(map[string]interface{})["value"])
 			val, err := strconv.ParseFloat(value, 64)
 			if err != nil {
+				//se si fossero valori non numerici così me ne accorgo e non si impanica nulla
 				log.Println("value non converitibile in float64", err.Error())
 			}
 
+			//appendo a values il nuovo valore
 			values = append(values, val)
 
 		}
 		wg.Add()
 		go elaboraserie(values, device, ifname)
 	}
-	//fmt.Println(detail)
-	// st := refle.sct.TypeOf(test)
-	// field := st.Field(0)
-	// v := field.Tag.Get("2/1/2-100-Gig-Ethernet-ICR-C00228/05-Metropolitano-HNE500C-MI-CLD50-SEABONE-LAG100-")
-	// fmt.Println(v)
-	//fmt.Println(result["2/1/2-100-Gig-Ethernet-ICR-C00228/05-Metropolitano-HNE500C-MI-CLD50-SEABONE-LAG100-"])
-	// e := reflect.TypeOf(&test).Elem()
-	// getValues(e, device, choisedinterface)
-	// s := structs.New(test)
-	// p := s.Field("NetThroughputOut").Field("XrsMi001").Field("A110100EthernetTX").Field("Data").Fields()
-	// fmt.Println(p)
-	//values = "test.NetThroughputOut." + device + "." + choisedinterface + ".Data"
-
-	//values = structpath
-	// tlen := len(t) - 1
-	// for i := 0; i <= tlen; i++ {
-	// 	values[i] = t[i].Value
-	// 	//fmt.Println(t[i].Value)
-	// }
-	// //fmt.Println(tlen)
 
 	//Crea il file dove salvare i dati, se non ci risce impanica tutto ed esce.
 	f, err := os.Create(file)
@@ -190,6 +167,8 @@ func recuperajson(device string, ifnames []string) {
 	f.Write(body)
 	//wg.Done()
 
+	//Attende che siano finite tutte le elaborazioni prima di chiudere
 	wg.Wait()
+
 	return
 }

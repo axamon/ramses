@@ -94,7 +94,7 @@ func elaboraserie(lista []float64, device, interfaccia string) {
 		ma20Lowerband = append(ma20Lowerband, sma20.Avg()-sigma*devstdBands)
 
 		//Verifica anomalie
-		if i > len(speeds)-3 { //Confronto solo gli ultimi3 valori per un ROPLdi 15 minuti
+		if i > len(speeds)-3 { //Confronto solo gli ultimi3 valori per un ROPL di 15 minuti
 			if yaryOrig[i] > ma20Upperband[i] {
 				fmt.Fprint(os.Stderr, "violazione soglia alta:", device, interfaccia, yaryOrig[i], xary[i], "\n")
 			}

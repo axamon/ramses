@@ -8,6 +8,10 @@ import (
 	"github.com/remeh/sizedwaitgroup"
 )
 
+const (
+	ipdomainurl string = "https://ipw.telecomitalia.it/ipwmetrics/api/v1/metrics/net.throughput.out/"
+)
+
 //Dove salvere il nome delle interfacce
 var listainterfacce []string
 var listainterfacce2 = make(map[string]string)
