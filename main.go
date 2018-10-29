@@ -4,14 +4,17 @@ import (
 	"log"
 	"os"
 	"reflect"
-	"sync"
+
+	"github.com/remeh/sizedwaitgroup"
 )
 
 //Dove salvere il nome delle interfacce
 var listainterfacce []string
 var listainterfacce2 = make(map[string]string)
 
-var wg sync.WaitGroup
+var wg = sizedwaitgroup.New(8)
+
+//var wg waitgroup
 
 func printTags(t reflect.Type) {
 	for i := 0; i < t.NumField(); i++ {
@@ -85,13 +88,7 @@ func main() {
 	// p.X.Label.Text = "X"
 	// p.Y.Label.Text = "Y"
 
-	for _, interfaccia := range ifnames {
+	recuperajson(device, ifnames)
 
-		values := recuperajson(device, interfaccia)
-		//fmt.Println(values) //debug
-		wg.Add(1)
-		go elaboraserie(values, device, interfaccia)
-	}
-	wg.Wait()
 	log.Printf("Elaborazione per %s terminata\n", device)
 }

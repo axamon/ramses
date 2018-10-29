@@ -81,7 +81,7 @@ func recuperavariabile(variabile string) (result string, err error) {
 
 var test XrsMi001Stru
 
-func recuperajson(device, choisedinterface string) (values []float64) {
+func recuperajson(device string, ifnames []string) {
 
 	//Recupera la variabile d'ambiente
 	username, err := recuperavariabile("username")
@@ -95,15 +95,7 @@ func recuperajson(device, choisedinterface string) (values []float64) {
 		log.Fatal(err)
 		return
 	}
-	//device = xrs-mi001
-	//for {
-	//Scaricare in parallelo i 3 file xml che float64eressano
-	//wg.Add(1)
-	//getxml(, device+".json")
-	//wg.Wait()
-	//time.Sleep(5 * time.Minute)
-	//	}
-	//}
+
 	url := "https://ipw.telecomitalia.it/ipwmetrics/api/v1/metrics/net.throughput.out/" + device
 	file := device + ".json"
 
@@ -144,21 +136,25 @@ func recuperajson(device, choisedinterface string) (values []float64) {
 		log.Println("errore: ", err.Error())
 	}
 
-	//device = "xrs-mi001"
-	NET := result["net.throughput.out"].(map[string]interface{})
-	DEVICE := NET[device].(map[string]interface{})
-	INT := DEVICE[choisedinterface].(map[string]interface{})
-	DATA := INT["data"].([]interface{})
+	for _, ifname := range ifnames {
+		var values []float64
+		NET := result["net.throughput.out"].(map[string]interface{})
+		DEVICE := NET[device].(map[string]interface{})
+		INT := DEVICE[ifname].(map[string]interface{})
+		DATA := INT["data"].([]interface{})
 
-	for _, v := range DATA {
-		//fmt.Println(k, v.(map[string]interface{})["time"], v.(map[string]interface{})["value"])
-		value := fmt.Sprint(v.(map[string]interface{})["value"])
-		val, err := strconv.ParseFloat(value, 64)
-		if err != nil {
-			log.Println("value non converitibile in float64", err.Error())
+		for _, v := range DATA {
+			//fmt.Println(k, v.(map[string]interface{})["time"], v.(map[string]interface{})["value"])
+			value := fmt.Sprint(v.(map[string]interface{})["value"])
+			val, err := strconv.ParseFloat(value, 64)
+			if err != nil {
+				log.Println("value non converitibile in float64", err.Error())
+			}
+
+			values = append(values, val)
+			wg.Add()
+			go elaboraserie(values, device, ifname)
 		}
-
-		values = append(values, val)
 	}
 	//fmt.Println(detail)
 	// st := refle.sct.TypeOf(test)
@@ -191,5 +187,6 @@ func recuperajson(device, choisedinterface string) (values []float64) {
 	f.Write(body)
 	//wg.Done()
 
-	return values
+	wg.Wait()
+	return
 }
