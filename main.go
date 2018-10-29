@@ -31,10 +31,8 @@ var wg = sizedwaitgroup.New(20)
 
 func main() {
 
-	if _, err := os.Stat("./grafici"); os.IsNotExist(err) {
-		os.Mkdir("./grafici", 664)
-	}
-
+	
+	
 	device := os.Args[1]
 
 	//	ifnames := ifNames(device)
