@@ -19,14 +19,24 @@ import (
 	"os"
 )
 
-func elaboraserie(lista []float64, interfaccia string) {
+func elaboraserie(lista []float64, device, interfaccia string) {
+	defer wg.Done()
 
 	speeds := lista
 
-	re := regexp.MustCompile("(ICR-.[0-9]+/[0-9]+)")
-	nameICR := re.FindStringSubmatch(interfaccia)[0]
+	if len(speeds) < 120 {
+		log.Println("Non ci sono abbastanza dati:", device, interfaccia)
+		return
+	}
+
+	// re := regexp.MustCompile("(ICR-.[0-9]+/[0-9]+)")
+	// subnames := re.FindStringSubmatch(interfaccia)
+	// if len(subnames) >= 0 {
+	// 	nameICR := subnames[0]
+	// }
+
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
-	nomeimmagine := reg.ReplaceAllString(nameICR, "")
+	nomeimmagine := reg.ReplaceAllString(interfaccia, "")
 
 	// fmt.Println(choisedinterface)
 
@@ -184,6 +194,7 @@ func elaboraserie(lista []float64, interfaccia string) {
 	}
 
 	// Save the plot to a PNG file.
+	p.Title.Text = device + "\n " + interfaccia
 	if err := p.Save(8*vg.Inch, 4*vg.Inch, nomeimmagine+".png"); err != nil {
 		panic(err)
 	}
