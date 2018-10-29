@@ -136,10 +136,12 @@ func recuperajson(device string, ifnames []string) {
 		log.Println("errore: ", err.Error())
 	}
 
+	NET := result["net.throughput.out"].(map[string]interface{})
+	DEVICE := NET[device].(map[string]interface{})
+
 	for _, ifname := range ifnames {
+		log.Printf("Inzio elaborazione %s\n", ifname)
 		var values []float64
-		NET := result["net.throughput.out"].(map[string]interface{})
-		DEVICE := NET[device].(map[string]interface{})
 		INT := DEVICE[ifname].(map[string]interface{})
 		DATA := INT["data"].([]interface{})
 
@@ -152,9 +154,10 @@ func recuperajson(device string, ifnames []string) {
 			}
 
 			values = append(values, val)
-			wg.Add()
-			go elaboraserie(values, device, ifname)
+
 		}
+		wg.Add()
+		go elaboraserie(values, device, ifname)
 	}
 	//fmt.Println(detail)
 	// st := refle.sct.TypeOf(test)

@@ -198,6 +198,7 @@ func elaboraserie(lista []float64, device, interfaccia string) {
 	if err := p.Save(8*vg.Inch, 4*vg.Inch, nomeimmagine+".png"); err != nil {
 		panic(err)
 	}
+	return
 }
 
 func generatePoints(x []float64, y []float64) plotter.XYs {
