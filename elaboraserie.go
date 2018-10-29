@@ -38,76 +38,14 @@ func elaboraserie(lista []float64, device, interfaccia string) {
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 	nomeimmagine := reg.ReplaceAllString(interfaccia, "")
 
-	// fmt.Println(choisedinterface)
-
-	//var numchunks int
-	//numchunks = len(speeds)
-
-	//mean := stat.Mean(speeds, nil)
-	//fmt.Printf("Media: %.3f\n", stat.Mean(speeds, nil))
-	//harmonicmean := stat.HarmonicMean(speeds, nil)
-
-	//fmt.Printf("MediaArmonica: %.3f\n", stat.HarmonicMean(speeds, nil))
-	//mode, _ := stat.Mode(speeds, nil)
-	//mean, _ := stat.Mode(speeds, nil)
-
-	//fmt.Printf("Moda: %.3f\n", mode)
-	//nums := speeds
-	//fmt.Println(len(nums))
-	//entropy := stat.Entropy(nums)
-	//sort.Float64s(nums) //Mette in ordine nums
-	//fmt.Printf("Mediana: %.3f\n", stat.Quantile(0.5, stat.Empirical, nums, nil))
-	//median := stat.Quantile(0.5, stat.Empirical, nums, nil)
-	//percentile95 := stat.Quantile(0.95, stat.Empirical, nums, nil)
-
-	//stdev := stat.StdDev(speeds, nil)
-	//stderr := stat.StdErr(stdev, float64(numchunks))
-	//fmt.Printf("StDev: %.3f\n", stat.StdDev(speeds, nil))
-	//skew := stat.Skew(speeds, nil)
-	//fmt.Printf("Skew: %.3f\n", stat.Skew(speeds, nil))
-	//curtosi := stat.ExKurtosis(speeds, nil)
-	//chisquare := stat.ChiSquare(nums, speeds)
-
-	/* l, err := json.Marshal(fe)
-	if err != nil {
-		log.Println(err.Error())
-	}
-	fmt.Println(string(l)) */
-	// 	kalmansample(speeds, stdev)
-
-	// 	return
-
-	// }
-
-	// func kalmansample(speeds []float64, stdev float64) {
-
 	sma3 := ma.ThreadSafe(ma.NewSMA(3))   //creo una moving average a 3
 	sma7 := ma.ThreadSafe(ma.NewSMA(7))   //creo una moving average a 7
 	sma20 := ma.ThreadSafe(ma.NewSMA(20)) //creo una moving average a 20
 	sma100 := ma.ThreadSafe(ma.NewSMA(100))
-	//
-	// kalman filter
-	//
-
-	//sstd := 0.000001
-	//sstd := stdev
-	//ostd := 0.5
-
-	// trend model
-	//filter, err := kalman.New(&kalman.Config{
-	// 	F: mat64.NewDense(2, 2, []float64{2, -1, 1, 0}),
-	// 	G: mat64.NewDense(2, 1, []float64{1, 0}),
-	// 	Q: mat64.NewDense(1, 1, []float64{sstd}),
-	// 	H: mat64.NewDense(1, 2, []float64{1, 0}),
-	// 	R: mat64.NewDense(1, 1, []float64{ostd}),
-	// })
-	// if err != nil {
-	// 	panic(err)
-	// }
 
 	n := len(speeds)
-	fmt.Println(n)
-	//s := mat64.NewDense(1, n, nil)
+	//fmt.Println(n)
+
 	x, dx := 0.0, 0.01
 	xary := make([]float64, 0, n)
 	yaryOrig := make([]float64, 0, n)
@@ -155,24 +93,16 @@ func elaboraserie(lista []float64, device, interfaccia string) {
 		ma20Upperband = append(ma20Upperband, sma20.Avg()+sigma*devstdBands)
 		ma20Lowerband = append(ma20Lowerband, sma20.Avg()-sigma*devstdBands)
 
-		//Verifica anomalia
-		if i > len(speeds)-120 {
+		//Verifica anomalie
+		if i > len(speeds)-3 { //Confronto solo gli ultimi3 valori per un ROPLdi 15 minuti
 			if yaryOrig[i] > ma20Upperband[i] {
-				fmt.Fprint(os.Stderr, "violazione soglia:", yaryOrig[i], xary[i], "\n")
-				// if i >= len(yaryOrig)-120 {
+				fmt.Fprint(os.Stderr, "violazione soglia alta:", device, interfaccia, yaryOrig[i], xary[i], "\n")
+			}
 
-				// 	ptp := make([]plotter.XYer, 120)
-				// 	xys := make(plotter.XYs, 120)
-				// 	ptp[i] = xys
-				// 	xys[i].X = xary[i]
-				// 	xys[i].Y = yaryOrig[i]
-				// 	plotutil.AddScatters(p, ptp[i]
-				//)
-
-				// }
+			if yaryOrig[i] < ma20Lowerband[i] {
+				fmt.Fprint(os.Stderr, "violazione soglia bassa:", device, interfaccia, yaryOrig[i], xary[i], "\n")
 			}
 		}
-
 	}
 
 	//filtered := filter.Filter(s)
