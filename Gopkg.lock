@@ -3,12 +3,6 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/Pallinder/go-randomdata"
-  packages = ["."]
-  revision = "15df0648130a623e418886f81b2aaecd0a00547b"
-
-[[projects]]
-  branch = "master"
   name = "github.com/ajstarks/svgo"
   packages = ["."]
   revision = "6ce6a3bcf6cde6c5007887677ebd148ec30f42a4"
@@ -22,51 +16,6 @@
     "truetype"
   ]
   revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/gonum/blas"
-  packages = [
-    ".",
-    "blas64",
-    "native",
-    "native/internal/math32"
-  ]
-  revision = "e7c5890b24cf6f3bb173f76e1bd71e80e887e3f9"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/gonum/floats"
-  packages = ["."]
-  revision = "7de1f4ea7ab57890bfd427af68c7994cd67975d4"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/gonum/internal"
-  packages = [
-    "asm/f32",
-    "asm/f64"
-  ]
-  revision = "fda53f8d25717c07e2dac25758075a182bd74235"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/gonum/lapack"
-  packages = [
-    ".",
-    "lapack64",
-    "native"
-  ]
-  revision = "f0b8b25edeceafb3a2752941c7bf0cda962df112"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/gonum/matrix"
-  packages = [
-    ".",
-    "mat64"
-  ]
-  revision = "a41cc49d4c29f7451775f4379a5cc6ec6239dfab"
 
 [[projects]]
   name = "github.com/jung-kurt/gofpdf"
@@ -92,9 +41,9 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/ryskiwt/go-kalman"
+  name = "github.com/remeh/sizedwaitgroup"
   packages = ["."]
-  revision = "4f4ccfb3b9089bcb76f1b82e2f63f211fb22e25e"
+  revision = "5e7302b12ccef91dce9fde2f5bda6d5c7ea5d2eb"
 
 [[projects]]
   branch = "master"
@@ -157,6 +106,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "b906700e2d288dd7c88d6edca1410dc2f10a58a1cea8c7ee462ab8771b636cec"
+  inputs-digest = "e470cd0d21065264e474456c4525c0436a25eb3ad1a3365ff115a13a18f6f3b2"
   solver-name = "gps-cdcl"
   solver-version = 1
