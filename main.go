@@ -31,8 +31,6 @@ var wg = sizedwaitgroup.New(20)
 
 func main() {
 
-	
-	
 	device := os.Args[1]
 
 	//	ifnames := ifNames(device)

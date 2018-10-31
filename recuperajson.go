@@ -41,7 +41,7 @@ func recuperajson(device string) {
 		fmt.Println(url)
 
 		//url := ipdomainurl + device
-		file := device + metrica + ".json"
+		file := device + "_" + metrica + ".json"
 
 		req, _ := http.NewRequest("GET", url, nil)
 
