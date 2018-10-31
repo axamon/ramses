@@ -2,6 +2,7 @@ package main
 
 import (
 	"regexp"
+	"strconv"
 
 	//"github.com/spf13/viper"
 
@@ -14,7 +15,6 @@ import (
 
 	//"compress/gzip"
 
-	"fmt"
 	"log"
 	"os"
 )
@@ -27,7 +27,7 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 	speeds := lista
 
 	if len(speeds) < 120 {
-		log.Println("Non ci sono abbastanza dati:", device, interfaccia)
+		//log.Println("Non ci sono abbastanza dati:", device, interfaccia)
 		return
 	}
 
@@ -96,20 +96,21 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 		}
 		// ma20Upperband = append(ma20Upperband, sma20.Avg()+3*devstdBands)
 		// ma20Lowerband = append(ma20Lowerband, sma20.Avg()-3*devstdBands)
-		var sigma float64
-		sigma = 2
+
 		ma20Upperband = append(ma20Upperband, sma20.Avg()+sigma*devstdBands)
 		ma20Lowerband = append(ma20Lowerband, sma20.Avg()-sigma*devstdBands)
 
 		//Verifica anomalie
 		if i > len(speeds)-3 { //Confronto solo gli ultimi3 valori per un ROPL di 15 minuti
 			if yaryOrig[i] > ma20Upperband[i] {
-				fmt.Fprint(os.Stderr, "violazione soglia alta:", device, interfaccia, yaryOrig[i], xary[i], "\n")
+				log.Printf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+				//fmt.Fprint(os.Stderr, "violazione soglia alta:", device, interfaccia, metrica, yaryOrig[i], xary[i], "\n")
 				//TODO inviare alert
 			}
 
 			if yaryOrig[i] < ma20Lowerband[i] {
-				fmt.Fprint(os.Stderr, "violazione soglia bassa:", device, interfaccia, yaryOrig[i], xary[i], "\n")
+				log.Printf("Violata soglia bassa %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+				//fmt.Fprint(os.Stderr, "violazione soglia bassa:", device, interfaccia, metrica, yaryOrig[i], xary[i], "\n")
 				//TODO inviare alert
 			}
 		}
@@ -118,16 +119,20 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 	//filtered := filter.Filter(s)
 	//yaryFilt := mat64.Row(nil, 0, filtered)
 
+	//salva sigma come string
+	sigmastring := strconv.FormatFloat(sigma, 'f', 1, 64)
+
 	err = plotutil.AddLinePoints(p,
 
 		//"Filtered", generatePoints(xary, yaryFilt[len(yaryFilt)-120:]),
 		//"MA3", generatePoints(xary, ma3),
 		//"MA7", generatePoints(xary, ma7),
-		"Up 2 sigma", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:len(ma20Upperband)-1]),
+
+		"Up "+sigmastring+" sigma", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:len(ma20Upperband)-1]),
 		"Original", generatePoints(xary, yaryOrig[len(yaryOrig)-120:len(yaryOrig)-1]),
 		"Media mobile 20", generatePoints(xary, ma20[len(ma20)-120:]),
 		"Media mobile 100", generatePoints(xary, ma100[len(ma20)-120:]),
-		"Low 2 sigma", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:len(ma20Lowerband)-1]),
+		"Low "+sigmastring+" sigma", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:len(ma20Lowerband)-1]),
 	)
 	if err != nil {
 		log.Println(err)
@@ -149,7 +154,7 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 			os.Mkdir(path, 664)
 		}
 	}
-	fmt.Println(path3)
+	//fmt.Println(path3) //debug
 
 	//SALVA IL GRAFICO
 	if err := p.Save(8*vg.Inch, 4*vg.Inch, path3+"/"+nomeimmagine+".png"); err != nil {

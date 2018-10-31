@@ -38,7 +38,7 @@ func recuperajson(device string) {
 
 	for _, metrica := range metriche {
 		url := ipdomainurl + metrica + "/" + device
-		fmt.Println(url)
+		//fmt.Println(url)
 
 		//url := ipdomainurl + device
 		file := device + "_" + metrica + ".json"
@@ -83,7 +83,7 @@ func recuperajson(device string) {
 
 		//Prendo una interfaccia alla volta ed eseguo il for
 		for _, ifname := range listainterfacce {
-			log.Printf("Inzio elaborazione %s\n", ifname)
+			//log.Printf("Inzio elaborazione %s\n", ifname)
 
 			//Ripulisco la variabile values per ingestare i nuovi valori della nuova interfaccia
 			var values []float64
@@ -109,7 +109,10 @@ func recuperajson(device string) {
 		}
 
 		//Crea il file dove salvare i dati, se non ci risce impanica tutto ed esce.
-		f, err := os.Create(file)
+		if _, err := os.Stat("jsondb"); os.IsNotExist(err) {
+			os.Mkdir("jsondb", 664)
+		}
+		f, err := os.Create("jsondb" + "/" + file)
 		if err != nil {
 			panic(err)
 		}
