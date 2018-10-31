@@ -11,6 +11,7 @@ Dal vostro amichevole Gopher di quartiere.
 Sintassi: ramses -s=<numero di deviazioni standard da considerare> <device da interrogare>
 
 per funzionare serve settare delle variabili d'ambiente.
+
 Su windows:
     set username=<matricola>
     set password=<password di posta>
