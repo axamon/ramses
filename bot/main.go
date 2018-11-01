@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -39,21 +38,27 @@ func main() {
 	b.Handle(tb.OnText, func(m *tb.Message) {
 		//b.Send(m.Sender, m.Text)
 		//cerca se nella stringa di testo è presente fd + cache
-		ramses, _ := regexp.Compile(`^[rR]amses\s.*`)
+		ramses, _ := regexp.Compile(`^[rR]amses\s.*\s.*`)
 		if ramses.MatchString(m.Text) == true {
 
 			//prende il secondo parametro passato via chat
 			device := strings.Split(m.Text, " ")[1]
 
-			image, err := recuperajson(device)
+			//prende identificativo interfaccia
+			icr := strings.Split(m.Text, " ")[2]
+
+			allalerts, err := recuperajson(device, icr)
 			if err != nil {
 				log.Println(err.Error())
 			}
-			p := &tb.Photo{File: tb.FromDisk(image)}
+			//p := &tb.Photo{File: tb.FromDisk(image)}
 
-			msg := fmt.Sprintf("Ecco cosa ho trovato per: %s", device)
-			b.Reply(m, msg)
-			b.Send(m.Chat, p)
+			//msg := fmt.Sprintf("Ecco cosa ho trovato per: %s", device)
+			for alerts := range allalerts {
+
+				b.Reply(m, alerts)
+				//	b.Send(m.Chat, p)
+			}
 		}
 
 	})
