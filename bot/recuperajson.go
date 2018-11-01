@@ -8,7 +8,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/remeh/sizedwaitgroup"
 )
@@ -38,7 +40,7 @@ var wg = sizedwaitgroup.New(80)
 //Gestione sigma
 var sigma = float64(2)
 
-func recuperajson(device string) (image string, err error) {
+func recuperajson(device, icr string) (allalerts [][]string, err error) {
 	log.Printf("Elaborazione per %s Iniziata\n", device)
 	defer log.Printf("Elaborazione per %s Terminata\n", device)
 
@@ -96,7 +98,6 @@ func recuperajson(device string) (image string, err error) {
 			log.Println("errore: ", err.Error())
 		}
 
-		//Viene preso in considerazione solo il throughput.out ma si può gestire anche altre metriche
 		NET := result[metrica].(map[string]interface{})
 		DEVICE := NET[device].(map[string]interface{})
 
@@ -107,7 +108,14 @@ func recuperajson(device string) (image string, err error) {
 		}
 
 		//Prendo una interfaccia alla volta ed eseguo il for
+		reg, _ := regexp.Compile("[^a-zA-Z0-9]+")
 		for _, ifname := range listainterfacce {
+			//se icr non in ifname esci
+
+			ifnamepulito := reg.ReplaceAllString(ifname, "")
+			if !strings.Contains(ifnamepulito, icr) {
+				continue
+			}
 			//log.Printf("Inzio elaborazione %s\n", ifname)
 
 			//Ripulisco la variabile values per ingestare i nuovi valori della nuova interfaccia
@@ -129,8 +137,12 @@ func recuperajson(device string) (image string, err error) {
 				values = append(values, val)
 
 			}
+
 			wg.Add()
-			go elaboraserie(values, device, ifname, metrica)
+
+			alerts := elaboraserie(values, device, ifname, metrica)
+			allalerts = append(allalerts, alerts)
+
 		}
 
 		//Crea il file dove salvare i dati, se non ci risce impanica tutto ed esce.
