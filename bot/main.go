@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -17,6 +18,11 @@ func RiceviResult(result string) {
 	return
 }
 
+//rendiamo il bot b usabile anche in altre funzioni
+var b *tb.Bot
+
+//var m *tb.Message
+
 func main() {
 
 	//Recupera la variabile d'ambiente
@@ -26,39 +32,47 @@ func main() {
 		return
 	}
 
-	b, err := tb.NewBot(tb.Settings{
+	b, _ = tb.NewBot(tb.Settings{
 		Token:  TELEGRAMTOKEN,
 		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
 	})
 
 	b.Handle("/version", func(m *tb.Message) {
-		b.Send(m.Chat, "Ramses_bot v2.4.1 beta")
+		b.Send(m.Chat, "Ramses_bot v2.5.3 beta")
+		b.Send(m.Chat, "In continuo cambiamento")
 	})
 
+	ramses, _ := regexp.Compile(`^[rR]amses\s.*`)
+
 	b.Handle(tb.OnText, func(m *tb.Message) {
+		go func() {
+			for {
+				b.Send(m.Chat, <-msg)
+			}
+		}()
 		//b.Send(m.Sender, m.Text)
 		//cerca se nella stringa di testo è presente fd + cache
-		ramses, _ := regexp.Compile(`^[rR]amses\s.*\s.*`)
+		fmt.Println(m.Text) //debug
+
 		if ramses.MatchString(m.Text) == true {
 
 			//prende il secondo parametro passato via chat
+
 			device := strings.Split(m.Text, " ")[1]
+			fmt.Println(device) //debug
+			//answer := "Vediamo cosa trovo su " + device
+			//b.Send(m.Chat, answer)
+			// b.Reply(m, "Vediamo cosa trovo per", device)
 
 			//prende identificativo interfaccia
-			icr := strings.Split(m.Text, " ")[2]
+			//icr := strings.Split(m.Text, " ")[2]
 
-			allalerts, err := recuperajson(device, icr)
-			if err != nil {
-				log.Println(err.Error())
-			}
+			go recuperajson(device)
+
 			//p := &tb.Photo{File: tb.FromDisk(image)}
 
 			//msg := fmt.Sprintf("Ecco cosa ho trovato per: %s", device)
-			for alerts := range allalerts {
 
-				b.Reply(m, alerts)
-				//	b.Send(m.Chat, p)
-			}
 		}
 
 	})

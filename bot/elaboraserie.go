@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 
@@ -19,7 +20,7 @@ import (
 	"os"
 )
 
-func elaboraserie(lista []float64, device, interfaccia, metrica string) (alerst []string) {
+func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 
 	//Finita la funzione notifica il waitgroup
 	defer wg.Done()
@@ -104,12 +105,17 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) (alerst 
 		if i > len(speeds)-3 { //Confronto solo gli ultimi3 valori per un ROPL di 15 minuti
 			if yaryOrig[i] > ma20Upperband[i] {
 				log.Printf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+				alert := fmt.Sprintf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+				msg <- alert
 				//TODO inviare alert
+
 			}
 
 			if yaryOrig[i] < ma20Lowerband[i] {
 				log.Printf("Violata soglia bassa %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+				alert := fmt.Sprintf("Violata soglia bassa %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
 				//TODO inviare alert
+				msg <- alert
 			}
 		}
 	}

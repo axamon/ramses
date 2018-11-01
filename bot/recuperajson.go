@@ -8,9 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/remeh/sizedwaitgroup"
 )
@@ -29,9 +27,6 @@ var metriche = []string{
 	"net.throughput.in",
 	"net.throughput.out"}
 
-//Dove salvere il nome delle interfacce
-var listainterfacce []string
-
 //Waitgroupche gestisce il throtteling
 var wg = sizedwaitgroup.New(80)
 
@@ -40,9 +35,13 @@ var wg = sizedwaitgroup.New(80)
 //Gestione sigma
 var sigma = float64(2)
 
-func recuperajson(device, icr string) (allalerts [][]string, err error) {
+func recuperajson(device string) (err error) {
 	log.Printf("Elaborazione per %s Iniziata\n", device)
+	msg <- "Inizio controllo"
 	defer log.Printf("Elaborazione per %s Terminata\n", device)
+
+	//Dove salvere il nome delle interfacce
+	var listainterfacce []string
 
 	//Recupera la variabile d'ambiente
 	username, err := recuperavariabile("username")
@@ -83,8 +82,11 @@ func recuperajson(device, icr string) (allalerts [][]string, err error) {
 
 		res, _ := client.Do(req)
 
+		fmt.Println(res.StatusCode)
+
 		if res.StatusCode > 399 {
 			err = fmt.Errorf("Impossibile raggiungere %s", url)
+			msg <- "http status errato, controllo interrotto"
 			return
 		}
 
@@ -108,15 +110,8 @@ func recuperajson(device, icr string) (allalerts [][]string, err error) {
 		}
 
 		//Prendo una interfaccia alla volta ed eseguo il for
-		reg, _ := regexp.Compile("[^a-zA-Z0-9]+")
+		//reg, _ := regexp.Compile("[^a-zA-Z0-9]+")
 		for _, ifname := range listainterfacce {
-			//se icr non in ifname esci
-
-			ifnamepulito := reg.ReplaceAllString(ifname, "")
-			if !strings.Contains(ifnamepulito, icr) {
-				continue
-			}
-			//log.Printf("Inzio elaborazione %s\n", ifname)
 
 			//Ripulisco la variabile values per ingestare i nuovi valori della nuova interfaccia
 			var values []float64
@@ -139,10 +134,7 @@ func recuperajson(device, icr string) (allalerts [][]string, err error) {
 			}
 
 			wg.Add()
-
-			alerts := elaboraserie(values, device, ifname, metrica)
-			allalerts = append(allalerts, alerts)
-
+			go elaboraserie(values, device, ifname, metrica)
 		}
 
 		//Crea il file dove salvare i dati, se non ci risce impanica tutto ed esce.
@@ -160,6 +152,7 @@ func recuperajson(device, icr string) (allalerts [][]string, err error) {
 	}
 	//Attende che siano finite tutte le elaborazioni prima di chiudere
 	wg.Wait()
+	msg <- "Finito controllo"
 
 	return
 }
