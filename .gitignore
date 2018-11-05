@@ -3,3 +3,5 @@ ramses.exe
 *.json
 grafici
 pippo
+*.bat
+*.sh

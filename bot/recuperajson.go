@@ -37,10 +37,11 @@ var sigma = float64(2)
 
 func recuperajson(device string) (err error) {
 	log.Printf("Elaborazione per %s Iniziata\n", device)
-	msg <- "Inizio controllo"
+	msg <- "Inizio controllo " + device
 	defer log.Printf("Elaborazione per %s Terminata\n", device)
 
 	//Dove salvere il nome delle interfacce
+	//Viene ripulito a ogni ciclo
 	var listainterfacce []string
 
 	//Recupera la variabile d'ambiente

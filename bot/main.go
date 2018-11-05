@@ -11,6 +11,7 @@ import (
 )
 
 var msg = make(chan string, 1)
+var image = make(chan string, 1)
 
 //RiceviResult riceve una stringa e la invia a telegram
 func RiceviResult(result string) {
@@ -48,6 +49,12 @@ func main() {
 		go func() {
 			for {
 				b.Send(m.Chat, <-msg)
+			}
+		}()
+		go func() {
+			for {
+				p := &tb.Photo{File: tb.FromDisk(<-image)}
+				b.Send(m.Chat, p)
 			}
 		}()
 		//b.Send(m.Sender, m.Text)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 
@@ -21,6 +20,8 @@ import (
 )
 
 func elaboraserie(lista []float64, device, interfaccia, metrica string) {
+
+	var sendimage bool
 
 	//Finita la funzione notifica il waitgroup
 	defer wg.Done()
@@ -105,17 +106,20 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 		if i > len(speeds)-3 { //Confronto solo gli ultimi3 valori per un ROPL di 15 minuti
 			if yaryOrig[i] > ma20Upperband[i] {
 				log.Printf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
-				alert := fmt.Sprintf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
-				msg <- alert
+				//alert := fmt.Sprintf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+				//msg <- alert
+				sendimage = true
 				//TODO inviare alert
 
 			}
 
 			if yaryOrig[i] < ma20Lowerband[i] {
 				log.Printf("Violata soglia bassa %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
-				alert := fmt.Sprintf("Violata soglia bassa %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+				//alert := fmt.Sprintf("Violata soglia bassa %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
 				//TODO inviare alert
-				msg <- alert
+				//msg <- alert
+				sendimage = true
+
 			}
 		}
 	}
@@ -164,6 +168,11 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 	if err := p.Save(8*vg.Inch, 4*vg.Inch, path3+"/"+nomeimmagine+".png"); err != nil {
 		panic(err)
 	}
+
+	if sendimage == true {
+		image <- path3 + "/" + nomeimmagine + ".png"
+	}
+
 	return
 }
 
