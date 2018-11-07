@@ -66,7 +66,7 @@ func main() {
 
 	// Equation 3-10.
 	x := func(n int) float64 {
-		wave0 := 2.0 + (rand.Float64() + float64(n)/10) + rand.Float64()*4
+		wave0 := 2.0 + (rand.Float64() + float64(n)/10) + rand.Float64()*8
 		//wave0 := 3*math.Sin(2*math.Pi*float64(n)/20.0) + 2.0 + float64(n)/10
 		wave1 := 3 * math.Sin(2*math.Pi*float64(n)/6.0)
 		wave3 := 4.0 * math.Sin(2*math.Pi*float64(n)/3.0)
@@ -135,7 +135,7 @@ func main() {
 
 	//Crea una sinusoide con frequenza l'armonicaprincipale
 	sinwave := func(n int, armonica float64) float64 {
-		wave := math.Sin(2 * math.Pi * armonica * float64(n))
+		wave := math.Sin(2*math.Pi*armonica*float64(n) + math.Cos(2*math.Pi*armonica*float64(n)))
 		return wave
 	}
 
@@ -169,41 +169,45 @@ func main() {
 		//p, f := cmplx.Polar(X[i])
 		///= p * math.Exp(f*math.Sqrt(-1))
 		//diff[i] = diff[i] - math.Abs(diff[i]*sinwavediscrete[i]) - math.Abs(diff[i]*sinwavediscrete1[i]*sinwavediscrete2[i])
-		sumsinewaves := (sinwavediscrete[i] + sinwavediscrete1[i])
-		/*sinwavediscrete2[i] +
-		sinwavediscrete3[i] +
-		sinwavediscrete4[i] +
-		sinwavediscrete5[i] +
-		sinwavediscrete6[i] +
-		sinwavediscrete7[i] +
-		sinwavediscrete8[i])
-		*/
-		if diff[i] >= 0 && sumsinewaves >= 0 {
-			diff[i] = diff[i] - sumsinewaves
-			continue
-		}
-		if diff[i] <= 0 && sumsinewaves <= 0 {
-			diff[i] = diff[i] - sumsinewaves
-			continue
-		}
-		if diff[i] >= 0 && sumsinewaves <= 0 {
-			diff[i] = diff[i] + sumsinewaves
-			continue
-		}
-		if diff[i] <= 0 && sumsinewaves >= 0 {
-			diff[i] = diff[i] + sumsinewaves
-			continue
-		}
+		sumsinewaves := (sinwavediscrete[i] +
+			sinwavediscrete1[i] +
+			sinwavediscrete2[i] +
+			sinwavediscrete3[i] +
+			sinwavediscrete4[i]) // +
+		//sinwavediscrete5[i] +
+		//sinwavediscrete6[i] +
+		//sinwavediscrete7[i] +
+		//sinwavediscrete8[i])
 
+		diff[i] = diff[i] - sumsinewaves
 	}
+	/*
+			if diff[i] >= 0 && sumsinewaves >= 0 {
+				diff[i] = diff[i] - sumsinewaves
+				continue
+			}
+			if diff[i] <= 0 && sumsinewaves <= 0 {
+				diff[i] = diff[i] - sumsinewaves
+				continue
+			}
+			if diff[i] >= 0 && sumsinewaves <= 0 {
+				diff[i] = diff[i] + sumsinewaves
+				continue
+			}
+			if diff[i] <= 0 && sumsinewaves >= 0 {
+				diff[i] = diff[i] + sumsinewaves
+				continue
+			}
 
-	mediadiff, _ := stat.Mode(diff, nil)
-	fmt.Println(mediadiff)
+		}
 
-	for i := 0; i < len(diff); i++ {
-		diff[i] = diff[i] * math.Abs(mediadiff)
-	}
+		mediadiff, _ := stat.Mode(diff, nil)
+		fmt.Println(mediadiff)
 
+		for i := 0; i < len(diff); i++ {
+			diff[i] = diff[i] * math.Abs(mediadiff)
+		}
+	*/
 	p, err := plot.New()
 	if err != nil {
 		panic(err)
@@ -215,8 +219,8 @@ func main() {
 
 	err = plotutil.AddLinePoints(p,
 		//
-		//"First", points(a, numSamples),
-		//"Psinwavediscrete", points(sinwavediscrete1, numSamples),
+		"First", points(a, numSamples),
+		//"Psinwavediscrete", points(Pxx, numSamples),
 		//"SS", points(ss, numSamples),
 		//"Fourier", points(l, numSamples),
 		//
