@@ -18,7 +18,7 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
-//Computa la potenza spettrale
+//PwelchOptions computa la potenza spettrale
 type PwelchOptions struct {
 	// NFFT is the number of data points used in each block for the FFT. Must be
 	// even; a power 2 is most efficient. This should *NOT* be used to get zero
