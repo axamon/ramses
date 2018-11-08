@@ -109,33 +109,35 @@ func main() {
 	}
 
 	//Analisi spettrale
-	Pxx, ff := spectral.Pwelch(diff, float64(6), &pippo)
+	Pxx, ff := spectral.Pwelch(diff, float64(300), &pippo)
+
+	fmt.Println(len(Pxx))
+	pxxmedia := stat.Mean(Pxx, nil)
+	ffmedia := stat.Mean(Pxx, nil)
 
 	//Crea mappa delle frequenze
 	frequenze := make(map[float64]float64)
 
 	//Associa frequenza a Potenza spettrale
 	for l := 0; l < len(Pxx); l++ {
+		//Se l'ampiezza è troppo bassa o la frequenza troppo alta escludi armonica
+		if Pxx[l] < pxxmedia || ff[l] > 2*ffmedia {
+			continue
+		}
 		frequenze[Pxx[l]] = ff[l]
 	}
+
+	fmt.Println(len(frequenze))
 
 	//Mette in ordine crescente i poteri spettrali
 	sort.Sort(sort.Reverse(sort.Float64Slice(Pxx)))
 
-	//l'armonica principale è quella che ha potere spettrale superiore
-	armonicaprincipale := frequenze[Pxx[0]] * Pxx[0]
-	armonicaprincipale1 := frequenze[Pxx[1]] * Pxx[1]
-	armonicaprincipale2 := frequenze[Pxx[2]] * Pxx[2]
-	armonicaprincipale3 := frequenze[Pxx[3]] * Pxx[3]
-	armonicaprincipale4 := frequenze[Pxx[4]] * Pxx[4]
-	armonicaprincipale5 := frequenze[Pxx[5]] * Pxx[5]
-	armonicaprincipale6 := frequenze[Pxx[6]] * Pxx[6]
-	armonicaprincipale7 := frequenze[Pxx[7]] * Pxx[7]
-	armonicaprincipale8 := frequenze[Pxx[8]] * Pxx[8]
+	//Mette in ordine decrescente i poteri spettrali
+	//sort.Sort(sort.Float64Slice(Pxx))
 
-	//Crea una sinusoide con frequenza l'armonicaprincipale
-	sinwave := func(n int, armonica float64) float64 {
-		wave := math.Sin(2*math.Pi*armonica*float64(n) + math.Cos(2*math.Pi*armonica*float64(n)))
+	//Crea una sinusoide con frequenza e ampiezza date
+	sinwave := func(n int, ampiezza, frequenza float64) float64 {
+		wave := ampiezza / 10 * pxxmedia * math.Sin(2*math.Pi*frequenza*float64(n))
 		return wave
 	}
 
@@ -146,21 +148,19 @@ func main() {
 	sinwavediscrete3 := make([]float64, numSamples)
 	sinwavediscrete4 := make([]float64, numSamples)
 	sinwavediscrete5 := make([]float64, numSamples)
-	sinwavediscrete6 := make([]float64, numSamples)
-	sinwavediscrete7 := make([]float64, numSamples)
-	sinwavediscrete8 := make([]float64, numSamples)
-
+	/*
+		sinwavediscrete6 := make([]float64, numSamples)
+		sinwavediscrete7 := make([]float64, numSamples)
+		sinwavediscrete8 := make([]float64, numSamples)
+	*/
 	for i := 0; i < numSamples; i++ {
 
-		sinwavediscrete[i] = sinwave(i, armonicaprincipale)
-		sinwavediscrete1[i] = sinwave(i, armonicaprincipale1)
-		sinwavediscrete2[i] = sinwave(i, armonicaprincipale2)
-		sinwavediscrete3[i] = sinwave(i, armonicaprincipale3)
-		sinwavediscrete4[i] = sinwave(i, armonicaprincipale4)
-		sinwavediscrete5[i] = sinwave(i, armonicaprincipale5)
-		sinwavediscrete6[i] = sinwave(i, armonicaprincipale6)
-		sinwavediscrete7[i] = sinwave(i, armonicaprincipale7)
-		sinwavediscrete8[i] = sinwave(i, armonicaprincipale8)
+		sinwavediscrete[i] = sinwave(i, Pxx[0], frequenze[Pxx[0]])
+		sinwavediscrete1[i] = sinwave(i, Pxx[1], frequenze[Pxx[1]])
+		sinwavediscrete2[i] = sinwave(i, Pxx[2], frequenze[Pxx[2]])
+		sinwavediscrete3[i] = sinwave(i, Pxx[3], frequenze[Pxx[3]])
+		sinwavediscrete4[i] = sinwave(i, Pxx[4], frequenze[Pxx[4]])
+		sinwavediscrete5[i] = sinwave(i, Pxx[5], frequenze[Pxx[5]])
 
 	}
 
@@ -169,19 +169,19 @@ func main() {
 		//p, f := cmplx.Polar(X[i])
 		///= p * math.Exp(f*math.Sqrt(-1))
 		//diff[i] = diff[i] - math.Abs(diff[i]*sinwavediscrete[i]) - math.Abs(diff[i]*sinwavediscrete1[i]*sinwavediscrete2[i])
-		sumsinewaves := (sinwavediscrete[i] +
-			sinwavediscrete1[i] +
-			sinwavediscrete2[i] +
-			sinwavediscrete3[i] +
-			sinwavediscrete4[i]) // +
-		//sinwavediscrete5[i] +
+		sumsinewaves := (sinwavediscrete[i]) //+
+		//	sinwavediscrete1[i]) //+
+		//	sinwavediscrete2[i]) //+
+		//		sinwavediscrete3[i] +
+		//		sinwavediscrete4[i] +
+		//	sinwavediscrete5[i])
 		//sinwavediscrete6[i] +
 		//sinwavediscrete7[i] +
 		//sinwavediscrete8[i])
 
 		diff[i] = diff[i] - sumsinewaves
-	}
-	/*
+
+		/*
 			if diff[i] >= 0 && sumsinewaves >= 0 {
 				diff[i] = diff[i] - sumsinewaves
 				continue
@@ -198,9 +198,18 @@ func main() {
 				diff[i] = diff[i] + sumsinewaves
 				continue
 			}
+		*/
+	}
 
+	//diffmean := sPPANICtat.Mean(diff, nil)
+	//diffmode, _ := stat.Mode(diff, nil)
+	diffmean, diffstd := stat.MeanStdDev(diff, nil)
+	for i := 0; i < len(diff); i++ {
+		if math.Abs(diff[i]) < diffmean+2.5*diffstd {
+			diff[i] = 0
 		}
-
+	}
+	/*
 		mediadiff, _ := stat.Mode(diff, nil)
 		fmt.Println(mediadiff)
 
