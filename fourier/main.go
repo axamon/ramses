@@ -61,12 +61,12 @@ type PwelchOptions struct {
 var pippo spectral.PwelchOptions
 
 func main() {
-	pippo.Scale_off = true
+	//pippo.Scale_off = true
 	numSamples, _ := strconv.Atoi(os.Args[1])
 
 	// Equation 3-10.
 	x := func(n int) float64 {
-		wave0 := 2.0 + (rand.Float64() + float64(n)/10) + rand.Float64()*8
+		wave0 := 2.0 + (rand.Float64() + float64(n)/10) + rand.Float64()*5
 		//wave0 := 3*math.Sin(2*math.Pi*float64(n)/20.0) + 2.0 + float64(n)/10
 		wave1 := 3 * math.Sin(2*math.Pi*float64(n)/6.0)
 		wave3 := 4.0 * math.Sin(2*math.Pi*float64(n)/3.0)
@@ -84,8 +84,8 @@ func main() {
 	//Effettua la regressione lineare
 	var weights []float64
 	alpha, beta := stat.LinearRegression(xs, a, weights, false)
-	r2 := stat.RSquared(xs, a, weights, alpha, beta)
-	fmt.Println(alpha, beta, r2)
+	//r2 := stat.RSquared(xs, a, weights, alpha, beta)
+	//fmt.Println(alpha, beta, r2)
 
 	//creo un risultato anomalo
 	indiceanomalo, _ := strconv.Atoi(os.Args[2])
@@ -109,21 +109,24 @@ func main() {
 	}
 
 	//Analisi spettrale
+	//	Pxx, ff := spectral.Pwelch(diff, float64(300), &pippo)
 	Pxx, ff := spectral.Pwelch(diff, float64(300), &pippo)
 
 	fmt.Println(len(Pxx))
-	pxxmedia := stat.Mean(Pxx, nil)
-	ffmedia := stat.Mean(Pxx, nil)
+	//pxxmedia := stat.Mean(Pxx, nil)
+	//ffmedia := stat.Mean(Pxx, nil)
 
 	//Crea mappa delle frequenze
 	frequenze := make(map[float64]float64)
 
 	//Associa frequenza a Potenza spettrale
+
 	for l := 0; l < len(Pxx); l++ {
-		//Se l'ampiezza è troppo bassa o la frequenza troppo alta escludi armonica
+		/*//Se l'ampiezza è troppo bassa o la frequenza troppo alta escludi armonica
 		if Pxx[l] < pxxmedia || ff[l] > 2*ffmedia {
 			continue
 		}
+		*/
 		frequenze[Pxx[l]] = ff[l]
 	}
 
@@ -132,12 +135,20 @@ func main() {
 	//Mette in ordine crescente i poteri spettrali
 	sort.Sort(sort.Reverse(sort.Float64Slice(Pxx)))
 
+	mediaPxx := stat.Mean(Pxx, nil)
+	lenp := len(Pxx)
+	sumPxx := mediaPxx * float64(lenp)
+
+	//Debug
+	//for n, p := range Pxx {
+	//	fmt.Printf("%v,%2.2f\n", n, p/sumPxx*100)
+	//}
 	//Mette in ordine decrescente i poteri spettrali
 	//sort.Sort(sort.Float64Slice(Pxx))
 
 	//Crea una sinusoide con frequenza e ampiezza date
 	sinwave := func(n int, ampiezza, frequenza float64) float64 {
-		wave := ampiezza / 10 * pxxmedia * math.Sin(2*math.Pi*frequenza*float64(n))
+		wave := ampiezza / sumPxx * math.Sin(2*math.Pi*frequenza*float64(n))
 		return wave
 	}
 
@@ -148,11 +159,12 @@ func main() {
 	sinwavediscrete3 := make([]float64, numSamples)
 	sinwavediscrete4 := make([]float64, numSamples)
 	sinwavediscrete5 := make([]float64, numSamples)
-	/*
-		sinwavediscrete6 := make([]float64, numSamples)
-		sinwavediscrete7 := make([]float64, numSamples)
-		sinwavediscrete8 := make([]float64, numSamples)
-	*/
+	sinwavediscrete6 := make([]float64, numSamples)
+	sinwavediscrete7 := make([]float64, numSamples)
+	sinwavediscrete8 := make([]float64, numSamples)
+	sinwavediscrete9 := make([]float64, numSamples)
+	sinwavediscrete10 := make([]float64, numSamples)
+
 	for i := 0; i < numSamples; i++ {
 
 		sinwavediscrete[i] = sinwave(i, Pxx[0], frequenze[Pxx[0]])
@@ -161,51 +173,45 @@ func main() {
 		sinwavediscrete3[i] = sinwave(i, Pxx[3], frequenze[Pxx[3]])
 		sinwavediscrete4[i] = sinwave(i, Pxx[4], frequenze[Pxx[4]])
 		sinwavediscrete5[i] = sinwave(i, Pxx[5], frequenze[Pxx[5]])
+		sinwavediscrete6[i] = sinwave(i, Pxx[6], frequenze[Pxx[6]])
+		sinwavediscrete7[i] = sinwave(i, Pxx[7], frequenze[Pxx[7]])
+		sinwavediscrete8[i] = sinwave(i, Pxx[8], frequenze[Pxx[8]])
+		sinwavediscrete9[i] = sinwave(i, Pxx[9], frequenze[Pxx[9]])
+		sinwavediscrete10[i] = sinwave(i, Pxx[10], frequenze[Pxx[10]])
 
 	}
 
+	//mediaA, _ := stat.Mode(a, nil)
+
 	//Elimina la stagionalità
+	var stagionalita []float64
 	for i := 0; i < numSamples; i++ {
 		//p, f := cmplx.Polar(X[i])
 		///= p * math.Exp(f*math.Sqrt(-1))
 		//diff[i] = diff[i] - math.Abs(diff[i]*sinwavediscrete[i]) - math.Abs(diff[i]*sinwavediscrete1[i]*sinwavediscrete2[i])
-		sumsinewaves := (sinwavediscrete[i]) //+
-		//	sinwavediscrete1[i]) //+
-		//	sinwavediscrete2[i]) //+
-		//		sinwavediscrete3[i] +
-		//		sinwavediscrete4[i] +
-		//	sinwavediscrete5[i])
-		//sinwavediscrete6[i] +
-		//sinwavediscrete7[i] +
-		//sinwavediscrete8[i])
+		sumsinewaves := (sinwavediscrete[i] +
+			sinwavediscrete1[i] +
+			sinwavediscrete2[i] +
+			sinwavediscrete3[i] +
+			sinwavediscrete4[i] +
+			sinwavediscrete5[i] +
+			sinwavediscrete6[i] +
+			sinwavediscrete7[i] +
+			sinwavediscrete8[i] +
+			sinwavediscrete9[i] +
+			sinwavediscrete10[i])
+
+		stagionalita = append(stagionalita, sumsinewaves*alpha+alpha)
 
 		diff[i] = diff[i] - sumsinewaves
 
-		/*
-			if diff[i] >= 0 && sumsinewaves >= 0 {
-				diff[i] = diff[i] - sumsinewaves
-				continue
-			}
-			if diff[i] <= 0 && sumsinewaves <= 0 {
-				diff[i] = diff[i] - sumsinewaves
-				continue
-			}
-			if diff[i] >= 0 && sumsinewaves <= 0 {
-				diff[i] = diff[i] + sumsinewaves
-				continue
-			}
-			if diff[i] <= 0 && sumsinewaves >= 0 {
-				diff[i] = diff[i] + sumsinewaves
-				continue
-			}
-		*/
 	}
 
 	//diffmean := sPPANICtat.Mean(diff, nil)
 	//diffmode, _ := stat.Mode(diff, nil)
 	diffmean, diffstd := stat.MeanStdDev(diff, nil)
 	for i := 0; i < len(diff); i++ {
-		if math.Abs(diff[i]) < diffmean+2.5*diffstd {
+		if math.Abs(diff[i]) < diffmean+3*diffstd {
 			diff[i] = 0
 		}
 	}
@@ -228,12 +234,12 @@ func main() {
 
 	err = plotutil.AddLinePoints(p,
 		//
-		"First", points(a, numSamples),
-		//"Psinwavediscrete", points(Pxx, numSamples),
+		"Andamento reale", points(a, numSamples),
+		"Stagionalità", points(stagionalita, numSamples),
 		//"SS", points(ss, numSamples),
 		//"Fourier", points(l, numSamples),
 		//
-		"diff", points(diff, numSamples),
+		"Anomalie", points(diff, numSamples),
 	)
 
 	if err != nil {
