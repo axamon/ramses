@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"math/rand"
 	"os"
 	"sort"
 	"strconv"
@@ -61,15 +60,15 @@ type PwelchOptions struct {
 var pippo spectral.PwelchOptions
 
 func main() {
-	//pippo.Scale_off = true
+	pippo.Scale_off = true
 	numSamples, _ := strconv.Atoi(os.Args[1])
 
 	// Equation 3-10.
 	x := func(n int) float64 {
-		wave0 := 2.0 + (rand.Float64() + float64(n)/10) + rand.Float64()*5
+		wave0 := 50.0 // + (rand.Float64() + float64(n)/10) + rand.Float64()*5
 		//wave0 := 3*math.Sin(2*math.Pi*float64(n)/20.0) + 2.0 + float64(n)/10
-		wave1 := 3 * math.Sin(2*math.Pi*float64(n)/6.0)
-		wave3 := 4.0 * math.Sin(2*math.Pi*float64(n)/3.0)
+		wave1 := 30 * math.Sin(2*math.Pi*float64(n)/1000) //settimanale
+		wave3 := 12.0                                     // * math.Sin(2*math.Pi*float64(n))   //gionaliero
 		return wave0 + wave1 + wave3
 	}
 
@@ -92,9 +91,6 @@ func main() {
 	anomalo, _ := strconv.Atoi(os.Args[3])
 	a[indiceanomalo] = float64(anomalo)
 
-	//X := fft.FFTReal(a)
-	//l := fft.IFFT(X)
-
 	//fmt.Println(a)
 	//ll := make([]complex128, numSamples)
 	diff := make([]float64, numSamples)
@@ -110,7 +106,7 @@ func main() {
 
 	//Analisi spettrale
 	//	Pxx, ff := spectral.Pwelch(diff, float64(300), &pippo)
-	Pxx, ff := spectral.Pwelch(diff, float64(300), &pippo)
+	Pxx, ff := spectral.Pwelch(diff, float64(1), &pippo)
 
 	fmt.Println(len(Pxx))
 	//pxxmedia := stat.Mean(Pxx, nil)
@@ -122,8 +118,8 @@ func main() {
 	//Associa frequenza a Potenza spettrale
 
 	for l := 0; l < len(Pxx); l++ {
-		/*//Se l'ampiezza è troppo bassa o la frequenza troppo alta escludi armonica
-		if Pxx[l] < pxxmedia || ff[l] > 2*ffmedia {
+		//Se l'ampiezza è troppo bassa o la frequenza troppo alta escludi armonica
+		/*if Pxx[l] < pxxmedia || ff[l] > 2*ffmedia {
 			continue
 		}
 		*/
@@ -139,6 +135,16 @@ func main() {
 	lenp := len(Pxx)
 	sumPxx := mediaPxx * float64(lenp)
 
+	//Trasformata di fourier
+	//F := fft.FFTReal(a)
+	//Finversa := fft.IFFT(F)
+
+	//Finversa è una slice di complessi
+
+	//trasforma in complex le frequenze da eliminare
+
+	//fmt.Println(F)
+	//l := fft.IFFT(F)
 	//Debug
 	//for n, p := range Pxx {
 	//	fmt.Printf("%v,%2.2f\n", n, p/sumPxx*100)
@@ -190,31 +196,35 @@ func main() {
 		///= p * math.Exp(f*math.Sqrt(-1))
 		//diff[i] = diff[i] - math.Abs(diff[i]*sinwavediscrete[i]) - math.Abs(diff[i]*sinwavediscrete1[i]*sinwavediscrete2[i])
 		sumsinewaves := (sinwavediscrete[i] +
+
 			sinwavediscrete1[i] +
 			sinwavediscrete2[i] +
 			sinwavediscrete3[i] +
 			sinwavediscrete4[i] +
 			sinwavediscrete5[i] +
 			sinwavediscrete6[i] +
-			sinwavediscrete7[i] +
-			sinwavediscrete8[i] +
-			sinwavediscrete9[i] +
-			sinwavediscrete10[i])
+			sinwavediscrete7[i])
+		//	sinwavediscrete8[i] +
+		//	sinwavediscrete9[i] +
+		//	sinwavediscrete10[i])
 
-		stagionalita = append(stagionalita, sumsinewaves*alpha+alpha)
+		stagionalita = append(stagionalita, sumsinewaves*a[i]) //*alpha+alpha)
 
-		diff[i] = diff[i] - sumsinewaves
+		diff[i] = diff[i] - sumsinewaves*stat.Mean(a, nil)
 
 	}
 
 	//diffmean := sPPANICtat.Mean(diff, nil)
 	//diffmode, _ := stat.Mode(diff, nil)
-	diffmean, diffstd := stat.MeanStdDev(diff, nil)
-	for i := 0; i < len(diff); i++ {
-		if math.Abs(diff[i]) < diffmean+3*diffstd {
-			diff[i] = 0
+	//diffmean, diffstd := stat.MeanStdDev(diff, nil)
+	/*
+		for i := 0; i < len(diff); i++ {
+			if math.Abs(diff[i]) < diffmean+2.5*diffstd {
+				diff[i] = 0
+				continue
+			}
 		}
-	}
+	*/
 	/*
 		mediadiff, _ := stat.Mode(diff, nil)
 		fmt.Println(mediadiff)
