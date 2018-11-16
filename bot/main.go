@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -25,6 +26,10 @@ var b *tb.Bot
 //var m *tb.Message
 
 func main() {
+
+	go nasppp()
+
+	os.Setenv("HTTP_PROXY", "http://00246506:cfxW$lMS6d@lelaporm.telecomitalia.local:8080")
 
 	//Recupera la variabile d'ambiente
 	TELEGRAMTOKEN, err := recuperavariabile("TELEGRAMTOKEN")
