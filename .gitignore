@@ -4,3 +4,5 @@ ramses.exe
 grafici
 pippo
 fourier/fourier
+*.bat
+*.sh
