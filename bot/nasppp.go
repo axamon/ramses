@@ -6,14 +6,19 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"sort"
-	"strings"
+	"sync"
 	"time"
 
 	"gonum.org/v1/gonum/stat"
 )
+
+const sessioniPPP = "https://ipw.telecomitalia.it/ipwmetrics/api/v1/rawmetrics/kpi.ppoe.slot?device="
+
+var wgppp sync.WaitGroup
 
 func nasppp() {
 
@@ -28,17 +33,20 @@ func nasppp() {
 		fmt.Println(n, device)
 	}
 
-	// for _, device := range devices {
-	// 	fmt.Printf("%v, verifico device %s\n", time.Now(), device)
-	// 	//time.Sleep(200 * time.Millisecond)
-	// 	nasppp2(device)
-	// }
+	for _, device := range devices {
+		wgppp.Add(1)
+		fmt.Printf("%s, verifico device %s\n", time.Now().Format("20060102T15:04:05"), device)
+		//time.Sleep(200 * time.Millisecond)
+		go nasppp2(device)
+	}
+	wgppp.Wait()
 
 	//imposta un refesh ogni tot minuti
 	c := time.Tick(15 * time.Minute)
 	for now := range c {
 		for _, device := range devices {
-			fmt.Printf("%v, verifico device %s\n", now, device)
+			wgppp.Add(1)
+			fmt.Printf("%s, verifico device %s\n", now.Format("20060102T15:04:05"), device)
 			//time.Sleep(200 * time.Millisecond)
 			nasppp2(device)
 		}
@@ -47,6 +55,10 @@ func nasppp() {
 }
 
 func nasppp2(device string) {
+	defer wgppp.Done()
+	//Attendo un tempo random per evitare di fare troppe query insieme
+	randomdelay := rand.Intn(500)
+	time.Sleep(time.Duration(randomdelay) * time.Millisecond)
 
 	os.Setenv("HTTP_PROXY", "")
 	os.Setenv("HTTPS_PROXY", "")
@@ -71,29 +83,28 @@ func nasppp2(device string) {
 		log.Fatal(err)
 		return
 	}
-	//url := "https://ipw.telecomitalia.it/ipwmetrics/api/v1/query"
-	url := "https://ipw.telecomitalia.it/grafana/api/datasources/proxy/1/api/query"
+	url := sessioniPPP + device + "&start=1d-ago&end=5m-ago&aggregator=sum"
 
-	adesso := time.Now()
-	//mezzorafa := adesso.Add(time.Duration(-30) * time.Minute)
-	quattroOreFa := adesso.Add(time.Duration(-4) * time.Hour)
+	// adesso := time.Now()
+	// //mezzorafa := adesso.Add(time.Duration(-30) * time.Minute)
+	// quattroOreFa := adesso.Add(time.Duration(-4) * time.Hour)
 
-	adessoEpoch := fmt.Sprint(adesso.Unix())
-	//mezzorafaEpoch := fmt.Sprint(mezzorafa.Unix())
-	quattroOreFaEpoch := fmt.Sprint(quattroOreFa.Unix())
+	// adessoEpoch := fmt.Sprint(adesso.Unix())
+	// //mezzorafaEpoch := fmt.Sprint(mezzorafa.Unix())
+	// quattroOreFaEpoch := fmt.Sprint(quattroOreFa.Unix())
 
-	payload := strings.NewReader("{\"start\":" + quattroOreFaEpoch + ",\"queries\":[{\"metric\":\"kpi.ppoe.slot\",\"aggregator\":\"sum\",\"downsample\":\"2m-avg\",\"tags\":{\"device\":\"" + device + "\"}}],\"msResolution\":false,\"globalAnnotations\":true,\"end\":" + adessoEpoch + "}\r\n")
+	// payload := strings.NewReader("{\"start\":" + quattroOreFaEpoch + ",\"queries\":[{\"metric\":\"kpi.ppoe.slot\",\"aggregator\":\"sum\",\"downsample\":\"2m-avg\",\"tags\":{\"device\":\"" + device + "\"}}],\"msResolution\":false,\"globalAnnotations\":true,\"end\":" + adessoEpoch + "}\r\n")
 
-	//fmt.Println(payload, adesso.Unix(), quattroOreFa.Unix()) //debug
+	// //fmt.Println(payload, adesso.Unix(), quattroOreFa.Unix()) //debug
 
-	req, _ := http.NewRequest("POST", url, payload)
+	req, _ := http.NewRequest("GET", url, nil)
 
 	//qui su costringe il client ad accettare anche certificati https non validi o scaduti, non anrebbe fatto ma bisogna fare di necessità virtù
 	transCfg := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
 	}
 
-	req.Header.Add("content-type", "application/json;charset=UTF-8")
+	//req.Header.Add("content-type", "application/json;charset=UTF-8")
 	req.SetBasicAuth(username, password)
 	//req.Header.Add("authorization", "Basic MDAyNDY1MDY6Y2Z4VyRsTVM2ZA==")
 	req.Header.Add("cache-control", "no-cache")
@@ -143,16 +154,21 @@ func nasppp2(device string) {
 	}
 	mean, stdev := stat.MeanStdDev(seriepppvalue, nil)
 	fmt.Println(mean, stdev)
+	wg.Add()
+	elaboraseriePPP(seriepppvalue, device, "test", "ppp")
 	//fmt.Println(serieppp)
 	for _, v := range seriepppvalue[len(seriepppvalue)-3:] {
 		//fmt.Println(v)
-		if v > mean+sigma*stdev {
-			log.Printf("Alert su %s, forte innalzamento sessioni ppp\n", device)
-			msg <- fmt.Sprintf("Alert su %s, forte innalzamento sessioni ppp\n", device)
-		}
+		//Se le sessioni salgono non è importante
+		// if v > mean+sigma*stdev {
+		// 	log.Printf("Alert su %s, forte innalzamento sessioni ppp\n", device)
+		// 	grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
+		// 	msg <- fmt.Sprintf("Alert su %s, forte innalzamento sessioni ppp, %s\n", device, grafanaurl)
+		// }
 		if v < mean-sigma*stdev {
 			log.Printf("Alert su %s, forte abbassamento sessioni ppp\n", device)
-			msg <- fmt.Sprintf("Alert su %s, forte abbassamento sessioni ppp\n", device)
+			grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
+			msg <- fmt.Sprintf("Alert su %s, forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
 		}
 	}
 

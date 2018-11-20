@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 
@@ -9,7 +10,6 @@ import (
 	ma "github.com/mxmCherry/movavg"
 	"gonum.org/v1/gonum/stat"
 	"gonum.org/v1/plot"
-	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 
@@ -29,7 +29,7 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 	speeds := lista
 
 	if len(speeds) < 120 {
-		//log.Println("Non ci sono abbastanza dati:", device, interfaccia)
+		log.Println("Non ci sono abbastanza dati:", device, interfaccia)
 		return
 	}
 
@@ -162,7 +162,7 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 			os.Mkdir(path, 664)
 		}
 	}
-	//fmt.Println(path3) //debug
+	fmt.Println(path3) //debug
 
 	//SALVA IL GRAFICO
 	if err := p.Save(8*vg.Inch, 4*vg.Inch, path3+"/"+nomeimmagine+".png"); err != nil {
@@ -174,16 +174,4 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 	}
 
 	return
-}
-
-func generatePoints(x []float64, y []float64) plotter.XYs {
-	//pts := make(plotter.XYs, len(x))
-	pts := make(plotter.XYs, 119)
-
-	for i := range pts {
-		pts[i].X = x[i]
-		pts[i].Y = y[i]
-	}
-
-	return pts
 }
