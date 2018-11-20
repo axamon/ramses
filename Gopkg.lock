@@ -9,6 +9,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/drewlanenga/govector"
+  packages = ["."]
+  revision = "f69e9f02317ee9608f7b224ce1fc63a8602d0785"
+
+[[projects]]
+  branch = "master"
   name = "github.com/golang/freetype"
   packages = [
     ".",
@@ -34,10 +40,33 @@
   revision = "f52c8a71aff06ab8df41843d33ab167b36c971cd"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/lytics/anomalyzer"
+  packages = ["."]
+  revision = "13cee106170131d4088721db299d09b42db508ac"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mjibson/go-dsp"
+  packages = [
+    "dsputils",
+    "fft",
+    "spectral",
+    "window"
+  ]
+  revision = "11479a337f1259210b7c8f93f7bf2b0cc87b066e"
+
+[[projects]]
   name = "github.com/mxmCherry/movavg"
   packages = ["."]
   revision = "409878dc0217b30656458b56ab1eb0843e346a99"
   version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   branch = "master"
@@ -103,9 +132,15 @@
   ]
   revision = "5f3c436ce602d80b13f2936b6bf149515198d6a4"
 
+[[projects]]
+  branch = "v2"
+  name = "gopkg.in/tucnak/telebot.v2"
+  packages = ["."]
+  revision = "2adea7c8be7158999ca414230da5c0314d6382ab"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e470cd0d21065264e474456c4525c0436a25eb3ad1a3365ff115a13a18f6f3b2"
+  inputs-digest = "a30ae5c46c3a1462089ba219d45d66141fe39d2757dec24c1ae14405fca163c5"
   solver-name = "gps-cdcl"
   solver-version = 1
