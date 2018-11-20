@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 
@@ -146,16 +147,17 @@ func nasppp2(device string) {
 	//Ordina i tempi in maniera crescente
 	sort.Strings(tempi)
 	var seriepppvalue []float64
-	var serieppptime []string
+	var serieppptime []float64
 	for _, t := range tempi {
-		serieppptime = append(serieppptime, t)
+		tint, _ := strconv.Atoi(t)
+		serieppptime = append(serieppptime, float64(tint))
 		seriepppvalue = append(seriepppvalue, dp[t].(float64))
 		//fmt.Println("orario: ", t, "valore: ", dp[t])
 	}
 	mean, stdev := stat.MeanStdDev(seriepppvalue, nil)
 	fmt.Println(mean, stdev)
 	wg.Add()
-	elaboraseriePPP(seriepppvalue, device, "test", "ppp")
+	elaboraseriePPP(serieppptime, seriepppvalue, device, "test", "ppp")
 	//fmt.Println(serieppp)
 	for _, v := range seriepppvalue[len(seriepppvalue)-3:] {
 		//fmt.Println(v)

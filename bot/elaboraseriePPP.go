@@ -18,7 +18,7 @@ import (
 	"os"
 )
 
-func elaboraseriePPP(lista []float64, device, interfaccia, metrica string) {
+func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
 
 	var sendimage bool
 
@@ -52,7 +52,6 @@ func elaboraseriePPP(lista []float64, device, interfaccia, metrica string) {
 	//fmt.Println(n)
 
 	//Crea contenitori parametrizzati al numero n di elementi in entrata
-	x, dx := 0.0, 0.01
 	xary := make([]float64, 0, n)
 	yaryOrig := make([]float64, 0, n)
 	ma3 := make([]float64, 0, n)
@@ -80,9 +79,8 @@ func elaboraseriePPP(lista []float64, device, interfaccia, metrica string) {
 		//y := math.Sin(x) + 0.1*(rand.NormFloat64()-0.5)
 		y := speeds[i]
 		//s.Set(0, i, y)
-		x += dx
 
-		xary = append(xary, x)
+		xary = append(xary, x[i])
 
 		ma3 = append(ma3, sma3.Add(y))       //aggiung alla media mobile il nuovo valore e storo la media
 		ma7 = append(ma7, sma7.Add(y))       //aggiung alla media mobile il nuovo valore e storo la media
