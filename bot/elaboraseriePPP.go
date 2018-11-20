@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 	"strconv"
 
 	//"github.com/spf13/viper"
@@ -40,8 +39,8 @@ func elaboraseriePPP(lista []float64, device, interfaccia, metrica string) {
 	// }
 
 	//Crea un nome per l'immagine che sia più contenuto del nomee interfaccia
-	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
-	nomeimmagine := reg.ReplaceAllString(interfaccia, "")
+	//reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	//nomeimmagine := reg.ReplaceAllString(interfaccia, "")
 
 	//Creazione medie mobili di interesse
 	sma3 := ma.ThreadSafe(ma.NewSMA(3))     //creo una moving average a 3
@@ -108,7 +107,7 @@ func elaboraseriePPP(lista []float64, device, interfaccia, metrica string) {
 				log.Printf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
 				//alert := fmt.Sprintf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
 				//msg <- alert
-				sendimage = true
+				//sendimage = true
 				//TODO inviare alert
 
 			}
@@ -165,12 +164,12 @@ func elaboraseriePPP(lista []float64, device, interfaccia, metrica string) {
 	fmt.Println(path3) //debug
 
 	//SALVA IL GRAFICO
-	if err := p.Save(8*vg.Inch, 4*vg.Inch, path3+"/"+nomeimmagine+".png"); err != nil {
+	if err := p.Save(8*vg.Inch, 4*vg.Inch, path3+"/"+device+".png"); err != nil {
 		panic(err)
 	}
 
 	if sendimage == true {
-		image <- path3 + "/" + nomeimmagine + ".png"
+		image <- path3 + "/" + device + ".png"
 	}
 
 	return

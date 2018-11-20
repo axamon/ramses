@@ -21,6 +21,7 @@ import (
 
 func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 
+	//Inviare o no immagine del grafico a Teleram?
 	var sendimage bool
 
 	//Finita la funzione notifica il waitgroup
