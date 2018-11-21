@@ -19,7 +19,7 @@ import (
 	"os"
 )
 
-func elaboraserie(lista []float64, device, interfaccia, metrica string) {
+func elaboraserie(tempi, lista []float64, device, interfaccia, metrica string) {
 
 	//Inviare o no immagine del grafico a Teleram?
 	var sendimage bool
@@ -54,7 +54,6 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 	//fmt.Println(n)
 
 	//Crea contenitori parametrizzati al numero n di elementi in entrata
-	x, dx := 0.0, 0.01
 	xary := make([]float64, 0, n)
 	yaryOrig := make([]float64, 0, n)
 	ma3 := make([]float64, 0, n)
@@ -82,7 +81,7 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 		//y := math.Sin(x) + 0.1*(rand.NormFloat64()-0.5)
 		y := speeds[i]
 		//s.Set(0, i, y)
-		x += dx
+		x := tempi[i]
 
 		xary = append(xary, x)
 
@@ -137,11 +136,16 @@ func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 		//"MA3", generatePoints(xary, ma3),
 		//"MA7", generatePoints(xary, ma7),
 
-		"Up "+sigmastring+" sigma", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:len(ma20Upperband)-1]),
-		"Original", generatePoints(xary, yaryOrig[len(yaryOrig)-120:len(yaryOrig)-1]),
-		"Media mobile 20", generatePoints(xary, ma20[len(ma20)-120:]),
-		"Media mobile 100", generatePoints(xary, ma100[len(ma20)-120:]),
-		"Low "+sigmastring+" sigma", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:len(ma20Lowerband)-1]),
+		// "Up "+sigmastring+" sigma", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:len(ma20Upperband)-1]),
+		// "Original", generatePoints(xary, yaryOrig[len(yaryOrig)-120:len(yaryOrig)-1]),
+		// "Media mobile 20", generatePoints(xary, ma20[len(ma20)-120:]),
+		// "Media mobile 100", generatePoints(xary, ma100[len(ma20)-120:]),
+		// "Low "+sigmastring+" sigma", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:len(ma20Lowerband)-1]),
+		"Up "+sigmastring+" sigma", generatePoints(xary, ma20Upperband),
+		"Original", generatePoints(xary, yaryOrig),
+		"Media mobile 20", generatePoints(xary, ma20),
+		"Media mobile 100", generatePoints(xary, ma100),
+		"Low "+sigmastring+" sigma", generatePoints(xary, ma20Lowerband),
 	)
 	if err != nil {
 		log.Println(err)

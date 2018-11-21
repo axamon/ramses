@@ -84,19 +84,7 @@ func nasppp2(device string) {
 		log.Fatal(err)
 		return
 	}
-	url := sessioniPPP + device + "&start=1d-ago&end=5m-ago&aggregator=sum"
-
-	// adesso := time.Now()
-	// //mezzorafa := adesso.Add(time.Duration(-30) * time.Minute)
-	// quattroOreFa := adesso.Add(time.Duration(-4) * time.Hour)
-
-	// adessoEpoch := fmt.Sprint(adesso.Unix())
-	// //mezzorafaEpoch := fmt.Sprint(mezzorafa.Unix())
-	// quattroOreFaEpoch := fmt.Sprint(quattroOreFa.Unix())
-
-	// payload := strings.NewReader("{\"start\":" + quattroOreFaEpoch + ",\"queries\":[{\"metric\":\"kpi.ppoe.slot\",\"aggregator\":\"sum\",\"downsample\":\"2m-avg\",\"tags\":{\"device\":\"" + device + "\"}}],\"msResolution\":false,\"globalAnnotations\":true,\"end\":" + adessoEpoch + "}\r\n")
-
-	// //fmt.Println(payload, adesso.Unix(), quattroOreFa.Unix()) //debug
+	url := sessioniPPP + device + "&start=7d-ago&end=5m-ago&aggregator=sum"
 
 	req, _ := http.NewRequest("GET", url, nil)
 
@@ -157,8 +145,11 @@ func nasppp2(device string) {
 	mean, stdev := stat.MeanStdDev(seriepppvalue, nil)
 	fmt.Println(mean, stdev)
 	wg.Add()
+
+	//Passo le info alla fuzione di elaborazione e grafico
 	elaboraseriePPP(serieppptime, seriepppvalue, device, "test", "ppp")
-	//fmt.Println(serieppp)
+
+	//Verifica se ci sono errori da segnalare
 	for _, v := range seriepppvalue[len(seriepppvalue)-3:] {
 		//fmt.Println(v)
 		//Se le sessioni salgono non è importante

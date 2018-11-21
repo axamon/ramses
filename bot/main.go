@@ -20,9 +20,9 @@ func RiceviResult(result string) {
 }
 
 //rendiamo il bot b usabile anche in altre funzioni
-var b *tb.Bot
 
 //var m *tb.Message
+var b *tb.Bot
 
 func main() {
 
@@ -35,10 +35,13 @@ func main() {
 		return
 	}
 
-	b, _ = tb.NewBot(tb.Settings{
+	b, err = tb.NewBot(tb.Settings{
 		Token:  TELEGRAMTOKEN,
 		Poller: &tb.LongPoller{Timeout: 10 * time.Second},
 	})
+	if err != nil {
+		log.Println(err.Error())
+	}
 
 	b.Handle("/version", func(m *tb.Message) {
 		b.Send(m.Chat, "Ramses_bot v2.5.3 beta")

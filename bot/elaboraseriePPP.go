@@ -19,13 +19,18 @@ import (
 )
 
 func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
-
+	sigma = 2.0
 	var sendimage bool
 
 	//Finita la funzione notifica il waitgroup
 	defer wg.Done()
 
-	speeds := lista
+	//elimino il trend
+	xdet, ydet := detrend(x, lista)
+
+	speeds := ydet
+	x = xdet
+	//speeds := lista
 
 	// if len(speeds) < 120 {
 	// 	log.Println("Non ci sono abbastanza dati:", device, interfaccia)
@@ -49,7 +54,7 @@ func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
 	sma100 := ma.ThreadSafe(ma.NewSMA(100)) //creo una moving average a 100
 
 	n := len(speeds)
-	//fmt.Println(n)
+	fmt.Println(n) //debug
 
 	//Crea contenitori parametrizzati al numero n di elementi in entrata
 	xary := make([]float64, 0, n)
@@ -75,8 +80,10 @@ func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
 	var i int
 
 	//aryOrig := speeds
-	for i = 0; i < n; i++ {
+	for i = 0; i < n-1; i++ {
 		//y := math.Sin(x) + 0.1*(rand.NormFloat64()-0.5)
+		//smoothing
+		speeds[i] = speeds[i+1] - speeds[i]
 		y := speeds[i]
 		//s.Set(0, i, y)
 
@@ -90,8 +97,8 @@ func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
 		yaryOrig = append(yaryOrig, y)
 
 		var devstdBands float64
-		if i >= 100 {
-			devstdBands = stat.StdDev(speeds[i-99:i], nil)
+		if i >= 300 {
+			devstdBands = stat.StdDev(speeds[i-288:i], nil)
 		}
 		// ma20Upperband = append(ma20Upperband, sma20.Avg()+3*devstdBands)
 		// ma20Lowerband = append(ma20Lowerband, sma20.Avg()-3*devstdBands)

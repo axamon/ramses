@@ -116,6 +116,7 @@ func recuperajson(device string) (err error) {
 
 			//Ripulisco la variabile values per ingestare i nuovi valori della nuova interfaccia
 			var values []float64
+			var tempi []float64
 			INT := DEVICE[ifname].(map[string]interface{})
 			DATA := INT["data"].([]interface{})
 
@@ -123,19 +124,24 @@ func recuperajson(device string) (err error) {
 			for _, v := range DATA {
 				//fmt.Println(k, v.(map[string]interface{})["time"], v.(map[string]interface{})["value"])
 				value := fmt.Sprint(v.(map[string]interface{})["value"])
+				tempo := fmt.Sprint(v.(map[string]interface{})["time"])
 				val, err := strconv.ParseFloat(value, 64)
 				if err != nil {
 					//se si fossero valori non numerici così me ne accorgo e non si impanica nulla
 					log.Println("value non converitibile in float64", err.Error())
 				}
-
+				tempofloat, err := strconv.ParseFloat(tempo, 64)
+				if err != nil {
+					log.Println("value non converitibile in float64", err.Error())
+				}
 				//appendo a values il nuovo valore
 				values = append(values, val)
+				tempi = append(tempi, tempofloat)
 
 			}
 
 			wg.Add()
-			go elaboraserie(values, device, ifname, metrica)
+			go elaboraserie(tempi, values, device, ifname, metrica)
 		}
 
 		//Crea il file dove salvare i dati, se non ci risce impanica tutto ed esce.
