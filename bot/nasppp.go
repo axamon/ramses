@@ -58,8 +58,8 @@ func nasppp() {
 	fmt.Println("Dopo primo run")
 
 	//imposta un refesh ogni tot minuti
-	t := time.Tick(30 * time.Second)
-	c := time.Tick(1 * time.Minute)
+	t := time.Tick(1 * time.Minute)
+	c := time.Tick(5 * time.Minute)
 	for {
 		select {
 		case <-c:
