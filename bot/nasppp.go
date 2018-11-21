@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"sort"
 	"strconv"
 	"sync"
@@ -21,10 +22,6 @@ const sessioniPPP = "https://ipw.telecomitalia.it/ipwmetrics/api/v1/rawmetrics/k
 var wgppp sync.WaitGroup
 
 func nasppp() {
-
-	//elenco NAS da monitorare
-	//devices := []string{"r-rm899", "r-rm900"}
-	//devices := recuperaNAS()
 
 	var devices []string
 	listalistanas := recuperaNAS()
@@ -50,12 +47,12 @@ func nasppp() {
 	wgppp.Wait()
 
 	//imposta un refesh ogni tot minuti
-	c := time.Tick(15 * time.Minute)
+	c := time.Tick(5 * time.Minute)
 	for now := range c {
 		for _, device := range devices {
 			wgppp.Add(1)
 			fmt.Printf("%s, verifico device %s\n", now.Format("20060102T15:04:05"), device)
-			//time.Sleep(200 * time.Millisecond)
+			time.Sleep(10 * time.Millisecond)
 			go nasppp2(device)
 		}
 	}
@@ -67,12 +64,12 @@ func nasppp2(device string) {
 	//Attendo un tempo random per evitare di fare troppe query insieme
 	randomdelay := rand.Intn(100)
 	time.Sleep(time.Duration(randomdelay) * time.Millisecond)
-	/*
-		os.Setenv("HTTP_PROXY", "")
-		os.Setenv("HTTPS_PROXY", "")
-		fmt.Println(os.Getenv("HTTP_PROXY"))
-		fmt.Println(os.Getenv("HTTPS_PROXY"))
-	*/
+
+	os.Setenv("HTTP_PROXY", "")
+	os.Setenv("HTTPS_PROXY", "")
+	fmt.Println(os.Getenv("HTTP_PROXY"))
+	fmt.Println(os.Getenv("HTTPS_PROXY"))
+
 	//fmt.Println(device)
 
 	var sigma float64
