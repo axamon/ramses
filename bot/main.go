@@ -44,7 +44,7 @@ func main() {
 	}
 
 	b.Handle("/version", func(m *tb.Message) {
-		b.Send(m.Chat, "Ramses_bot v2.5.3 beta")
+		b.Send(m.Chat, "Ramses_bot v3.5.3 beta")
 		b.Send(m.Chat, "In continuo cambiamento")
 	})
 

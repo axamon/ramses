@@ -18,13 +18,13 @@ const (
 )
 
 var metriche = []string{
-	"net.volume.in",
-	"net.volume.out",
-	"net.errors.in",
-	"net.errors.out",
-	"net.discards.in",
-	"net.discards.out",
-	"net.throughput.in",
+	//"net.volume.in",
+	//"net.volume.out",
+	//"net.errors.in",
+	//"net.errors.out",
+	//"net.discards.in",
+	//"net.discards.out",
+	//"net.throughput.in",
 	"net.throughput.out"}
 
 //Waitgroupche gestisce il throtteling

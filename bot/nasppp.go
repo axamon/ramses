@@ -8,7 +8,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"os"
 	"sort"
 	"strconv"
 	"sync"
@@ -27,12 +26,20 @@ func nasppp() {
 	//devices := []string{"r-rm899", "r-rm900"}
 	//devices := recuperaNAS()
 
-	devices := []string{"r-al899", "r-al900", "r-an899", "r-an900", "r-ba900", "r-bg900", "r-bo900", "r-bs122", "r-bs900", "r-bs899", "r-bz900", "r-ca900", "r-co900", "r-ct899", "r-ct900", "r-cz900", "r-FI899-re0", "r-ge900", "r-mi506", "r-mi890", "r-mi895", "r-mi898", "r-mi899", "r-mi900", "r-mo898", "r-mo899", "r-na899", "r-na900", "r-nl897", "r-nl899", "r-pa900", "r-pe899", "r-pd166", "r-pd900", "r-pe900", "r-pg900", "r-pi095", "r-pi899", "r-pi900", "r-rm613", "r-rm890", "r-rm897", "r-rm898", "r-rm895", "r-rm899", "r-rm900", "r-rn899", "r-rn900", "r-SV900", "r-ta899", "r-ta900", "r-to189", "r-to900", "r-ts900", "r-vr900", "r-fi900", "r-nl900", "r-ve900", "r-BG899", "r-mi897", "r-nl898", "r-pa899-re0", "r-rm896", "r-to899", "r-ve899", "r-bo890", "r-nl890", "r-fi898", "r-cz899", "r-ct898", "r-mo900", "r-na898", "r-ba899", "r-bo899", "r-mi896", "r-ts899", "r-pd899"}
+	var devices []string
+	listalistanas := recuperaNAS()
 
-	for n, device := range devices {
-
-		fmt.Println(n, device)
+	var i int
+	for _, listanas := range listalistanas {
+		for _, nas := range listanas {
+			i++
+			//fmt.Println(n, nas.Name)
+			devices = append(devices, nas.Name)
+		}
 	}
+	log.Printf("I Nas trovati sono %d\n", i)
+
+	//devices := []string{"r-al899", "r-al900", "r-an899", "r-an900", "r-ba900", "r-bg900", "r-bo900", "r-bs122", "r-bs900", "r-bs899", "r-bz900", "r-ca900", "r-co900", "r-ct899", "r-ct900", "r-cz900", "r-FI899-re0", "r-ge900", "r-mi506", "r-mi890", "r-mi895", "r-mi898", "r-mi899", "r-mi900", "r-mo898", "r-mo899", "r-na899", "r-na900", "r-nl897", "r-nl899", "r-pa900", "r-pe899", "r-pd166", "r-pd900", "r-pe900", "r-pg900", "r-pi095", "r-pi899", "r-pi900", "r-rm613", "r-rm890", "r-rm897", "r-rm898", "r-rm895", "r-rm899", "r-rm900", "r-rn899", "r-rn900", "r-SV900", "r-ta899", "r-ta900", "r-to189", "r-to900", "r-ts900", "r-vr900", "r-fi900", "r-nl900", "r-ve900", "r-BG899", "r-mi897", "r-nl898", "r-pa899-re0", "r-rm896", "r-to899", "r-ve899", "r-bo890", "r-nl890", "r-fi898", "r-cz899", "r-ct898", "r-mo900", "r-na898", "r-ba899", "r-bo899", "r-mi896", "r-ts899", "r-pd899"}
 
 	for _, device := range devices {
 		wgppp.Add(1)
@@ -49,7 +56,7 @@ func nasppp() {
 			wgppp.Add(1)
 			fmt.Printf("%s, verifico device %s\n", now.Format("20060102T15:04:05"), device)
 			//time.Sleep(200 * time.Millisecond)
-			nasppp2(device)
+			go nasppp2(device)
 		}
 	}
 
@@ -58,18 +65,18 @@ func nasppp() {
 func nasppp2(device string) {
 	defer wgppp.Done()
 	//Attendo un tempo random per evitare di fare troppe query insieme
-	randomdelay := rand.Intn(500)
+	randomdelay := rand.Intn(100)
 	time.Sleep(time.Duration(randomdelay) * time.Millisecond)
-
-	os.Setenv("HTTP_PROXY", "")
-	os.Setenv("HTTPS_PROXY", "")
-	fmt.Println(os.Getenv("HTTP_PROXY"))
-	fmt.Println(os.Getenv("HTTPS_PROXY"))
-
-	fmt.Println(device)
+	/*
+		os.Setenv("HTTP_PROXY", "")
+		os.Setenv("HTTPS_PROXY", "")
+		fmt.Println(os.Getenv("HTTP_PROXY"))
+		fmt.Println(os.Getenv("HTTPS_PROXY"))
+	*/
+	//fmt.Println(device)
 
 	var sigma float64
-	sigma = 2.5
+	sigma = 2.0
 
 	//Recupera la variabile d'ambiente
 	username, err := recuperavariabile("username")
@@ -121,7 +128,7 @@ func nasppp2(device string) {
 		return
 	}
 	if len(result) < 1 {
-		log.Println("Non ci sono abbastanza info")
+		log.Printf("Non ci sono abbastanza info per %s", device)
 		return
 	}
 	d := result[0].(map[string]interface{})
@@ -143,14 +150,14 @@ func nasppp2(device string) {
 		//fmt.Println("orario: ", t, "valore: ", dp[t])
 	}
 	mean, stdev := stat.MeanStdDev(seriepppvalue, nil)
-	fmt.Println(mean, stdev)
-	wg.Add()
+	log.Printf("%s: media: %2.f stdev: %2.f", device, mean, stdev)
 
 	//Passo le info alla fuzione di elaborazione e grafico
-	elaboraseriePPP(serieppptime, seriepppvalue, device, "test", "ppp")
+	//wg.Add()
+	//elaboraseriePPP(serieppptime, seriepppvalue, device, "test", "ppp")
 
 	//Verifica se ci sono errori da segnalare
-	for _, v := range seriepppvalue[len(seriepppvalue)-3:] {
+	for _, v := range seriepppvalue[len(seriepppvalue)-1:] {
 		//fmt.Println(v)
 		//Se le sessioni salgono non è importante
 		// if v > mean+sigma*stdev {
@@ -164,5 +171,5 @@ func nasppp2(device string) {
 			msg <- fmt.Sprintf("Alert su %s, forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
 		}
 	}
-
+	return
 }
