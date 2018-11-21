@@ -42,9 +42,9 @@ func nasppp() {
 		wgppp.Add(1)
 		fmt.Printf("%s, verifico device %s\n", time.Now().Format("20060102T15:04:05"), device)
 		//time.Sleep(200 * time.Millisecond)
-		go nasppp2(device)
+		nasppp2(device)
 	}
-	wgppp.Wait()
+	//wgppp.Wait()
 
 	//imposta un refesh ogni tot minuti
 	c := time.Tick(5 * time.Minute)
@@ -52,8 +52,8 @@ func nasppp() {
 		for _, device := range devices {
 			wgppp.Add(1)
 			fmt.Printf("%s, verifico device %s\n", now.Format("20060102T15:04:05"), device)
-			time.Sleep(10 * time.Millisecond)
-			go nasppp2(device)
+			//time.Sleep(10 * time.Millisecond)
+		 	nasppp2(device)
 		}
 	}
 
@@ -106,14 +106,13 @@ func nasppp2(device string) {
 
 	res, _ := client.Do(req)
 	//res, err := http.DefaultClient.Do(req)
-
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error(), device)
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error(), device)
 	}
 	defer res.Body.Close()
 	//fmt.Println(res)
@@ -121,7 +120,7 @@ func nasppp2(device string) {
 	var result []interface{}
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Println(err.Error(), device)
 		return
 	}
 	if len(result) < 1 {

@@ -69,7 +69,6 @@ func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
 		//applico uno smoothing delle ascisse
 		speeds[i] = speeds[i+1] - speeds[i]
 		y := speeds[i]
-		//s.Set(0, i, y)
 
 		xary = append(xary, x[i])
 
