@@ -24,33 +24,77 @@ const sessioniPPP = "https://ipw.telecomitalia.it/ipwmetrics/api/v1/rawmetrics/k
 var wgppp sync.WaitGroup
 
 func nasppp() {
+	//Creo il contesto inziale che verrà propagato alle go-routine
+	ctx := context.Background()
 
+	//Creo la variabile dove accodare i nomi dei nas
 	var devices []string
-	listalistanas := recuperaNAS()
 
+	//identifico il file json con le informazioni da parsare
+	filelistapparati := "nasInventory.json"
+
+	//leggo il file in memoria
+	body, err := ioutil.ReadFile(filelistapparati)
+	if err != nil {
+		log.Printf("%s Error Impossibile recuperare lista\n", filelistapparati)
+	}
+
+	//Creo la variabile dove conservare i dati parsati
+	var listalistanas [][]TNAS
+	errjson := json.Unmarshal(body, &listalistanas)
+	if errjson != nil {
+		log.Printf("%s Error Impossibile parsare dati\n", filelistapparati)
+	}
+
+	//Istanzio un contatore per contare i nas trovati
 	var i int
+
+	//listalistanas è una lista di liste quindi bisogna fare un doppio ciclo for
 	for _, listanas := range listalistanas {
 		for _, nas := range listanas {
-			//fmt.Println(n, nas.Name)
+			//fmt.Println(n, nas.Name) //debug
+
+			//considero solo gli apparati che abbiano "NAS" all'inzio del campo Service
 			if strings.HasPrefix(nas.Service, "NAS") {
+				//incremento il contatore
 				i++
+
+				//Appendo in devices il nome nas trovato
 				devices = append(devices, nas.Name)
 			}
 		}
 	}
-	log.Printf("I Nas trovati sono %d\n", i)
+	//loggo il numero di NAS identificati
+	log.Printf("%d INFO numero di NAS trovati\n", i)
 
+	//recuperaSessioniPPP è una funzione che recupera i dati ppp dei nas
 	recuperaSessioniPPP := func() {
-		ctx := context.Background()
-		ctx, cancel := context.WithTimeout(ctx, 4*time.Minute)
+		//espando il contesto inziale inserendo un timeout
+		ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+
+		//prima di chiudere vengono rilasciate tutte le risorse
 		defer cancel()
-		for _, device := range devices {
-			wgppp.Add(1)
-			log.Printf("Verifico device %s\n", device)
-			go nasppp2(device)
+
+		//Avvio un ciclo infinito
+		for {
+			select {
+			//se viene raggiunto il timeout la funzione viene killata
+			case <-ctx.Done():
+				log.Printf("All Error Tempo per completare recupero dati terminato\n")
+				return
+
+			//finchè non si raggiunge il timeout viene eseguito il codice di default
+			default:
+				for _, device := range devices {
+					wgppp.Add(1)
+					log.Printf("%s Info Inzio verifica device\n", device)
+					//go nasppp2(device)
+					nasppp2(ctx, device)
+				}
+				return
+			}
 		}
 
-		return
 	}
 
 	recuperaSessioniPPP()
@@ -58,7 +102,7 @@ func nasppp() {
 	fmt.Println("Dopo primo run")
 
 	//imposta un refesh ogni tot minuti
-	t := time.Tick(1 * time.Minute)
+	t := time.Tick(30 * time.Second)
 	c := time.Tick(5 * time.Minute)
 	for {
 		select {
@@ -72,117 +116,129 @@ func nasppp() {
 
 }
 
-func nasppp2(device string) {
-	ctx := context.Background()
+func nasppp2(ctx context.Context, device string) {
+	//Riceve il contesto padre e aggiunge un timeout
+	//massimo per terminare la richiesta dati
 	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
+	defer log.Printf("%s Info Recupero dati terminato\n", device)
 	defer wgppp.Done()
-	//Attendo un tempo random per evitare di fare troppe query insieme
-	randomdelay := rand.Intn(100)
-	time.Sleep(time.Duration(randomdelay) * time.Millisecond)
 
-	os.Setenv("HTTP_PROXY", "")
-	os.Setenv("HTTPS_PROXY", "")
-	fmt.Println(os.Getenv("HTTP_PROXY"))
-	fmt.Println(os.Getenv("HTTPS_PROXY"))
+	for {
+		select {
+		case <-ctx.Done():
+			log.Printf("%s Error Superato tempo massimo per raccolta dati\n", device)
+			return
 
-	//fmt.Println(device)
+		default:
+			//Attendo un tempo random per evitare di fare troppe query insieme
+			randomdelay := rand.Intn(100)
+			time.Sleep(time.Duration(randomdelay) * time.Millisecond)
 
-	var sigma float64
-	sigma = 2.0
+			os.Setenv("HTTP_PROXY", "")
+			os.Setenv("HTTPS_PROXY", "")
+			fmt.Println(os.Getenv("HTTP_PROXY"))
+			fmt.Println(os.Getenv("HTTPS_PROXY"))
 
-	//Recupera la variabile d'ambiente
-	username, err := recuperavariabile("username")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+			//fmt.Println(device)
 
-	//Recupera la variabile d'ambiente
-	password, err := recuperavariabile("password")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
-	url := sessioniPPP + device + "&start=7d-ago&end=5m-ago&aggregator=sum"
+			var sigma float64
+			sigma = 2.0
 
-	req, _ := http.NewRequest("GET", url, nil)
+			//Recupera la variabile d'ambiente
+			username, err := recuperavariabile("username")
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
 
-	//qui su costringe il client ad accettare anche certificati https non validi o scaduti, non anrebbe fatto ma bisogna fare di necessità virtù
-	transCfg := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
-	}
+			//Recupera la variabile d'ambiente
+			password, err := recuperavariabile("password")
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+			url := sessioniPPP + device + "&start=7d-ago&end=5m-ago&aggregator=sum"
 
-	//req.Header.Add("content-type", "application/json;charset=UTF-8")
-	req.SetBasicAuth(username, password)
-	//req.Header.Add("authorization", "Basic MDAyNDY1MDY6Y2Z4VyRsTVM2ZA==")
-	req.Header.Add("cache-control", "no-cache")
+			req, _ := http.NewRequest("GET", url, nil)
 
-	client := &http.Client{Transport: transCfg}
+			//qui su costringe il client ad accettare anche certificati https non validi o scaduti, non anrebbe fatto ma bisogna fare di necessità virtù
+			transCfg := &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+			}
 
-	res, _ := client.Do(req)
-	//res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Println(err.Error(), device)
-	}
+			//req.Header.Add("content-type", "application/json;charset=UTF-8")
+			req.SetBasicAuth(username, password)
+			//req.Header.Add("authorization", "Basic MDAyNDY1MDY6Y2Z4VyRsTVM2ZA==")
+			req.Header.Add("cache-control", "no-cache")
 
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Println(err.Error(), device)
-	}
-	defer res.Body.Close()
-	//fmt.Println(res)
-	//	fmt.Println(string(body))
-	var result []interface{}
-	err = json.Unmarshal(body, &result)
-	if err != nil {
-		log.Println(err.Error(), device)
-		return
-	}
-	if len(result) < 1 {
-		log.Printf("Non ci sono abbastanza info per %s", device)
-		return
-	}
-	d := result[0].(map[string]interface{})
-	dp := d["dps"].(map[string]interface{})
+			client := &http.Client{Transport: transCfg}
 
-	//Metti i tempi in ordine
-	tempi := make([]string, 0)
-	for t := range dp {
-		tempi = append(tempi, t)
-	}
-	//Ordina i tempi in maniera crescente
-	sort.Strings(tempi)
-	var seriepppvalue []float64
-	var serieppptime []float64
-	for _, t := range tempi {
-		tint, _ := strconv.Atoi(t)
-		serieppptime = append(serieppptime, float64(tint))
-		seriepppvalue = append(seriepppvalue, dp[t].(float64))
-		//fmt.Println("orario: ", t, "valore: ", dp[t])
-	}
-	mean, stdev := stat.MeanStdDev(seriepppvalue, nil)
-	log.Printf("%s: media: %2.f stdev: %2.f", device, mean, stdev)
+			res, _ := client.Do(req)
+			//res, err := http.DefaultClient.Do(req)
+			if err != nil {
+				log.Println(err.Error(), device)
+			}
 
-	//Passo le info alla fuzione di elaborazione e grafico
-	//wg.Add()
-	//elaboraseriePPP(serieppptime, seriepppvalue, device, "test", "ppp")
+			body, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				log.Println(err.Error(), device)
+			}
+			defer res.Body.Close()
+			//fmt.Println(res)
+			//	fmt.Println(string(body))
+			var result []interface{}
+			err = json.Unmarshal(body, &result)
+			if err != nil {
+				log.Println(err.Error(), device)
+				return
+			}
+			if len(result) < 1 {
+				log.Printf("%s Error Non ci sono abbastanza info\n", device)
+				return
+			}
+			d := result[0].(map[string]interface{})
+			dp := d["dps"].(map[string]interface{})
 
-	//Verifica se ci sono errori da segnalare
-	for _, v := range seriepppvalue[len(seriepppvalue)-1:] {
-		//fmt.Println(v)
-		//Se le sessioni salgono non è importante
-		// if v > mean+sigma*stdev {
-		// 	log.Printf("Alert su %s, forte innalzamento sessioni ppp\n", device)
-		// 	grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
-		// 	msg <- fmt.Sprintf("Alert su %s, forte innalzamento sessioni ppp, %s\n", device, grafanaurl)
-		// }
-		if v < mean-sigma*stdev {
-			log.Printf("Alert su %s, forte abbassamento sessioni ppp\n", device)
-			grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
-			msg <- fmt.Sprintf("Alert su %s, forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
+			//Metti i tempi in ordine
+			tempi := make([]string, 0)
+			for t := range dp {
+				tempi = append(tempi, t)
+			}
+			//Ordina i tempi in maniera crescente
+			sort.Strings(tempi)
+			var seriepppvalue []float64
+			var serieppptime []float64
+			for _, t := range tempi {
+				tint, _ := strconv.Atoi(t)
+				serieppptime = append(serieppptime, float64(tint))
+				seriepppvalue = append(seriepppvalue, dp[t].(float64))
+				//fmt.Println("orario: ", t, "valore: ", dp[t])
+			}
+			mean, stdev := stat.MeanStdDev(seriepppvalue, nil)
+			log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev)
+
+			//Passo le info alla fuzione di elaborazione e grafico
+			//wg.Add()
+			//elaboraseriePPP(serieppptime, seriepppvalue, device, "test", "ppp")
+
+			//Verifica se ci sono errori da segnalare
+			for _, v := range seriepppvalue[len(seriepppvalue)-1:] {
+				//fmt.Println(v)
+				//Se le sessioni salgono non è importante
+				// if v > mean+sigma*stdev {
+				// 	log.Printf("Alert su %s, forte innalzamento sessioni ppp\n", device)
+				// 	grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
+				// 	msg <- fmt.Sprintf("Alert su %s, forte innalzamento sessioni ppp, %s\n", device, grafanaurl)
+				// }
+				if v < mean-sigma*stdev {
+					log.Printf("%s Alert, forte abbassamento sessioni ppp\n", device)
+					grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
+					msg <- fmt.Sprintf("Alert su %s, forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
+				}
+			}
+
+			return
 		}
 	}
-
-	return
 }
