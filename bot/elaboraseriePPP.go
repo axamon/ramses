@@ -2,11 +2,16 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 
 	//"github.com/spf13/viper"
 
 	ma "github.com/mxmCherry/movavg"
 	"gonum.org/v1/gonum/stat"
+	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotutil"
+	"gonum.org/v1/plot/vg"
 
 	//"compress/gzip"
 
@@ -14,23 +19,26 @@ import (
 )
 
 func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
-	sigma = 2.5
-	//var sendimage bool
 
 	//Finita la funzione notifica il waitgroup
 	defer wg.Done()
 
-	//elimino il trend
-	xdet, ydet := detrend(x, lista)
-
-	speeds := ydet
-	x = xdet
-	//speeds := lista
-
-	if len(speeds) < 300 {
+	//Se non trovo abbastanza dati esci
+	if len(lista) < 300 {
 		log.Println("Non ci sono abbastanza dati: ", device)
 		return
 	}
+
+	sigma = 2.5
+	//var sendimage bool
+
+	//elimino il trend
+	xdet, ydet := detrend(x, lista)
+
+	//applico derivata seconda alle ordinate
+	speeds, _ := derive2(ydet)
+
+	x = xdet
 
 	//Creazione medie mobili di interesse
 	//sma3 := ma.ThreadSafe(ma.NewSMA(3))     //creo una moving average a 3
@@ -50,23 +58,22 @@ func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
 	//ma100 := make([]float64, 0, n)
 	ma20Upperband := make([]float64, 0, n)
 	ma20Lowerband := make([]float64, 0, n)
-
 	//
 	// plot
 	//
 
 	//Inzializza il grafico
-	//p, err := plot.New()
-	//if err != nil {
-	//	panic(err)
-	//}
+	p, err := plot.New()
+	if err != nil {
+		panic(err)
+	}
 
 	//inzializza il puntatore
 	var i int
 
 	//aryOrig := speeds
 	for i = 0; i < n-1; i++ {
-		//applico uno smoothing delle ascisse
+		//applico uno smoothing delle ordinate
 		speeds[i] = speeds[i+1] - speeds[i]
 		y := speeds[i]
 
@@ -117,46 +124,47 @@ func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
 	//yaryFilt := mat64.Row(nil, 0, filtered)
 
 	//salva sigma come string
-	//sigmastring := strconv.FormatFloat(sigma, 'f', 1, 64)
+	sigmastring := strconv.FormatFloat(sigma, 'f', 1, 64)
 
-	//err = plotutil.AddLinePoints(p,
+	err = plotutil.AddLinePoints(p,
 
-	//"Filtered", generatePoints(xary, yaryFilt[len(yaryFilt)-120:]),
-	//"MA3", generatePoints(xary, ma3),
-	//"MA7", generatePoints(xary, ma7),
+		//"Filtered", generatePoints(xary, yaryFilt[len(yaryFilt)-120:]),
+		//"MA3", generatePoints(xary, ma3),
+		//"MA7", generatePoints(xary, ma7),
 
-	//	"Up "+sigmastring+" sigma", generatePoints(xary, ma20Upperband),
-	//	"Original", generatePoints(xary, yaryOrig),
-	//	"Media mobile 20", generatePoints(xary, ma20),
-	//	"Media mobile 100", generatePoints(xary, ma100),
-	//	"Low "+sigmastring+" sigma", generatePoints(xary, ma20Lowerband),
-	//)
-	//if err != nil {
-	//	log.Println(err)
-	//}
+		"Up "+sigmastring+" sigma", generatePoints(xary, ma20Upperband),
+		"Original", generatePoints(xary, yaryOrig),
+		"Media mobile 20", generatePoints(xary, ma20),
+		//"Media mobile 100", generatePoints(xary, ma100),
+		"Low "+sigmastring+" sigma", generatePoints(xary, ma20Lowerband),
+		//		"lower", generatePoints(xary, lower),
+	)
+	if err != nil {
+		log.Println(err)
+	}
 
 	// Save the plot to a PNG file.
 
 	//imposta su due righe del grafico nome apparato e interfaccia
-	//p.Title.Text = device + "\n " + interfaccia + "\n" + metrica
+	p.Title.Text = device + "\n " + interfaccia + "\n" + metrica
 
-	//path1 := "./grafici"
-	//path2 := path1 + "/" + device
-	//path3 := path2 + "/" + metrica
+	path1 := "./grafici"
+	path2 := path1 + "/" + device
+	path3 := path2 + "/" + metrica
 
-	//paths := []string{path1, path2, path3}
+	paths := []string{path1, path2, path3}
 
-	//for _, path := range paths {
-	//	if _, err := os.Stat(path); os.IsNotExist(err) {
-	//		os.Mkdir(path, 664)
-	//	}
-	//}
-	//fmt.Println(path3) //debug
+	for _, path := range paths {
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			os.Mkdir(path, 664)
+		}
+	}
+	fmt.Println(path3) //debug
 
 	//SALVA IL GRAFICO
-	//if err := p.Save(8*vg.Inch, 4*vg.Inch, path3+"/"+device+".png"); err != nil {
-	//	panic(err)
-	//}
+	if err := p.Save(8*vg.Inch, 4*vg.Inch, path3+"/"+device+".png"); err != nil {
+		panic(err)
+	}
 
 	//if sendimage == true {
 	//	image <- path3 + "/" + device + ".png"

@@ -55,7 +55,7 @@ func nasppp() {
 			//fmt.Println(n, nas.Name) //debug
 
 			//considero solo gli apparati che abbiano "NAS" all'inzio del campo Service
-			if strings.HasPrefix(nas.Service, "NAS") {
+			if strings.HasPrefix(nas.Service, "NAS") && strings.Contains(nas.Domain, "EDGE_BRAS") && strings.Contains(nas.ChassisName, "MX960") {
 				//incremento il contatore
 				i++
 
@@ -66,6 +66,7 @@ func nasppp() {
 	}
 	//loggo il numero di NAS identificati
 	log.Printf("%d INFO numero di NAS trovati\n", i)
+	time.Sleep(3 * time.Second)
 
 	//recuperaSessioniPPP è una funzione che recupera i dati ppp dei nas
 	recuperaSessioniPPP := func() {
@@ -219,8 +220,8 @@ func nasppp2(ctx context.Context, device string) {
 			log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev)
 
 			//Passo le info alla fuzione di elaborazione e grafico
-			//wg.Add()
-			//elaboraseriePPP(serieppptime, seriepppvalue, device, "test", "ppp")
+			wg.Add()
+			elaboraseriePPP(serieppptime, seriepppvalue, device, "test", "ppp")
 
 			//Verifica se ci sono errori da segnalare
 			for _, v := range seriepppvalue[len(seriepppvalue)-1:] {

@@ -1,0 +1,229 @@
+2018/11/22 18:51:50 76 INFO numero di NAS trovati
+2018/11/22 18:51:53 r-al899 Info Inzio verifica device
+2018/11/22 18:51:53 r-al899 Error Non ci sono abbastanza info
+2018/11/22 18:51:53 r-al899 Info Recupero dati terminato
+2018/11/22 18:51:53 r-al900 Info Inzio verifica device
+2018/11/22 18:51:54 r-al900 Info media: 91823 stdev: 2331
+2018/11/22 18:51:54 r-al900 Info Recupero dati terminato
+2018/11/22 18:51:54 r-an898 Info Inzio verifica device
+2018/11/22 18:51:55 r-an898 Error Non ci sono abbastanza info
+2018/11/22 18:51:55 r-an898 Info Recupero dati terminato
+2018/11/22 18:51:55 r-an899 Info Inzio verifica device
+2018/11/22 18:51:55 r-an899 Info media: 36474 stdev: 908
+2018/11/22 18:51:55 r-an899 Info Recupero dati terminato
+2018/11/22 18:51:55 r-an900 Info Inzio verifica device
+2018/11/22 18:51:56 r-an900 Info media: 120193 stdev: 2691
+2018/11/22 18:51:56 r-an900 Info Recupero dati terminato
+2018/11/22 18:51:56 r-ba899 Info Inzio verifica device
+2018/11/22 18:51:57 r-ba899 Info media: 25769 stdev: 518
+2018/11/22 18:51:57 r-ba899 Info Recupero dati terminato
+2018/11/22 18:51:57 r-ba900 Info Inzio verifica device
+2018/11/22 18:51:57 r-ba900 Info media: 106546 stdev: 1960
+2018/11/22 18:51:57 r-ba900 Info Recupero dati terminato
+2018/11/22 18:51:57 r-bg899 Info Inzio verifica device
+2018/11/22 18:51:58 r-bg899 Info media: 23378 stdev: 749
+2018/11/22 18:51:58 r-bg899 Info Recupero dati terminato
+2018/11/22 18:51:58 r-bg900 Info Inzio verifica device
+2018/11/22 18:51:59 r-bg900 Info media: 122531 stdev: 3133
+2018/11/22 18:51:59 r-bg900 Info Recupero dati terminato
+2018/11/22 18:51:59 r-bo890 Info Inzio verifica device
+2018/11/22 18:51:59 r-bo890 Error Non ci sono abbastanza info
+2018/11/22 18:51:59 r-bo890 Info Recupero dati terminato
+2018/11/22 18:51:59 r-bo899 Info Inzio verifica device
+2018/11/22 18:52:00 r-bo899 Info media: 13665 stdev: 337
+2018/11/22 18:52:00 r-bo899 Info Recupero dati terminato
+2018/11/22 18:52:00 r-bo900 Info Inzio verifica device
+2018/11/22 18:52:00 r-bo900 Info media: 108436 stdev: 1884
+2018/11/22 18:52:00 r-bo900 Info Recupero dati terminato
+2018/11/22 18:52:00 r-bz899 Info Inzio verifica device
+2018/11/22 18:52:01 r-bz899 Error Non ci sono abbastanza info
+2018/11/22 18:52:01 r-bz899 Info Recupero dati terminato
+2018/11/22 18:52:01 r-bz900 Info Inzio verifica device
+2018/11/22 18:52:02 r-bz900 Info media: 81401 stdev: 3010
+2018/11/22 18:52:02 r-bz900 Info Recupero dati terminato
+2018/11/22 18:52:02 r-bs122 Info Inzio verifica device
+2018/11/22 18:52:02 r-bs122 Info media: 102623 stdev: 1604
+2018/11/22 18:52:02 r-bs122 Info Recupero dati terminato
+2018/11/22 18:52:02 r-bs899 Info Inzio verifica device
+2018/11/22 18:52:03 r-bs899 Info media: 13305 stdev: 313
+2018/11/22 18:52:03 r-bs899 Info Recupero dati terminato
+2018/11/22 18:52:03 r-bs900 Info Inzio verifica device
+2018/11/22 18:52:04 r-bs900 Info media: 87301 stdev: 2106
+2018/11/22 18:52:04 r-bs900 Info Recupero dati terminato
+2018/11/22 18:52:04 r-ca899 Info Inzio verifica device
+2018/11/22 18:52:04 r-ca899 Error Non ci sono abbastanza info
+2018/11/22 18:52:04 r-ca899 Info Recupero dati terminato
+2018/11/22 18:52:04 r-ca900 Info Inzio verifica device
+2018/11/22 18:52:05 r-ca900 Info media: 91156 stdev: 1926
+2018/11/22 18:52:05 r-ca900 Info Recupero dati terminato
+2018/11/22 18:52:05 r-ct898 Info Inzio verifica device
+2018/11/22 18:52:05 r-ct898 Info media: 31137 stdev: 524
+2018/11/22 18:52:05 r-ct898 Info Recupero dati terminato
+2018/11/22 18:52:05 r-ct899 Info Inzio verifica device
+2018/11/22 18:52:06 r-ct899 Info media: 67426 stdev: 1153
+2018/11/22 18:52:06 r-ct899 Info Recupero dati terminato
+2018/11/22 18:52:06 r-ct900 Info Inzio verifica device
+2018/11/22 18:52:07 r-ct900 Info media: 124166 stdev: 1922
+2018/11/22 18:52:07 r-ct900 Info Recupero dati terminato
+2018/11/22 18:52:07 r-cz899 Info Inzio verifica device
+2018/11/22 18:52:07 r-cz899 Info media: 54189 stdev: 917
+2018/11/22 18:52:08 r-cz899 Info Recupero dati terminato
+2018/11/22 18:52:08 r-cz900 Info Inzio verifica device
+2018/11/22 18:52:08 r-cz900 Info media: 114936 stdev: 1812
+2018/11/22 18:52:08 r-cz900 Info Recupero dati terminato
+2018/11/22 18:52:08 r-co900 Info Inzio verifica device
+2018/11/22 18:52:09 r-co900 Info media: 52296 stdev: 1289
+2018/11/22 18:52:09 r-co900 Info Recupero dati terminato
+2018/11/22 18:52:09 r-fi898 Info Inzio verifica device
+2018/11/22 18:52:09 r-fi898 Info media: 35688 stdev: 514
+2018/11/22 18:52:10 r-fi898 Info Recupero dati terminato
+2018/11/22 18:52:10 r-fi899 Info Inzio verifica device
+2018/11/22 18:52:10 r-fi899 Error Non ci sono abbastanza info
+2018/11/22 18:52:10 r-fi899 Info Recupero dati terminato
+2018/11/22 18:52:10 r-fi900 Info Inzio verifica device
+2018/11/22 18:52:11 r-fi900 Info media: 124543 stdev: 2084
+2018/11/22 18:52:11 r-fi900 Info Recupero dati terminato
+2018/11/22 18:52:11 r-ge899 Info Inzio verifica device
+2018/11/22 18:52:11 r-ge899 Error Non ci sono abbastanza info
+2018/11/22 18:52:11 r-ge899 Info Recupero dati terminato
+2018/11/22 18:52:11 r-ge900 Info Inzio verifica device
+2018/11/22 18:52:12 r-ge900 Info media: 76546 stdev: 1677
+2018/11/22 18:52:12 r-ge900 Info Recupero dati terminato
+2018/11/22 18:52:12 r-mi506 Info Inzio verifica device
+2018/11/22 18:52:13 r-mi506 Info media: 112817 stdev: 2520
+2018/11/22 18:52:13 r-mi506 Info Recupero dati terminato
+2018/11/22 18:52:13 r-mi890 Info Inzio verifica device
+2018/11/22 18:52:13 r-mi890 Error Non ci sono abbastanza info
+2018/11/22 18:52:13 r-mi890 Info Recupero dati terminato
+2018/11/22 18:52:13 r-mi895 Info Inzio verifica device
+2018/11/22 18:52:14 r-mi895 Info media: 8084 stdev: 91
+2018/11/22 18:52:14 r-mi895 Info Recupero dati terminato
+2018/11/22 18:52:14 r-mi896 Info Inzio verifica device
+2018/11/22 18:52:14 r-mi896 Info media: 9541 stdev: 196
+2018/11/22 18:52:15 r-mi896 Info Recupero dati terminato
+2018/11/22 18:52:15 r-mi897 Info Inzio verifica device
+2018/11/22 18:52:15 r-mi897 Info media: 46046 stdev: 927
+2018/11/22 18:52:15 r-mi897 Info Recupero dati terminato
+2018/11/22 18:52:15 r-mi898 Info Inzio verifica device
+2018/11/22 18:52:16 r-mi898 Info media: 88547 stdev: 1847
+2018/11/22 18:52:16 r-mi898 Info Recupero dati terminato
+2018/11/22 18:52:16 r-mi899 Info Inzio verifica device
+2018/11/22 18:52:17 r-mi899 Info media: 106290 stdev: 2220
+2018/11/22 18:52:17 r-mi899 Info Recupero dati terminato
+2018/11/22 18:52:17 r-mi900 Info Inzio verifica device
+2018/11/22 18:52:17 r-mi900 Info media: 123041 stdev: 2486
+2018/11/22 18:52:17 r-mi900 Info Recupero dati terminato
+2018/11/22 18:52:17 r-mo898 Info Inzio verifica device
+2018/11/22 18:52:18 r-mo898 Error Non ci sono abbastanza info
+2018/11/22 18:52:18 r-mo898 Info Recupero dati terminato
+2018/11/22 18:52:18 r-mo899 Info Inzio verifica device
+2018/11/22 18:52:18 r-mo899 Info media: 68956 stdev: 1400
+2018/11/22 18:52:19 r-mo899 Info Recupero dati terminato
+2018/11/22 18:52:19 r-mo900 Info Inzio verifica device
+2018/11/22 18:52:19 r-mo900 Info media: 116381 stdev: 2279
+2018/11/22 18:52:19 r-mo900 Info Recupero dati terminato
+2018/11/22 18:52:19 r-na898 Info Inzio verifica device
+2018/11/22 18:52:20 r-na898 Info media: 43798 stdev: 1735
+2018/11/22 18:52:20 r-na898 Info Recupero dati terminato
+2018/11/22 18:52:20 r-na899 Info Inzio verifica device
+2018/11/22 18:52:21 r-na899 Info media: 67787 stdev: 1843
+2018/11/22 18:52:21 r-na899 Info Recupero dati terminato
+2018/11/22 18:52:21 r-na900 Info Inzio verifica device
+2018/11/22 18:52:21 r-na900 Info media: 105396 stdev: 1542
+2018/11/22 18:52:21 r-na900 Info Recupero dati terminato
+2018/11/22 18:52:21 r-pd166 Info Inzio verifica device
+2018/11/22 18:52:22 r-pd166 Info media: 106883 stdev: 2901
+2018/11/22 18:52:22 r-pd166 Info Recupero dati terminato
+2018/11/22 18:52:22 r-pd899 Info Inzio verifica device
+2018/11/22 18:52:23 r-pd899 Error Non ci sono abbastanza info
+2018/11/22 18:52:23 r-pd899 Info Recupero dati terminato
+2018/11/22 18:52:23 r-pd900 Info Inzio verifica device
+2018/11/22 18:52:23 r-pd900 Info media: 62247 stdev: 1430
+2018/11/22 18:52:23 r-pd900 Info Recupero dati terminato
+2018/11/22 18:52:23 r-pa899 Info Inzio verifica device
+2018/11/22 18:52:24 r-pa899 Error Non ci sono abbastanza info
+2018/11/22 18:52:24 r-pa899 Info Recupero dati terminato
+2018/11/22 18:52:24 r-pa900 Info Inzio verifica device
+2018/11/22 18:52:24 r-pa900 Info media: 112117 stdev: 1723
+2018/11/22 18:52:24 r-pa900 Info Recupero dati terminato
+2018/11/22 18:52:24 r-pg900 Info Inzio verifica device
+2018/11/22 18:52:25 r-pg900 Info media: 66458 stdev: 1025
+2018/11/22 18:52:25 r-pg900 Info Recupero dati terminato
+2018/11/22 18:52:25 r-pe899 Info Inzio verifica device
+2018/11/22 18:52:26 r-pe899 Info media: 21055 stdev: 373
+2018/11/22 18:52:26 r-pe899 Info Recupero dati terminato
+2018/11/22 18:52:26 r-pe900 Info Inzio verifica device
+2018/11/22 18:52:26 r-pe900 Info media: 92736 stdev: 2044
+2018/11/22 18:52:26 r-pe900 Info Recupero dati terminato
+2018/11/22 18:52:26 r-pi095 Info Inzio verifica device
+2018/11/22 18:52:27 r-pi095 Info media: 124809 stdev: 2583
+2018/11/22 18:52:27 r-pi095 Info Recupero dati terminato
+2018/11/22 18:52:27 r-pi899 Info Inzio verifica device
+2018/11/22 18:52:28 r-pi899 Info media: 13152 stdev: 351
+2018/11/22 18:52:28 r-pi899 Info Recupero dati terminato
+2018/11/22 18:52:28 r-pi900 Info Inzio verifica device
+2018/11/22 18:52:28 r-pi900 Info media: 65347 stdev: 1317
+2018/11/22 18:52:28 r-pi900 Info Recupero dati terminato
+2018/11/22 18:52:28 r-rn899 Info Inzio verifica device
+2018/11/22 18:52:29 r-rn899 Info media: 4674 stdev: 94
+2018/11/22 18:52:29 r-rn899 Info Recupero dati terminato
+2018/11/22 18:52:29 r-rn900 Info Inzio verifica device
+2018/11/22 18:52:30 r-rn900 Info media: 101695 stdev: 1753
+2018/11/22 18:52:30 r-rn900 Info Recupero dati terminato
+2018/11/22 18:52:30 r-rm613 Info Inzio verifica device
+2018/11/22 18:52:30 r-rm613 Info media: 120608 stdev: 2126
+2018/11/22 18:52:30 r-rm613 Info Recupero dati terminato
+2018/11/22 18:52:30 r-rm890 Info Inzio verifica device
+2018/11/22 18:52:31 r-rm890 Error Non ci sono abbastanza info
+2018/11/22 18:52:31 r-rm890 Info Recupero dati terminato
+2018/11/22 18:52:31 r-rm895 Info Inzio verifica device
+2018/11/22 18:52:32 r-rm895 Info media: 19994 stdev: 256
+2018/11/22 18:52:32 r-rm895 Info Recupero dati terminato
+2018/11/22 18:52:32 r-rm896 Info Inzio verifica device
+2018/11/22 18:52:32 r-rm896 Info media: 52449 stdev: 767
+2018/11/22 18:52:32 r-rm896 Info Recupero dati terminato
+2018/11/22 18:52:32 r-rm897 Info Inzio verifica device
+2018/11/22 18:52:33 r-rm897 Info media: 64664 stdev: 1217
+2018/11/22 18:52:33 r-rm897 Info Recupero dati terminato
+2018/11/22 18:52:33 r-rm898 Info Inzio verifica device
+2018/11/22 18:52:34 r-rm898 Info media: 102422 stdev: 2387
+2018/11/22 18:52:34 r-rm898 Info Recupero dati terminato
+2018/11/22 18:52:34 r-rm899 Info Inzio verifica device
+2018/11/22 18:52:34 r-rm899 Info media: 86631 stdev: 1905
+2018/11/22 18:52:34 r-rm899 Info Recupero dati terminato
+2018/11/22 18:52:34 r-rm900 Info Inzio verifica device
+2018/11/22 18:52:35 r-rm900 Info media: 117338 stdev: 1910
+2018/11/22 18:52:35 r-rm900 Info Recupero dati terminato
+2018/11/22 18:52:35 r-sv900 Info Inzio verifica device
+2018/11/22 18:52:36 r-sv900 Error Non ci sono abbastanza info
+2018/11/22 18:52:36 r-sv900 Info Recupero dati terminato
+2018/11/22 18:52:36 r-ta899 Info Inzio verifica device
+2018/11/22 18:52:36 r-ta899 Info media: 444 stdev: 10
+2018/11/22 18:52:36 r-ta899 Info Recupero dati terminato
+2018/11/22 18:52:36 r-ta900 Info Inzio verifica device
+2018/11/22 18:52:37 r-ta900 Info media: 100365 stdev: 2059
+2018/11/22 18:52:37 r-ta900 Info Recupero dati terminato
+2018/11/22 18:52:37 r-to189 Info Inzio verifica device
+2018/11/22 18:52:38 r-to189 Info media: 100632 stdev: 2635
+2018/11/22 18:52:38 r-to189 Info Recupero dati terminato
+2018/11/22 18:52:38 r-to899 Info Inzio verifica device
+2018/11/22 18:52:38 r-to899 Info media: 21352 stdev: 519
+2018/11/22 18:52:38 r-to899 Info Recupero dati terminato
+2018/11/22 18:52:38 r-to900 Info Inzio verifica device
+2018/11/22 18:52:39 r-to900 Info media: 97601 stdev: 2945
+2018/11/22 18:52:39 r-to900 Info Recupero dati terminato
+2018/11/22 18:52:39 r-ts899 Info Inzio verifica device
+2018/11/22 18:52:40 r-ts899 Info media: 4951 stdev: 219
+2018/11/22 18:52:40 r-ts899 Info Recupero dati terminato
+2018/11/22 18:52:40 r-ts900 Info Inzio verifica device
+2018/11/22 18:52:40 r-ts900 Info media: 98980 stdev: 2446
+2018/11/22 18:52:40 r-ts900 Info Recupero dati terminato
+2018/11/22 18:52:40 r-ve899 Info Inzio verifica device
+2018/11/22 18:52:41 r-ve899 Info media: 40115 stdev: 1133
+2018/11/22 18:52:41 r-ve899 Info Recupero dati terminato
+2018/11/22 18:52:41 r-ve900 Info Inzio verifica device
+2018/11/22 18:52:41 r-ve900 Info media: 127351 stdev: 3295
+2018/11/22 18:52:41 r-ve900 Info Recupero dati terminato
+2018/11/22 18:52:41 r-vr900 Info Inzio verifica device
+2018/11/22 18:52:42 r-vr900 Info media: 70740 stdev: 1038
+2018/11/22 18:52:42 r-vr900 Info Recupero dati terminato
