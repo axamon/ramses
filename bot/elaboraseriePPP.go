@@ -30,7 +30,7 @@ func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
 	}
 
 	sigma = 2.5
-	//var sendimage bool
+	var sendimage bool
 
 	//elimino il trend
 	xdet, ydet := detrend(x, lista)
@@ -114,7 +114,7 @@ func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
 				alert := fmt.Sprintf("Violata soglia bassa %s su %s. %s", metrica, device, urlgrafana)
 				//TODO inviare alert
 				msg <- alert
-				//sendimage = true
+				sendimage = true
 
 			}
 		}
@@ -166,9 +166,9 @@ func elaboraseriePPP(x, lista []float64, device, interfaccia, metrica string) {
 		panic(err)
 	}
 
-	//if sendimage == true {
-	//	image <- path3 + "/" + device + ".png"
-	//}
+	if sendimage == true {
+		image <- path3 + "/" + device + ".png"
+	}
 
 	return
 }
