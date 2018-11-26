@@ -55,6 +55,7 @@ func nasppp() {
 			//fmt.Println(n, nas.Name) //debug
 
 			//considero solo gli apparati che abbiano "NAS" all'inzio del campo Service
+			//e EDGE_BRAS come dominio e MX960 come chassis
 			if strings.HasPrefix(nas.Service, "NAS") && strings.Contains(nas.Domain, "EDGE_BRAS") && strings.Contains(nas.ChassisName, "MX960") {
 				//incremento il contatore
 				i++
@@ -98,9 +99,12 @@ func nasppp() {
 
 	}
 
+	//Prima esecuzione del recupero dati dall'avvio dell'applicazione
 	recuperaSessioniPPP()
+
+	//Attende che tutte le richieste siano terminate prima di proseguire
 	wgppp.Wait()
-	fmt.Println("Dopo primo run")
+	fmt.Println("Dopo primo run") //debug
 
 	//imposta un refesh ogni tot minuti
 	t := time.Tick(30 * time.Second)
@@ -120,7 +124,7 @@ func nasppp() {
 func nasppp2(ctx context.Context, device string) {
 	//Riceve il contesto padre e aggiunge un timeout
 	//massimo per terminare la richiesta dati
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)
 	defer cancel()
 	defer log.Printf("%s Info Recupero dati terminato\n", device)
 	defer wgppp.Done()
@@ -136,6 +140,7 @@ func nasppp2(ctx context.Context, device string) {
 			randomdelay := rand.Intn(100)
 			time.Sleep(time.Duration(randomdelay) * time.Millisecond)
 
+			//Ripulisce eventiali impostazioni di proxy a livello di sistema
 			os.Setenv("HTTP_PROXY", "")
 			os.Setenv("HTTPS_PROXY", "")
 			fmt.Println(os.Getenv("HTTP_PROXY"))
@@ -221,7 +226,7 @@ func nasppp2(ctx context.Context, device string) {
 
 			//Passo le info alla fuzione di elaborazione e grafico
 			wg.Add()
-			elaboraseriePPP(serieppptime, seriepppvalue, device, "test", "ppp")
+			elaboraseriePPP(ctx, serieppptime, seriepppvalue, device, "test", "ppp")
 
 			//Verifica se ci sono errori da segnalare
 			for _, v := range seriepppvalue[len(seriepppvalue)-1:] {

@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"gonum.org/v1/gonum/stat"
+	"github.com/axamon/ramses/algoritmi"
 )
 
 var numSamples int
@@ -38,33 +38,7 @@ func main() {
 	a[indiceanomalo] = float64(anomalo)
 
 	//fmt.Println(xs, a)
-	xdet, ydet := detrend(xs, a)
+	xdet, ydet := algoritmi.Detrend(xs, a)
 
 	elaboraserie(xdet, ydet, "prova", "eth0", "fuffa")
-}
-
-//detrend
-func detrend(x, y []float64) (xdet, ydet []float64) {
-	//Calcolo dei pesi per elimare la eteroschedasticità
-	//Ogni peso è dato dall'inverso della varianza del punto
-	var weights = make([]float64, numSamples)
-	for i := 0; i < len(y); i++ {
-		if i <= 2 {
-			weights[i] = 0
-			continue
-		}
-		variance := stat.Variance(y[:i], nil)
-		weights[i] = 1 / variance
-	}
-	alpha, beta := stat.LinearRegression(x, y, weights, false)
-
-	ydet = make([]float64, numSamples)
-	xdet = make([]float64, numSamples)
-
-	for i := 0; i < len(y); i++ {
-		ydet[i] = y[i] - (alpha + x[i]*beta)
-		xdet[i] = x[i]
-	}
-
-	return
 }
