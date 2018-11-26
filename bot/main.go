@@ -26,6 +26,8 @@ var b *tb.Bot
 
 func main() {
 
+	GatherInfo()
+
 	go nasppp()
 
 	//Recupera la variabile d'ambiente
