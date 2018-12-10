@@ -213,8 +213,12 @@ func nasppp2(ctx context.Context, device string) {
 			}
 			//Ordina i tempi in maniera crescente
 			sort.Strings(tempi)
+
+			//Crea variabili da'appoggio
 			var seriepppvalue []float64
 			var serieppptime []float64
+			
+			//Cicla i tempi
 			for _, t := range tempi {
 				tint, _ := strconv.Atoi(t)
 				serieppptime = append(serieppptime, float64(tint))

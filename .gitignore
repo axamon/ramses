@@ -7,3 +7,4 @@ fourier/fourier
 *.bat
 *.sh
 OLD
+*.prof
