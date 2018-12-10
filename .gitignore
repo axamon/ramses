@@ -8,3 +8,4 @@ fourier/fourier
 *.sh
 OLD
 *.prof
+*.csv
