@@ -14,9 +14,9 @@ var fileNasInventory = "nasInventory.json"
 func main() {
 
 	if _, err := os.Stat(fileNasInventory); os.IsNotExist(err) {
-		log.Println("Non trovo il file %s, riscarico la lista NAS", fileNasInventory)
+		log.Printf("Non trovo il file %s, riscarico la lista NAS\n", fileNasInventory)
 		recuperaNAS()
-		log.Println("%s creato", fileNasInventory)
+		log.Printf("%s creato\n", fileNasInventory)
 
 		time.Sleep(5 * time.Second)
 	}

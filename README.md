@@ -4,18 +4,17 @@ Attingendo ai dati di IPDOM Ramses elabora un grafico delle ultime 10 ore per tu
 
 Ramses inoltre monitora un sottoinsieme dei NAS esistenti ogni 15 minuti e allerta via TELEGRAM se ci sono scostamenti del numero di sessioni ppp molto elvati.
 
-Enjoy! 
+Enjoy!  
 
 Dal vostro amichevole Gopher di quartiere.
 
-Sintassi: 
-    
+Sintassi:  
+
     ramses -s=numero di deviazioni standard da considerare device da interrogare
 
 Esempio:
 
     ramses -s=2.5 se-fi1-9
-
 
 per funzionare serve settare delle variabili d'ambiente.
 
