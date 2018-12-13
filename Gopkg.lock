@@ -46,17 +46,6 @@
   revision = "13cee106170131d4088721db299d09b42db508ac"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/mjibson/go-dsp"
-  packages = [
-    "dsputils",
-    "fft",
-    "spectral",
-    "window"
-  ]
-  revision = "11479a337f1259210b7c8f93f7bf2b0cc87b066e"
-
-[[projects]]
   name = "github.com/mxmCherry/movavg"
   packages = ["."]
   revision = "409878dc0217b30656458b56ab1eb0843e346a99"
@@ -92,6 +81,12 @@
     "tiff/lzw"
   ]
   revision = "991ec62608f3c0da01d400756917825d1e2fd528"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = ["internal/timeseries"]
+  revision = "610586996380ceef02dd726cc09df7e00a3f8e56"
 
 [[projects]]
   branch = "master"
@@ -133,6 +128,18 @@
   revision = "5f3c436ce602d80b13f2936b6bf149515198d6a4"
 
 [[projects]]
+  branch = "v3"
+  name = "gopkg.in/alexcesaro/quotedprintable.v3"
+  packages = ["."]
+  revision = "2caba252f4dc53eaf6b553000885530023f54623"
+
+[[projects]]
+  name = "gopkg.in/gomail.v2"
+  packages = ["."]
+  revision = "41f3572897373c5538c50a2402db15db079fa4fd"
+  version = "2.0.0"
+
+[[projects]]
   branch = "v2"
   name = "gopkg.in/tucnak/telebot.v2"
   packages = ["."]
@@ -141,6 +148,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a30ae5c46c3a1462089ba219d45d66141fe39d2757dec24c1ae14405fca163c5"
+  inputs-digest = "ef9714db6ed3d1246a262e00be4dac3374bbd0f0d82eaa87c97e71c840e4fc50"
   solver-name = "gps-cdcl"
   solver-version = 1
