@@ -19,7 +19,7 @@ func mandamail(from, to, device string) {
 	m.SetBody("text/html", body)
 	//m.Attach("/home/Alex/lolcat.jpg")
 
-	d := gomail.NewDialer("smtp.gmail.com", 587, "alberto.bregliano@gmail.com", "lklfldsfrzlmcobs")
+	d := gomail.NewPlainDialer("smtp.gmail.com", 587, "alberto.bregliano@gmail.com", "lklfldsfrzlmcobs")
 
 	// Send the email to Bob, Cora and Dan.
 	if err := d.DialAndSend(m); err != nil {
