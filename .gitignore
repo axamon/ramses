@@ -9,3 +9,5 @@ fourier/fourier
 OLD
 *.prof
 *.csv
+config
+bot.exe

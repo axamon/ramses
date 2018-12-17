@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 	"time"
 
+	"github.com/tkanos/gonfig"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -24,7 +26,15 @@ func RiceviResult(result string) {
 //var m *tb.Message
 var b *tb.Bot
 
+var configuration Configuration
+
 func main() {
+	err := gonfig.GetConf(os.Args[1], &configuration)
+	if err != nil {
+		log.Printf("errore: %s", err.Error())
+	}
+
+	fmt.Println(configuration.SmtpPort)
 
 	GatherInfo()
 

@@ -19,8 +19,6 @@ import (
 	"gonum.org/v1/gonum/stat"
 )
 
-const sessioniPPP = "https://ipw.telecomitalia.it/ipwmetrics/api/v1/rawmetrics/kpi.ppoe.slot?device="
-
 var wgppp sync.WaitGroup
 
 func nasppp() {
@@ -31,7 +29,7 @@ func nasppp() {
 	var devices []string
 
 	//identifico il file json con le informazioni da parsare
-	filelistapparati := "nasInventory.json"
+	filelistapparati := configuration.NasInventory
 
 	//leggo il file in memoria
 	body, err := ioutil.ReadFile(filelistapparati)
@@ -164,7 +162,7 @@ func nasppp2(ctx context.Context, device string) {
 				log.Fatal(err)
 				return
 			}
-			url := sessioniPPP + device + "&start=7d-ago&end=5m-ago&aggregator=sum"
+			url := configuration.URLSessioniPPP + device + configuration.URLTail7d
 
 			req, _ := http.NewRequest("GET", url, nil)
 
@@ -175,7 +173,6 @@ func nasppp2(ctx context.Context, device string) {
 
 			//req.Header.Add("content-type", "application/json;charset=UTF-8")
 			req.SetBasicAuth(username, password)
-			//req.Header.Add("authorization", "Basic MDAyNDY1MDY6Y2Z4VyRsTVM2ZA==")
 			req.Header.Add("cache-control", "no-cache")
 
 			client := &http.Client{Transport: transCfg}
@@ -217,7 +214,7 @@ func nasppp2(ctx context.Context, device string) {
 			//Crea variabili da'appoggio
 			var seriepppvalue []float64
 			var serieppptime []float64
-			
+
 			//Cicla i tempi
 			for _, t := range tempi {
 				tint, _ := strconv.Atoi(t)
