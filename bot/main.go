@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/axamon/ramses/funzioni"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -26,12 +27,12 @@ var b *tb.Bot
 
 func main() {
 
-	GatherInfo()
+	funzioni.GatherInfo()
 
-	go nasppp()
+	go funzioni.nasppp()
 
 	//Recupera la variabile d'ambiente
-	TELEGRAMTOKEN, err := recuperavariabile("TELEGRAMTOKEN")
+	TELEGRAMTOKEN, err := funzioni.Recuperavariabile("TELEGRAMTOKEN")
 	if err != nil {
 		log.Println(err)
 		return
