@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"regexp"
 	"strconv"
 
@@ -10,6 +9,7 @@ import (
 	ma "github.com/mxmCherry/movavg"
 	"gonum.org/v1/gonum/stat"
 	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/plotutil"
 	"gonum.org/v1/plot/vg"
 
@@ -19,10 +19,7 @@ import (
 	"os"
 )
 
-func elaboraserie(tempi, lista []float64, device, interfaccia, metrica string) {
-
-	//Inviare o no immagine del grafico a Teleram?
-	var sendimage bool
+func elaboraserie(lista []float64, device, interfaccia, metrica string) {
 
 	//Finita la funzione notifica il waitgroup
 	defer wg.Done()
@@ -30,7 +27,7 @@ func elaboraserie(tempi, lista []float64, device, interfaccia, metrica string) {
 	speeds := lista
 
 	if len(speeds) < 120 {
-		log.Println("Non ci sono abbastanza dati:", device, interfaccia)
+		//log.Println("Non ci sono abbastanza dati:", device, interfaccia)
 		return
 	}
 
@@ -54,6 +51,7 @@ func elaboraserie(tempi, lista []float64, device, interfaccia, metrica string) {
 	//fmt.Println(n)
 
 	//Crea contenitori parametrizzati al numero n di elementi in entrata
+	x, dx := 0.0, 0.01
 	xary := make([]float64, 0, n)
 	yaryOrig := make([]float64, 0, n)
 	ma3 := make([]float64, 0, n)
@@ -81,7 +79,7 @@ func elaboraserie(tempi, lista []float64, device, interfaccia, metrica string) {
 		//y := math.Sin(x) + 0.1*(rand.NormFloat64()-0.5)
 		y := speeds[i]
 		//s.Set(0, i, y)
-		x := tempi[i]
+		x += dx
 
 		xary = append(xary, x)
 
@@ -106,20 +104,14 @@ func elaboraserie(tempi, lista []float64, device, interfaccia, metrica string) {
 		if i > len(speeds)-3 { //Confronto solo gli ultimi3 valori per un ROPL di 15 minuti
 			if yaryOrig[i] > ma20Upperband[i] {
 				log.Printf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
-				//alert := fmt.Sprintf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
-				//msg <- alert
-				sendimage = true
+				//fmt.Fprint(os.Stderr, "violazione soglia alta:", device, interfaccia, metrica, yaryOrig[i], xary[i], "\n")
 				//TODO inviare alert
-
 			}
 
 			if yaryOrig[i] < ma20Lowerband[i] {
 				log.Printf("Violata soglia bassa %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
-				//alert := fmt.Sprintf("Violata soglia bassa %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+				//fmt.Fprint(os.Stderr, "violazione soglia bassa:", device, interfaccia, metrica, yaryOrig[i], xary[i], "\n")
 				//TODO inviare alert
-				//msg <- alert
-				sendimage = true
-
 			}
 		}
 	}
@@ -136,16 +128,11 @@ func elaboraserie(tempi, lista []float64, device, interfaccia, metrica string) {
 		//"MA3", generatePoints(xary, ma3),
 		//"MA7", generatePoints(xary, ma7),
 
-		// "Up "+sigmastring+" sigma", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:len(ma20Upperband)-1]),
-		// "Original", generatePoints(xary, yaryOrig[len(yaryOrig)-120:len(yaryOrig)-1]),
-		// "Media mobile 20", generatePoints(xary, ma20[len(ma20)-120:]),
-		// "Media mobile 100", generatePoints(xary, ma100[len(ma20)-120:]),
-		// "Low "+sigmastring+" sigma", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:len(ma20Lowerband)-1]),
-		"Up "+sigmastring+" sigma", generatePoints(xary, ma20Upperband),
-		"Original", generatePoints(xary, yaryOrig),
-		"Media mobile 20", generatePoints(xary, ma20),
-		"Media mobile 100", generatePoints(xary, ma100),
-		"Low "+sigmastring+" sigma", generatePoints(xary, ma20Lowerband),
+		"Up "+sigmastring+" sigma", generatePoints(xary, ma20Upperband[len(ma20Upperband)-120:len(ma20Upperband)-1]),
+		"Original", generatePoints(xary, yaryOrig[len(yaryOrig)-120:len(yaryOrig)-1]),
+		"Media mobile 20", generatePoints(xary, ma20[len(ma20)-120:]),
+		"Media mobile 100", generatePoints(xary, ma100[len(ma20)-120:]),
+		"Low "+sigmastring+" sigma", generatePoints(xary, ma20Lowerband[len(ma20Lowerband)-120:len(ma20Lowerband)-1]),
 	)
 	if err != nil {
 		log.Println(err)
@@ -167,16 +154,23 @@ func elaboraserie(tempi, lista []float64, device, interfaccia, metrica string) {
 			os.Mkdir(path, 664)
 		}
 	}
-	fmt.Println(path3) //debug
+	//fmt.Println(path3) //debug
 
 	//SALVA IL GRAFICO
 	if err := p.Save(8*vg.Inch, 4*vg.Inch, path3+"/"+nomeimmagine+".png"); err != nil {
 		panic(err)
 	}
+	return
+}
 
-	if sendimage == true {
-		image <- path3 + "/" + nomeimmagine + ".png"
+func generatePoints(x []float64, y []float64) plotter.XYs {
+	//pts := make(plotter.XYs, len(x))
+	pts := make(plotter.XYs, 119)
+
+	for i := range pts {
+		pts[i].X = x[i]
+		pts[i].Y = y[i]
 	}
 
-	return
+	return pts
 }
