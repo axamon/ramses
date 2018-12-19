@@ -5,7 +5,6 @@ Attingendo ai dati di IPDOM Ramses elabora un grafico delle ultime 10 ore per tu
 Ramses inoltre monitora un sottoinsieme dei NAS esistenti ogni 5 minuti e allerta via mail se ci 
 sono scostamenti del numero di sessioni ppp molto elvati verso il basso.
 
-
 per configure l'applicativo bisogna compilare i campi di un file json di configurazione:
 
 {

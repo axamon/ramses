@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	gomail "gopkg.in/gomail.v2"
 )
@@ -15,9 +16,16 @@ func mandamailAlert(from, to, device string) {
 	grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
 	body := fmt.Sprintf("Alert su %s, forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
 
+	tomultiplo := strings.Split(to, ",")
+
+	t := make(map[string][]string)
+
+	t["To"] = tomultiplo
+
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
-	m.SetHeader("To", to)
+	//m.SetHeader("To", to)
+	m.SetHeaders(t)
 	m.SetAddressHeader("Cc", "alberto.bregliano@telecomitalia.it", "Alberto Bregliano")
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)
@@ -35,9 +43,16 @@ func mandamailAvvio(from, to string) (err error) {
 	subject := "Ramses - Avvio applicazione"
 	body := "Ramses avviato"
 
+	tomultiplo := strings.Split(to, ",")
+
+	t := make(map[string][]string)
+
+	t["To"] = tomultiplo
+
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
-	m.SetHeader("To", to)
+	//m.SetHeader("To", to)
+	m.SetHeaders(t)
 	m.SetAddressHeader("Cc", "alberto.bregliano@telecomitalia.it", "Alberto Bregliano")
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)
@@ -56,9 +71,16 @@ func mandamailChiusura(from, to string) (err error) {
 	subject := "Ramses - Arresto applicazione"
 	body := "Ramses arrestato"
 
+	tomultiplo := strings.Split(to, ",")
+
+	t := make(map[string][]string)
+
+	t["To"] = tomultiplo
+
 	m := gomail.NewMessage()
 	m.SetHeader("From", from)
-	m.SetHeader("To", to)
+	//m.SetHeader("To", to)
+	m.SetHeaders(t)
 	m.SetAddressHeader("Cc", "alberto.bregliano@telecomitalia.it", "Alberto Bregliano")
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)
