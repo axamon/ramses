@@ -26,6 +26,16 @@ func nasppp() {
 	//Creo il contesto inziale che verrà propagato alle go-routine
 	ctx := context.Background()
 
+	defer mandamailChiusura(configuration.SmtpFrom, configuration.SmtpTo)
+
+	//verifica l'avvio di mail. Se non manda mail esce.
+	err := mandamailAvvio(configuration.SmtpFrom, configuration.SmtpTo)
+
+	if err != nil {
+		log.Fatal(err.Error())
+		os.Exit(1)
+	}
+
 	//Creo la variabile dove accodare i nomi dei nas
 	var devices []string
 
@@ -216,6 +226,7 @@ func nasppp2(ctx context.Context, device string) {
 				//fmt.Println("orario: ", t, "valore: ", dp[t])
 			}
 
+			//Calcola statistiche sulla serie prima che sia elaborata
 			meanreale, stdevreale := stat.MeanStdDev(seriepppvalue, nil)
 			log.Printf("%s Info media: %2.f stdev: %2.f", device, meanreale, stdevreale)
 
@@ -232,6 +243,7 @@ func nasppp2(ctx context.Context, device string) {
 			//wg.Add()
 			//elaboraseriePPP(ctx, xdet, y, device, "test", "ppp")
 
+			//Calcola statistiche sulla serie elaborata
 			mean, stdev := stat.MeanStdDev(y, nil)
 			//log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev)
 
@@ -250,7 +262,7 @@ func nasppp2(ctx context.Context, device string) {
 					log.Printf("%s Alert, forte abbassamento sessioni ppp\n", device)
 					//grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
 					//<- fmt.Sprintf("Alert su %s, forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
-					mandamail(configuration.SmtpFrom, configuration.SmtpTo, device)
+					mandamailAlert(configuration.SmtpFrom, configuration.SmtpTo, device)
 				}
 			}
 
