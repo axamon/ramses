@@ -32,12 +32,15 @@ func nasppp() {
 	err := mandamailAvvio(configuration.SmtpFrom, configuration.SmtpTo)
 
 	if err != nil {
+		log.Println(err.Error())
 		log.Fatal(err.Error())
 		os.Exit(1)
 	}
 
 	//Creo la variabile dove accodare i nomi dei nas
 	var devices []string
+
+	//TODO creare il file con i nomi NAS dinamicamente
 
 	//identifico il file json con le informazioni da parsare
 	filelistapparati := configuration.NasInventory
@@ -98,7 +101,7 @@ func nasppp() {
 			default:
 				for _, device := range devices {
 					wgppp.Add(1)
-					log.Printf("%s Info Inzio verifica device\n", device)
+					//log.Printf("%s Info Inzio verifica device\n", device)
 					//go nasppp2(device)
 					nasppp2(ctx, device)
 				}
@@ -118,8 +121,11 @@ func nasppp() {
 	//imposta un refesh ogni tot minuti
 	t := time.Tick(30 * time.Second)
 	c := time.Tick(5 * time.Minute)
+	update := time.Tick(24 * time.Hour)
 	for {
 		select {
+		case <-update:
+			mandamailUpdate(configuration.SmtpFrom, configuration.SmtpTo)
 		case <-c:
 			recuperaSessioniPPP()
 			wgppp.Wait()
@@ -135,7 +141,7 @@ func nasppp2(ctx context.Context, device string) {
 	//massimo per terminare la richiesta dati
 	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)
 	defer cancel()
-	defer log.Printf("%s Info Recupero dati terminato\n", device)
+	//defer log.Printf("%s Info Recupero dati terminato\n", device)
 	defer wgppp.Done()
 
 	for {
@@ -226,29 +232,38 @@ func nasppp2(ctx context.Context, device string) {
 				//fmt.Println("orario: ", t, "valore: ", dp[t])
 			}
 
+			//Se non ci sono abbastanza valori per la serie esci
+			if len(seriepppvalue) < 300 {
+				log.Printf("%s Error Non ci sono abbastanza dati per elaborare statistiche", device)
+				return
+			}
+
 			//Calcola statistiche sulla serie prima che sia elaborata
-			meanreale, stdevreale := stat.MeanStdDev(seriepppvalue, nil)
-			log.Printf("%s Info media: %2.f stdev: %2.f", device, meanreale, stdevreale)
+			//meanreale, stdevreale := stat.MeanStdDev(seriepppvalue, nil)
+			//log.Printf("%s Info media: %2.f stdev: %2.f", device, meanreale, stdevreale)
 
 			//elimino il trend
 			//xdet, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
-			_, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
+			xdet, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
 
 			//applico derivata terza alle ordinate
 			yderived, _ := algoritmi.Derive3(ydet)
 
-			y := algoritmi.ScremaValori(yderived, 0.98, 0.02)
+			//Elimina i valori troppo alti o bassi
+			y := algoritmi.ScremaValori(yderived, 0.99, 0.01)
 
 			//Passo le info alla fuzione di elaborazione e grafico
-			//wg.Add()
-			//elaboraseriePPP(ctx, xdet, y, device, "test", "ppp")
+			wg.Add()
+			elaboraseriePPP(ctx, xdet, y, device, "test", "ppp")
+			wg.Wait()
 
 			//Calcola statistiche sulla serie elaborata
 			mean, stdev := stat.MeanStdDev(y, nil)
 			//log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev)
 
 			//Verifica se ci sono errori da segnalare negli ultimi valori y della serie
-			for _, v := range y[len(y)-1:] {
+			for _, v := range y[len(y)-2 : len(y)-1] {
+				log.Printf("%s Info media: %2.f stdev: %2.f Lastvalue: %2.f", device, mean, stdev, v)
 				//fmt.Println(v)
 				//Se le sessioni salgono non è importante
 				// if v > mean+sigma*stdev {

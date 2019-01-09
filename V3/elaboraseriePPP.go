@@ -43,7 +43,7 @@ func elaboraseriePPP(ctx context.Context, x, y []float64, device, interfaccia, m
 		default:
 			//Se non trovo abbastanza dati esci
 			if len(y) < 300 {
-				log.Println("Non ci sono abbastanza dati: ", device)
+				log.Printf("%s Error Non ci sono abbastanza dati per graficare", device)
 				return
 			}
 
@@ -112,26 +112,27 @@ func elaboraseriePPP(ctx context.Context, x, y []float64, device, interfaccia, m
 				ma20Lowerband = append(ma20Lowerband, sma20.Avg()-sigma*devstdBands)
 
 				//Verifica anomalie
-				if i > len(y)-3 { //Confronto solo gli ultimi3 valori per un ROPL di 15 minuti
-					if yaryOrig[i] > ma20Upperband[i] {
-						log.Printf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
-						//alert := fmt.Sprintf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
-						//msg <- alert
-						//sendimage = true
-						//TODO inviare alert
+				/*
+					if i > len(y)-3 { //Confronto solo gli ultimi3 valori per un ROPL di 15 minuti
+						if yaryOrig[i] > ma20Upperband[i] {
+							log.Printf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+							//alert := fmt.Sprintf("Violata soglia alta %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+							//msg <- alert
+							//sendimage = true
+							//TODO inviare alert
 
-					}
+						}
 
-					if yaryOrig[i] < ma20Lowerband[i] {
-						log.Printf("Violata soglia bassa %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
-						urlgrafana := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
-						alert := fmt.Sprintf("Violata soglia bassa %s su %s. %s", metrica, device, urlgrafana)
-						//TODO inviare alert
-						msg <- alert
-						sendimage = true
+						if yaryOrig[i] < ma20Lowerband[i] {
+							log.Printf("Violata soglia bassa %s %s. Intf: %s, valore: %.2f", device, metrica, interfaccia, yaryOrig[i])
+							urlgrafana := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
+							alert := fmt.Sprintf("Violata soglia bassa %s su %s. %s", metrica, device, urlgrafana)
+							//TODO inviare alert
+							msg <- alert
+							sendimage = true
 
-					}
-				}
+						}
+					}*/
 			}
 
 			//filtered := filter.Filter(s)
