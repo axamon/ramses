@@ -33,8 +33,8 @@ func nasppp() {
 
 	if err != nil {
 		log.Println(err.Error())
-		log.Fatal(err.Error())
-		os.Exit(1)
+		//log.Fatal(err.Error())
+		//os.Exit(1)
 	}
 
 	//Creo la variabile dove accodare i nomi dei nas
@@ -244,7 +244,7 @@ func nasppp2(ctx context.Context, device string) {
 
 			//elimino il trend
 			//xdet, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
-			xdet, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
+			_, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
 
 			//applico derivata terza alle ordinate
 			yderived, _ := algoritmi.Derive3(ydet)
@@ -253,9 +253,9 @@ func nasppp2(ctx context.Context, device string) {
 			y := algoritmi.ScremaValori(yderived, 0.99, 0.01)
 
 			//Passo le info alla fuzione di elaborazione e grafico
-			wg.Add()
-			elaboraseriePPP(ctx, xdet, y, device, "test", "ppp")
-			wg.Wait()
+			//wg.Add()
+			//elaboraseriePPP(ctx, xdet, y, device, "test", "ppp")
+			//wg.Wait()
 
 			//Calcola statistiche sulla serie elaborata
 			mean, stdev := stat.MeanStdDev(y, nil)

@@ -178,7 +178,7 @@ func elaboraseriePPP(ctx context.Context, x, y []float64, device, interfaccia, m
 
 			//SALVA IL GRAFICO
 			if err := p.Save(8*vg.Inch, 4*vg.Inch, path3+"/"+device+".png"); err != nil {
-				panic(err)
+				log.Printf("All Error Impossibile creare grafico %s", err.Error())
 			}
 
 			if sendimage == true {
