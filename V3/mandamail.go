@@ -4,11 +4,24 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	gomail "gopkg.in/gomail.v2"
 )
 
 func mandamailAlert(from, to, device string) {
+
+	//verifica che device non sia nella mappa, se c'è esce
+	elements := antistorm.GetAll()
+	for el := range elements {
+		if el == device {
+			log.Printf("%s Error Segnalazione già inviata recentemente.", device)
+			return
+		}
+	}
+
+	//se device non è nella mappa antistorm allora lo inserisce
+	antistorm.AddWithTTL(device, true, 1*time.Hour)
 
 	subject := "Allarme ppp su " + device
 	//body := "Ciao <b>Gringo</b> <hr> rilevato abbassamento anomalo sessioni ppp su " + device
@@ -37,7 +50,6 @@ func mandamailAlert(from, to, device string) {
 		log.Printf("impossibile inviare mail %s\n", err.Error())
 	}
 }
-
 
 func mandamailUpdate(from, to string) (err error) {
 
