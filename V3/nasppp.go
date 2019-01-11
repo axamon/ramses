@@ -250,7 +250,7 @@ func nasppp2(ctx context.Context, device string) {
 			yderived, _ := algoritmi.Derive3(ydet)
 
 			//Elimina i valori troppo alti o bassi
-			y := algoritmi.ScremaValori(yderived, 0.99, 0.01)
+			y := algoritmi.ScremaValori(yderived, 0.98, 0.02)
 
 			//Passo le info alla fuzione di elaborazione e grafico
 			//wg.Add()
@@ -262,8 +262,9 @@ func nasppp2(ctx context.Context, device string) {
 			//log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev)
 
 			//Verifica se ci sono errori da segnalare negli ultimi valori y della serie
-			for _, v := range y[len(y)-2 : len(y)-1] {
-				log.Printf("%s Info media: %2.f stdev: %2.f Lastvalue: %2.f", device, mean, stdev, v)
+			//for _, v := range y[len(y)-4 : len(y)-1] {
+			for i := len(y) - 2; i < len(y)-1; i++ {
+				log.Printf("%s Info media: %2.f stdev: %2.f , Penultimovalore: %2.f, Differenza: %2.f", device, mean, stdev, seriepppvalue[i-1], seriepppvalue[i]-seriepppvalue[i-1])
 				//fmt.Println(v)
 				//Se le sessioni salgono non è importante
 				// if v > mean+sigma*stdev {
@@ -273,11 +274,13 @@ func nasppp2(ctx context.Context, device string) {
 				// }
 
 				//Se il valore è minore di sigma volte la media allora allarma
-				if v < mean-sigma*stdev {
+
+				if y[i] < mean-sigma*stdev && seriepppvalue[i]/seriepppvalue[i-1] < 0.9 {
 					log.Printf("%s Alert, forte abbassamento sessioni ppp\n", device)
 					//grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
 					//<- fmt.Sprintf("Alert su %s, forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
 					mandamailAlert(configuration.SmtpFrom, configuration.SmtpTo, device)
+
 				}
 			}
 

@@ -24,6 +24,7 @@ func RiceviResult(result string) {
 var configuration Configuration
 
 var antistorm = NewTTLMap(24 * time.Hour)
+var violazioni = NewTTLMap(24 * time.Hour)
 
 func main() {
 
