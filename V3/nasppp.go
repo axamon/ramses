@@ -244,13 +244,14 @@ func nasppp2(ctx context.Context, device string) {
 
 			//elimino il trend
 			//xdet, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
-			_, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
+			xdet, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
 
 			//applico derivata terza alle ordinate
-			yderived, _ := algoritmi.Derive3(ydet)
+			//yderived, _ := algoritmi.Derive3(ydet)
+			y, _ := algoritmi.Derive3(ydet)
 
 			//Elimina i valori troppo alti o bassi
-			y := algoritmi.ScremaValori(yderived, 0.98, 0.02)
+			//y := algoritmi.ScremaValori(yderived, 0.98, 0.02)
 
 			//Passo le info alla fuzione di elaborazione e grafico
 			//wg.Add()
@@ -260,11 +261,22 @@ func nasppp2(ctx context.Context, device string) {
 			//Calcola statistiche sulla serie elaborata
 			mean, stdev := stat.MeanStdDev(y, nil)
 			//log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev)
+			for i := 3; i < len(y); i++ {
+				if y[i] < mean-sigma*stdev {
+					unixtimeUTC := time.Unix(int64(xdet[i]/1000), 0)
+					unixtimeinRFC3339 := unixtimeUTC.Format(time.RFC3339)
+					fmt.Println(unixtimeinRFC3339, "Jerk")
+					//fmt.Printf("%s Info media: %2.f stdev: %2.f , Penultimovalore: %2.f, Differenza: %2.f\n", device, mean, stdev, seriepppvalue[i-1], seriepppvalue[i]-seriepppvalue[i-1])
+					if (ydet[i-1]-ydet[i])/ydet[i-1] > 0.1 {
+						fmt.Printf("%s %s Alert, forte abbassamento sessioni ppp\n", unixtimeinRFC3339, device)
+					}
+				}
+			}
 
 			//Verifica se ci sono errori da segnalare negli ultimi valori y della serie
 			//for _, v := range y[len(y)-4 : len(y)-1] {
 			for i := len(y) - 2; i < len(y)-1; i++ {
-				log.Printf("%s Info media: %2.f stdev: %2.f , Penultimovalore: %2.f, Differenza: %2.f", device, mean, stdev, seriepppvalue[i-1], seriepppvalue[i]-seriepppvalue[i-1])
+				log.Printf("%s Info media: %2.f stdev: %2.f , Penultimovalore: %2.f, Differenza: %2.f\n", device, mean, stdev, seriepppvalue[i-1], seriepppvalue[i]-seriepppvalue[i-1])
 				//fmt.Println(v)
 				//Se le sessioni salgono non è importante
 				// if v > mean+sigma*stdev {
@@ -275,12 +287,14 @@ func nasppp2(ctx context.Context, device string) {
 
 				//Se il valore è minore di sigma volte la media allora allarma
 
-				if y[i] < mean-sigma*stdev && seriepppvalue[i]/seriepppvalue[i-1] < 0.9 {
+				if y[i] < mean-sigma*stdev {
 					log.Printf("%s Alert, forte abbassamento sessioni ppp\n", device)
 					//grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
 					//<- fmt.Sprintf("Alert su %s, forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
-					mandamailAlert(configuration.SmtpFrom, configuration.SmtpTo, device)
 
+					if (ydet[i-1]-ydet[i])/ydet[i-1] > 0.1 {
+						mandamailAlert(configuration.SmtpFrom, configuration.SmtpTo, device)
+					}
 				}
 			}
 
