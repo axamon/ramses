@@ -21,7 +21,7 @@ func mandamailAlert(from, to, device string) {
 	}
 
 	//se device non è nella mappa antistorm allora lo inserisce
-	antistorm.AddWithTTL(device, true, 1*time.Hour)
+	antistorm.AddWithTTL(device, true, 30*time.Minute)
 
 	subject := "Allarme ppp su " + device
 	//body := "Ciao <b>Gringo</b> <hr> rilevato abbassamento anomalo sessioni ppp su " + device
