@@ -313,7 +313,7 @@ func nasppp2(ctx context.Context, device string) {
 						//fmt.Printf("%s %s Jerk Ultimovalore: %2.f, Penultimovalore: %2.f, Limite: %.4f, %v\n", unixtimeinRFC3339, device, seriepppvalue[i], seriepppvalue[i+l], limite, l)
 						//fmt.Printf("%s Info media: %2.f stdev: %2.f , Penultimovalore: %2.f, Differenza: %2.f\n", device, mean, stdev, seriepppvalue[i-1], seriepppvalue[i]-seriepppvalue[i-1])
 
-						if limite > soglia {
+						if limite > configuration.Soglia {
 							fmt.Printf("%s %s Alert, forte abbassamento sessioni ppp\n", unixtimeinRFC3339, device)
 							//mandamail solo se siamo negli ultimi 6 valori
 							if i > (numvalori - 6) {
