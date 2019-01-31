@@ -5,7 +5,9 @@ type Configuration struct {
 	IPDOMUser      string
 	IPDOMPassword  string
 	Sigma          float64
+	Soglia         float64
 	NasInventory   string
+	NasDaIgnorare  string
 	URLSessioniPPP string
 	URLTail7d      string
 	SmtpPort       int

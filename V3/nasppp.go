@@ -48,15 +48,33 @@ func nasppp() {
 	//leggo il file in memoria
 	body, err := ioutil.ReadFile(filelistapparati)
 	if err != nil {
-		log.Printf("%s Error Impossibile recuperare lista\n", filelistapparati)
+		log.Printf("Error Impossibile recuperare lista %s\n", filelistapparati)
 	}
 
 	//Creo la variabile dove conservare i dati parsati
 	var listalistanas [][]TNAS
 	errjson := json.Unmarshal(body, &listalistanas)
 	if errjson != nil {
-		log.Printf("%s Error Impossibile parsare dati\n", filelistapparati)
+		log.Printf("Error Impossibile parsare dati %s\n", filelistapparati)
 	}
+
+	//identifico il file json con la lista NAS da ignorare
+	filelistaNasDaIgnorare := configuration.NasDaIgnorare
+	log.Println(filelistaNasDaIgnorare) //debug
+
+	//leggo il file in memoria
+	ignoranasbody, errignoranas := ioutil.ReadFile(filelistaNasDaIgnorare)
+	if errignoranas != nil {
+		log.Printf("Error Impossibile recuperare lista %s\n", filelistaNasDaIgnorare)
+	}
+
+	//Creo variabile che contiene lista nas da ignorare
+	var listaNasDaIgnorare map[string][]string
+	errjsonNasdaignorare := json.Unmarshal(ignoranasbody, &listaNasDaIgnorare)
+	if errjsonNasdaignorare != nil {
+		log.Printf("Error Impossibile parsare dati %s , %s\n", listaNasDaIgnorare, errjsonNasdaignorare.Error())
+	}
+	fmt.Println(listaNasDaIgnorare)
 
 	//Istanzio un contatore per contare i nas trovati
 	var i int
@@ -69,11 +87,20 @@ func nasppp() {
 			//considero solo gli apparati che abbiano "NAS" all'inzio del campo Service
 			//e EDGE_BRAS come dominio e MX960 come chassis
 			if strings.HasPrefix(nas.Service, "NAS") && strings.Contains(nas.Domain, "EDGE_BRAS") && strings.Contains(nas.ChassisName, "MX960") {
+
+				//Escludo i NAS in da ignorare
+				for _, ignoranas := range listaNasDaIgnorare["nasdaignorare"] {
+					if nas.Name == ignoranas {
+						log.Printf("Info %s ignorato", nas.Name)
+						continue
+					}
+					//Appendo in devices il nome nas trovato
+					devices = append(devices, nas.Name)
+				}
+
 				//incremento il contatore
 				i++
 
-				//Appendo in devices il nome nas trovato
-				devices = append(devices, nas.Name)
 			}
 		}
 	}
@@ -287,7 +314,7 @@ func nasppp2(ctx context.Context, device string) {
 						//fmt.Printf("%s %s Jerk Ultimovalore: %2.f, Penultimovalore: %2.f, Limite: %.4f, %v\n", unixtimeinRFC3339, device, seriepppvalue[i], seriepppvalue[i+l], limite, l)
 						//fmt.Printf("%s Info media: %2.f stdev: %2.f , Penultimovalore: %2.f, Differenza: %2.f\n", device, mean, stdev, seriepppvalue[i-1], seriepppvalue[i]-seriepppvalue[i-1])
 
-						if limite > 0.1 {
+						if limite > soglia {
 							fmt.Printf("%s %s Alert, forte abbassamento sessioni ppp\n", unixtimeinRFC3339, device)
 							//mandamail solo se siamo negli ultimi 6 valori
 							if i > (numvalori - 6) {
