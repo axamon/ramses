@@ -76,36 +76,35 @@ func nasppp() {
 	}
 	fmt.Println(listaNasDaIgnorare)
 
-	//Istanzio un contatore per contare i nas trovati
-	var i int
+	var ignora = make(map[string]bool)
+	for _, nasignorato := range listaNasDaIgnorare["nasdaignorare"] {
+		ignora[nasignorato] = true
+	}
 
 	//listalistanas è una lista di liste quindi bisogna fare un doppio ciclo for
 	for _, listanas := range listalistanas {
 		for _, nas := range listanas {
 			//fmt.Println(n, nas.Name) //debug
 
+			//Escludo i NAS in da ignorare
+			if _, ok := ignora[nas.Name]; ok {
+				log.Printf("INFO %s ignorato\n", nas.Name)
+				continue
+			}
+
 			//considero solo gli apparati che abbiano "NAS" all'inzio del campo Service
 			//e EDGE_BRAS come dominio e MX960 come chassis
 			if strings.HasPrefix(nas.Service, "NAS") && strings.Contains(nas.Domain, "EDGE_BRAS") && strings.Contains(nas.ChassisName, "MX960") {
 
-				//Escludo i NAS in da ignorare
-				for _, ignoranas := range listaNasDaIgnorare["nasdaignorare"] {
-					if nas.Name == ignoranas {
-						log.Printf("Info %s ignorato", nas.Name)
-						continue
-					}
-					//Appendo in devices il nome nas trovato
-					devices = append(devices, nas.Name)
-				}
-
-				//incremento il contatore
-				i++
+				//Appendo in devices il nome nas trovato
+				devices = append(devices, nas.Name)
+				//log.Printf("Info %v ignorato\n", devices) //debug
 
 			}
 		}
 	}
 	//loggo il numero di NAS identificati
-	log.Printf("%d INFO numero di NAS trovati\n", i)
+	log.Printf("%v INFO numero di NAS trovati\n", len(devices))
 	time.Sleep(3 * time.Second)
 
 	//recuperaSessioniPPP è una funzione che recupera i dati ppp dei nas
