@@ -233,6 +233,10 @@ func nasppp2(ctx context.Context, device string) {
 			}
 			if len(result) < 1 {
 				log.Printf("%s Error Non ci sono abbastanza info\n", device)
+				err := Creatrap(device, "sessioni ppp", "Error Non ci sono abbastanza info", 0)
+				if err != nil {
+					log.Printf("%s Error Impossibile inviare Trap\n", device)
+				}
 				return
 			}
 			d := result[0].(map[string]interface{})
