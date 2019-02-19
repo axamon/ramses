@@ -11,3 +11,5 @@ OLD
 *.csv
 config
 bot.exe
+*.zip
+trap

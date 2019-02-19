@@ -24,6 +24,12 @@
   revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
 
 [[projects]]
+  name = "github.com/golang/mock"
+  packages = ["gomock"]
+  revision = "51421b967af1f557f93a59e0057aaf15ca02e29c"
+  version = "v1.2.0"
+
+[[projects]]
   name = "github.com/jung-kurt/gofpdf"
   packages = ["."]
   revision = "14c1db30737a138f8d9797cffea58783892b2fae"
@@ -62,6 +68,18 @@
   name = "github.com/remeh/sizedwaitgroup"
   packages = ["."]
   revision = "5e7302b12ccef91dce9fde2f5bda6d5c7ea5d2eb"
+
+[[projects]]
+  name = "github.com/soniah/gosnmp"
+  packages = ["."]
+  revision = "28507a583d6f323959b554e0fc6d33eb589f5c05"
+  version = "v1.16"
+
+[[projects]]
+  name = "github.com/tkanos/gonfig"
+  packages = ["."]
+  revision = "e83209aed2d171bab5ffb312a1e630110481cb99"
+  version = "1.0"
 
 [[projects]]
   branch = "master"
@@ -148,6 +166,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ef9714db6ed3d1246a262e00be4dac3374bbd0f0d82eaa87c97e71c840e4fc50"
+  inputs-digest = "d98369fa7379d36cae53af536474631de9dc196252b27355e79554ba42cb8e60"
   solver-name = "gps-cdcl"
   solver-version = 1
