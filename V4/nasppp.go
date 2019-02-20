@@ -22,6 +22,12 @@ import (
 
 var wgppp sync.WaitGroup
 
+//Creo la mappa dove mettere nas name e ip insieme
+var listanasip = make(map[string]string)
+
+//Creo la mappa dei NAS per cui è stata inviata una trap
+var nastrappati = make(map[string]bool)
+
 func nasppp() {
 	//Creo il contesto inziale che verrà propagato alle go-routine
 	ctx := context.Background()
@@ -98,6 +104,9 @@ func nasppp() {
 
 				//Appendo in devices il nome nas trovato
 				devices = append(devices, nas.Name)
+
+				//Per inviare trap serve conoscere l'ip di management del NAS uffa che barba che noia
+				listanasip[nas.Name] = nas.ManIPAddress
 				//log.Printf("Info %v ignorato\n", devices) //debug
 
 			}
@@ -233,10 +242,11 @@ func nasppp2(ctx context.Context, device string) {
 			}
 			if len(result) < 1 {
 				log.Printf("%s Error Non ci sono abbastanza info\n", device)
-				err := Creatrap(device, "sessioni ppp", "Error Non ci sono abbastanza info", 0)
+				err := Creatrap(device, "sessioni ppp", "Error Non ci sono abbastanza info", listanasip[device], 0)
 				if err != nil {
 					log.Printf("%s Error Impossibile inviare Trap\n", device)
 				}
+				nastrappati[device] = true
 				return
 			}
 			d := result[0].(map[string]interface{})
@@ -295,6 +305,7 @@ func nasppp2(ctx context.Context, device string) {
 				//Individuo un Jerk
 				if y[i] < mean-sigma*stdev {
 					unixtimeUTC := time.Unix(int64(xdet[i]/1000), 0)
+					//Serve per avere il timestamp di quando c'è stato il problema
 					unixtimeinRFC3339 := unixtimeUTC.Format(time.RFC3339)
 
 					//Devo verificare se valori futuri dopo il Jerk hanno avuto problemi
@@ -318,10 +329,17 @@ func nasppp2(ctx context.Context, device string) {
 						//fmt.Printf("%s Info media: %2.f stdev: %2.f , Penultimovalore: %2.f, Differenza: %2.f\n", device, mean, stdev, seriepppvalue[i-1], seriepppvalue[i]-seriepppvalue[i-1])
 
 						if limite > configuration.Soglia {
-							fmt.Printf("%s %s Alert, forte abbassamento sessioni ppp\n", unixtimeinRFC3339, device)
+							summary := fmt.Sprintf("abbassamento sessioni ppp superiore al %2.0f%%\n", configuration.Soglia*100)
+							//Attenzione NON usare log.Print perchè serve printare il timestamp non attuale ma di quando si è verificato il problema
+							fmt.Printf("%s %s Alert, %s\n", unixtimeinRFC3339, device, summary)
 							//mandamail solo se siamo negli ultimi 6 valori
 							if i > (numvalori - 6) {
 								mandamailAlert(configuration.SmtpFrom, configuration.SmtpTo, device)
+								err := Creatrap(device, "sessioni ppp", summary, listanasip[device], 5)
+								if err != nil {
+									log.Printf("%s Error Impossibile inviare trap\n", device)
+								}
+								nastrappati[device] = true
 							}
 						}
 					}

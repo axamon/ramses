@@ -27,7 +27,7 @@ var antistorm = NewTTLMap(24 * time.Hour)
 var violazioni = NewTTLMap(24 * time.Hour)
 
 //recupera la soglia percentuale di allarmi per cui allarmarsi
-//var soglia = configuration.Soglia
+//var soglia = configuration.Soglia //è commentato se non viene preso il valore dopo nel codice
 
 func main() {
 
