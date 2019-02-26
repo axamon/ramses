@@ -15,7 +15,7 @@ summary := "Forte abbassamento sessioni ppp"
 */
 
 //Creatrap invia trap snmp v1 per notificare gli eventi
-func Creatrap(device, argomento, summary, ipdevice string, severity int) (err error) {
+func Creatrap(device, argomento, summary, ipdevice string, specific, severity int) (err error) {
 
 	// Default is a pointer to a GoSNMP struct that contains sensible defaults
 	// eg port 161, community public, etc
@@ -72,9 +72,9 @@ func Creatrap(device, argomento, summary, ipdevice string, severity int) (err er
 	trap := g.SnmpTrap{
 		Variables:    []g.SnmpPDU{pdu1, pdu2, pdu3, pdu4, pdu5},
 		Enterprise:   ".1.3.6.1.4.1.8888.200.34.34.34",
-		AgentAddress: ipdevice, //TODO: cambiare con ip apparato
+		AgentAddress: ipdevice,
 		GenericTrap:  6,
-		SpecificTrap: 0,
+		SpecificTrap: specific,
 		Timestamp:    300,
 	}
 

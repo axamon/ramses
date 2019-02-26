@@ -242,7 +242,7 @@ func nasppp2(ctx context.Context, device string) {
 			}
 			if len(result) < 1 {
 				log.Printf("%s Error Non ci sono abbastanza info\n", device)
-				err := Creatrap(device, "sessioni ppp", "Error Non ci sono abbastanza info", listanasip[device], 0)
+				err := Creatrap(device, "No data ppp", "Assenza dati sulle sessioni ppp", listanasip[device], 2, 4)
 				if err != nil {
 					log.Printf("%s Error Impossibile inviare Trap\n", device)
 				}
@@ -335,7 +335,7 @@ func nasppp2(ctx context.Context, device string) {
 							//mandamail solo se siamo negli ultimi 6 valori
 							if i > (numvalori - 6) {
 								mandamailAlert(configuration.SmtpFrom, configuration.SmtpTo, device)
-								err := Creatrap(device, "sessioni ppp", summary, listanasip[device], 5)
+								err := Creatrap(device, "sessioni ppp", summary, listanasip[device], 1, 5)
 								if err != nil {
 									log.Printf("%s Error Impossibile inviare trap\n", device)
 								}
