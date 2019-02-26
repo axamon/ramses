@@ -18,6 +18,12 @@ summary := "Forte abbassamento sessioni ppp"
 //Creatrap invia trap snmp v1 per notificare gli eventi
 func Creatrap(device, argomento, summary, ipdevice string, specific, severity int) (err error) {
 
+	//se si tratta di inviare trap per mancanza di dati (specific =1 e severity > 0)
+	if specific == 1 && severity > 0 {
+		//aggiungo il device alla lista per 8 ore
+		nientedatippp.AddWithTTL(device, true, 8*time.Hour)
+	}
+
 	adesso := time.Now()
 
 	//creo la variabile trapMancanoDatiInviata come falsa
@@ -32,13 +38,8 @@ func Creatrap(device, argomento, summary, ipdevice string, specific, severity in
 		}
 	}
 
-	//se si tratta di inviare trap per mancanza di dati (specific =1 e severity > 0)
-	//e NON sono le 10 di mattina
-	if specific == 1 && severity > 0 && adesso.Hour() != 10 {
-		//aggiungi il device alla lista per 8 ore
-		nientedatippp.AddWithTTL(device, true, 8*time.Hour)
-		//e poi esce perchè questo tipo di problema si comunica solo alle ore 10
-		//ma la mappa ci farà ricordare del problema
+	//se vuoi inviare una trap per mancanza di dati e non sono le 10 oppure è stato già notificato esce
+	if specific == 1 && severity > 0 && adesso.Hour() != 10 && trapMancanoDatiInviata == true {
 		return
 	}
 
