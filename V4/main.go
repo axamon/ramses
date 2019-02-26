@@ -21,13 +21,16 @@ func RiceviResult(result string) {
 	return
 }
 
+//crea variabile con le configurazioni del file passato come argomento
 var configuration Configuration
 
+//Crea delle mappe a tempo della durata di 24 ore per storicizzare avventimenti
 var antistorm = NewTTLMap(24 * time.Hour)
 var violazioni = NewTTLMap(24 * time.Hour)
+var nientedatippp = NewTTLMap(12 * time.Hour)
 
 //recupera la soglia percentuale di allarmi per cui allarmarsi
-//var soglia = configuration.Soglia //è commentato se non viene preso il valore dopo nel codice
+//var soglia = configuration.Soglia //è commentato altrimenti non viene preso il valore dopo nel codice
 
 func main() {
 

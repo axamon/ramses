@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	g "github.com/soniah/gosnmp"
 )
@@ -16,6 +17,40 @@ summary := "Forte abbassamento sessioni ppp"
 
 //Creatrap invia trap snmp v1 per notificare gli eventi
 func Creatrap(device, argomento, summary, ipdevice string, specific, severity int) (err error) {
+
+	adesso := time.Now()
+
+	//creo la variabile trapMancanoDatiInviata come falsa
+	var trapMancanoDatiInviata = false
+
+	//verifico se il device è nella lista di quelli che non hanno dati
+	elements := nientedatippp.GetAll()
+	for el := range elements {
+		if el == device { //se è presente cambio la variabile trapMancanoDatiInviata su true
+			//vuol dire che è stata inviata una trap di problema nelle 8 ore precedenti
+			trapMancanoDatiInviata = true
+		}
+	}
+
+	//se si tratta di inviare trap per mancanza di dati (specific =1 e severity > 0)
+	//e NON sono le 10 di mattina
+	if specific == 1 && severity > 0 && adesso.Hour() != 10 {
+		//aggiungi il device alla lista per 8 ore
+		nientedatippp.AddWithTTL(device, true, 8*time.Hour)
+		//e poi esce perchè questo tipo di problema si comunica solo alle ore 10
+		//ma la mappa ci farà ricordare del problema
+		return
+	}
+
+	//Se invece si deve comunicare la risoluzione di un problema di tipo mancanza dati (specific=1e severity=0)
+	//non importa a che ora si risolve
+	//e se il la variabile trapMancanoDatiInviata è falsa  vuol dire che non è stata notificata la trap del problema
+	if specific == 1 && severity == 0 && trapMancanoDatiInviata == false {
+		//quindi si esce perchè non c'è nessuna trap di risoluzione da inviare
+		return
+	}
+
+	//In tutti gli altri casi si può inviare la trap
 
 	// Default is a pointer to a GoSNMP struct that contains sensible defaults
 	// eg port 161, community public, etc
