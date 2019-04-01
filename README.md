@@ -13,18 +13,18 @@ per configure l'applicativo bisogna compilare i campi di un file json di configu
 
 {
     "Sigma": 2.5,
-    "IPDOMUser": "00246506",
+    "IPDOMUser": "ipdomainUsername",
     "IPDOMPassword": "fdfsfsfsdfsd",
     "NasInventory": "nasInventory.json",
     "URLSessioniPPP": "https://ipw.telecomitalia.it/ipwmetrics/api/v1/rawmetrics/kpi.ppoe.slot?device=",
     "URLTail7d": "&start=7d-ago&end=5m-ago&aggregator=sum",
     "SmtpPort": 587,
-    "SmtpServer": "smtp.gmail.com",
-    "SmtpUser": "alberto.bregliano@gmail.com",
+    "SmtpServer": "smtpserver.domain.com",
+    "SmtpUser": "smtpUser",
     "SmtpPassword": "fdsfdsfsdf",
-    "SmtpSender": "alberto.bregliano@gmail.com",
-    "SmtpFrom": "alberto.bregliano@gmail.com",
-    "SmtpTo": "alberto.bregliano@protonmail.com"
+    "SmtpSender": "sender@domain.com",
+    "SmtpFrom": "sender@domain.com",
+    "SmtpTo": "receiver@domain.com"
 
 }
 
