@@ -121,7 +121,7 @@ func recuperajson(device string) {
 		f.Write(body)
 		//wg.Done()
 	}
-	//Attende che siano finite tutte le elaborazioni prima di chiudere
+	// Attende che siano finite tutte le elaborazioni prima di chiudere
 	wg.Wait()
 
 	return

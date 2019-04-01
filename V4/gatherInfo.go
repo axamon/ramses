@@ -11,7 +11,7 @@ import (
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
 var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
 
-//GatherInfo gathers info on running app
+// GatherInfo gathers info on running app
 func GatherInfo() {
 	flag.Parse()
 	if *cpuprofile != "" {

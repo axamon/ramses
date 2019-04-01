@@ -26,32 +26,36 @@ func Creatrap(device, argomento, summary, ipdevice string, specific, severity in
 
 	adesso := time.Now()
 
-	//creo la variabile trapMancanoDatiInviata come falsa
+	// Creo la variabile trapMancanoDatiInviata come falsa
 	var trapMancanoDatiInviata = false
 
-	//verifico se il device è nella lista di quelli che non hanno dati
+	// Verifico se il device è nella lista di quelli che non hanno dati
 	elements := nientedatippp.GetAll()
 	for el := range elements {
-		if el == device { //se è presente cambio la variabile trapMancanoDatiInviata su true
-			//vuol dire che è stata inviata una trap di problema nelle 8 ore precedenti
+		if el == device {
+			// Sse è presente cambio la variabile trapMancanoDatiInviata
+			// su true vuol dire che è stata inviata una trap di problema
+			// nelle 8 ore precedenti.
 			trapMancanoDatiInviata = true
 		}
 	}
 
-	//se vuoi inviare una trap per mancanza di dati e non sono le 10 oppure è stato già notificato esce
+	// Se vuoi inviare una trap per mancanza di dati e non sono le 10 di mattina
+	// oppure il problema è stato già notificato allora esce.
 	if specific == 1 && severity > 0 && adesso.Hour() != 10 && trapMancanoDatiInviata == true {
 		return
 	}
 
-	//Se invece si deve comunicare la risoluzione di un problema di tipo mancanza dati (specific=1e severity=0)
-	//non importa a che ora si risolve
-	//e se il la variabile trapMancanoDatiInviata è falsa  vuol dire che non è stata notificata la trap del problema
+	// Se invece si deve comunicare la risoluzione di un problema di tipo
+	// mancanza dati (specific=1e severity=0) non importa a che ora si risolve
+	// e se la variabile trapMancanoDatiInviata è falsa vuol dire che
+	// non è stata notificata la trap del problema
 	if specific == 1 && severity == 0 && trapMancanoDatiInviata == false {
-		//quindi si esce perchè non c'è nessuna trap di risoluzione da inviare
+		// quindi si esce perchè non c'è nessuna trap di risoluzione da inviare
 		return
 	}
 
-	//In tutti gli altri casi si può inviare la trap
+	// In tutti gli altri casi si può inviare la trap
 
 	// Default is a pointer to a GoSNMP struct that contains sensible defaults
 	// eg port 161, community public, etc
