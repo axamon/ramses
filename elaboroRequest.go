@@ -92,7 +92,7 @@ func elaboroRequest(result []interface{}, device string) {
 					// Mandamail di notifica solo se siamo negli ultimi 6 valori
 					if i > (numvalori - 6) {
 						mandamailAlert(configuration.SmtpFrom, configuration.SmtpTo, device)
-						err := Creatrap(device, "sessioni ppp", summary, listanasip[device], 1, 5)
+						err := CreaTrap(device, "sessioni ppp", summary, listanasip[device], 1, 5)
 						if err != nil {
 							log.Printf("Error %s Impossibile inviare trap\n", device)
 						}
