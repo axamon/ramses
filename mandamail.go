@@ -53,38 +53,19 @@ func mandamailAlert(from, to, device string) {
 	}
 }
 
-func mandamailUpdate(from, to string) (err error) {
+func mandamail(from, to, scopo string) (err error) {
 
-	subject := "Ramses - applicazione attiva"
-	body := "Ramses è ancora attivo"
+	var subject, body string
 
-	tomultiplo := strings.Split(to, ",")
+	switch scopo {
+	case "Avvio":
+		subject = "Ramses - Avvio applicazione"
+		body = "Ramses avviato"
+	case "Update":
+		subject = "Ramses - applicazione attiva"
+		body = "Ramses è ancora attivo"
 
-	t := make(map[string][]string)
-
-	t["To"] = tomultiplo
-
-	m := gomail.NewMessage()
-	m.SetHeader("From", from)
-	//m.SetHeader("To", to)
-	m.SetHeaders(t)
-	m.SetAddressHeader("Cc", "alberto.bregliano@telecomitalia.it", "Alberto Bregliano")
-	m.SetHeader("Subject", subject)
-	m.SetBody("text/html", body)
-
-	d := gomail.NewPlainDialer(configuration.SmtpServer, configuration.SmtpPort, configuration.SmtpUser, configuration.SmtpPassword)
-
-	errdialandsend := d.DialAndSend(m)
-	if errdialandsend != nil {
-		err = fmt.Errorf("Error Impossibile inviare mail %s", errdialandsend.Error())
 	}
-	return err
-}
-
-func mandamailAvvio(from, to string) (err error) {
-
-	subject := "Ramses - Avvio applicazione"
-	body := "Ramses avviato"
 
 	tomultiplo := strings.Split(to, ",")
 
