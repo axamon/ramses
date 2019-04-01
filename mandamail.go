@@ -9,7 +9,7 @@ import (
 	gomail "gopkg.in/gomail.v2"
 )
 
-func mandamailAlert(from, to, device string) {
+func mandamailAlert(from, to, device string, valoreppp float64) {
 
 	// Verifica che device non sia nella mappa antistorm, se c'è esce
 	elements := antistorm.GetAll()
@@ -28,7 +28,7 @@ func mandamailAlert(from, to, device string) {
 
 	// Crea il contenuto della mail
 	grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
-	body := fmt.Sprintf("Alert %s Forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
+	body := fmt.Sprintf("Alert %s Forte abbassamento sessioni ppp, valore riscontrato %f %s\n", device, valoreppp, grafanaurl)
 
 	// Aggiunge i destinatari in to
 	tomultiplo := strings.Split(to, ",")
@@ -64,36 +64,10 @@ func mandamail(from, to, scopo string) (err error) {
 	case "Update":
 		subject = "Ramses - applicazione attiva"
 		body = "Ramses è ancora attivo"
-
+	case "Chiusura":
+		subject = "Ramses - Arresto applicazione"
+		body = "Ramses arrestato"
 	}
-
-	tomultiplo := strings.Split(to, ",")
-
-	t := make(map[string][]string)
-
-	t["To"] = tomultiplo
-
-	m := gomail.NewMessage()
-	m.SetHeader("From", from)
-	//m.SetHeader("To", to)
-	m.SetHeaders(t)
-	m.SetAddressHeader("Cc", "alberto.bregliano@telecomitalia.it", "Alberto Bregliano")
-	m.SetHeader("Subject", subject)
-	m.SetBody("text/html", body)
-
-	d := gomail.NewPlainDialer(configuration.SmtpServer, configuration.SmtpPort, configuration.SmtpUser, configuration.SmtpPassword)
-
-	errdialandsend := d.DialAndSend(m)
-	if errdialandsend != nil {
-		err = fmt.Errorf("Error Impossibile inviare mail %s", errdialandsend.Error())
-	}
-	return err
-}
-
-func mandamailChiusura(from, to string) (err error) {
-
-	subject := "Ramses - Arresto applicazione"
-	body := "Ramses arrestato"
 
 	tomultiplo := strings.Split(to, ",")
 

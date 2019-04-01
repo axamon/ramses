@@ -24,7 +24,7 @@ func nasppp() {
 	ctx := context.Background()
 
 	// Prima di terminare la funzione invia una mail
-	defer mandamailChiusura(configuration.SmtpFrom, configuration.SmtpTo)
+	defer mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura")
 
 	// Verifica l'avvio di mail. Se non riesce a mandare mail esce.
 	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio")
