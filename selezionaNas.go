@@ -13,7 +13,7 @@ import (
 func selezionaNas() (nomiNasSet *stringset.StringSet) {
 
 	// Creo la variabile dove accodare i nomi dei nas
-	var devices *stringset.StringSet
+	devices := stringset.NewStringSet()
 
 	// TODO: creare il file con i nomi NAS dinamicamente
 
@@ -40,7 +40,7 @@ func selezionaNas() (nomiNasSet *stringset.StringSet) {
 	// Leggo il file in memoria
 	ignoranasbody, errignoranas := ioutil.ReadFile(filelistaNasDaIgnorare)
 	if errignoranas != nil {
-		log.Printf("Error Impossibile recuperare lista %s\n", filelistaNasDaIgnorare)
+		log.Printf("Error Impossibile recuperare lista dei nas da ignorare %s %s\n", filelistaNasDaIgnorare, errignoranas.Error())
 	}
 
 	// Creo variabile che contiene lista nas da ignorare

@@ -27,9 +27,10 @@ func NewStringSet(strings ...string) *StringSet {
 // Add adds a string to the set.
 // If string is already in the set, it has no effect.
 func (s *StringSet) Add(str string) {
+	defer s.lock.Unlock()
 	s.lock.Lock()
 	s.m[str] = struct{}{}
-	s.lock.Unlock()
+	return
 }
 
 // Exists checks if string exists in the set.
