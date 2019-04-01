@@ -32,10 +32,12 @@ var antistorm = NewTTLMap(24 * time.Hour)
 var violazioni = NewTTLMap(24 * time.Hour)
 var nientedatippp = NewTTLMap(12 * time.Hour)
 
+var version = "version: 4"
+
 func main() {
 
 	// Scrive su standard output la versione di Ramses
-	log.Println("Avvio Ramses version: 4")
+	log.Printf("Avvio Ramses %s\n", version)
 
 	// Recupera valori dal file di configurazione passato come argomento
 	err := gonfig.GetConf(os.Args[1], &configuration)
