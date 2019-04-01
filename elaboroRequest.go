@@ -13,6 +13,8 @@ import (
 
 var sigma = configuration.Sigma
 
+var eventi Jerks
+
 func elaboroRequest(result []interface{}, device string) {
 
 	// Estraggo serie dati dal risultato query http
@@ -58,11 +60,19 @@ func elaboroRequest(result []interface{}, device string) {
 	// log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev) // debug
 
 	for i := 10; i < len(y); i++ {
+
 		// Individuo se è avvenuto un Jerk
 		if y[i] < mean-sigma*stdev {
+			evento := new(Jerk)
+			evento.NasName = device
+			evento.pppValue = y[i]
+
 			unixtimeUTC := time.Unix(int64(xdet[i]/1000), 0)
 			// Serve per avere il timestamp di quando c'è stato il problema
 			unixtimeinRFC3339 := unixtimeUTC.Format(time.RFC3339)
+			evento.Timestamp = unixtimeUTC
+
+			eventi = append(eventi, *evento)
 
 			// Devo verificare se valori futuri dopo il Jerk hanno avuto problemi
 			numvalori := len(seriepppvalue)
@@ -91,7 +101,7 @@ func elaboroRequest(result []interface{}, device string) {
 
 					// Mandamail di notifica solo se siamo negli ultimi 6 valori
 					if i > (numvalori - 6) {
-						mandamailAlert(configuration.SmtpFrom, configuration.SmtpTo, device, y[i])
+						mandamailAlert(configuration.SmtpFrom, configuration.SmtpTo, device, evento)
 						err := CreaTrap(device, "sessioni ppp", summary, listanasip[device], 1, 5)
 						if err != nil {
 							log.Printf("Error %s Impossibile inviare trap\n", device)

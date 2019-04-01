@@ -24,10 +24,10 @@ func nasppp() {
 	ctx := context.Background()
 
 	// Prima di terminare la funzione invia una mail
-	defer mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura")
+	defer mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura", eventi)
 
 	// Verifica l'avvio di mail. Se non riesce a mandare mail esce.
-	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio")
+	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio", eventi)
 	if err != nil {
 		log.Printf("Error Impossibile inviare mail: %s\n", err.Error())
 		os.Exit(1)
@@ -85,7 +85,7 @@ func nasppp() {
 		select {
 		case <-update:
 			// Ogni tot invia mail per far sapere che il sistema è attivo
-			mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Update")
+			mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Update", eventi)
 		case <-c:
 			// Ogni tot fa partire il recupero dei dati di sessione PPP
 			recuperaSessioniPPP()

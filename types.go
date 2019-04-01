@@ -1,6 +1,19 @@
 package main
 
-//Configuration tiene gli elementi di configurazione
+import "time"
+
+// Jerk contiene le informazioni sulle cadute di sessioni PPP
+// che si sono verificate.
+type Jerk struct {
+	NasName   string
+	Timestamp time.Time
+	pppValue  float64
+}
+
+// Jerks è un insieme di Jerk
+type Jerks []Jerk
+
+// Configuration tiene gli elementi di configurazione
 type Configuration struct {
 	IPDOMUser         string
 	IPDOMPassword     string

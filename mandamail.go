@@ -9,7 +9,7 @@ import (
 	gomail "gopkg.in/gomail.v2"
 )
 
-func mandamailAlert(from, to, device string, valoreppp float64) {
+func mandamailAlert(from, to, device string, evento *Jerk) {
 
 	// Verifica che device non sia nella mappa antistorm, se c'è esce
 	elements := antistorm.GetAll()
@@ -28,7 +28,7 @@ func mandamailAlert(from, to, device string, valoreppp float64) {
 
 	// Crea il contenuto della mail
 	grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
-	body := fmt.Sprintf("Alert %s Forte abbassamento sessioni ppp, valore riscontrato %f %s\n", device, valoreppp, grafanaurl)
+	body := fmt.Sprintf("Alert %s Forte abbassamento sessioni ppp, valore riscontrato %f alle %v %s\n", device, evento.pppValue, evento.Timestamp, grafanaurl)
 
 	// Aggiunge i destinatari in to
 	tomultiplo := strings.Split(to, ",")
@@ -53,20 +53,20 @@ func mandamailAlert(from, to, device string, valoreppp float64) {
 	}
 }
 
-func mandamail(from, to, scopo string) (err error) {
+func mandamail(from, to, scopo string, eventi Jerks) (err error) {
 
 	var subject, body string
 
 	switch scopo {
 	case "Avvio":
 		subject = "Ramses - Avvio applicazione"
-		body = "Ramses avviato"
+		body = "Ramses avviato " + fmt.Sprintf("%v", eventi)
 	case "Update":
 		subject = "Ramses - applicazione attiva"
-		body = "Ramses è ancora attivo"
+		body = "Ramses è ancora attivo" + fmt.Sprintf("%v", eventi)
 	case "Chiusura":
 		subject = "Ramses - Arresto applicazione"
-		body = "Ramses arrestato"
+		body = "Ramses arrestato" + fmt.Sprintf("%v", eventi)
 	}
 
 	tomultiplo := strings.Split(to, ",")
