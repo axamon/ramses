@@ -200,7 +200,8 @@ func nasppp2(ctx context.Context, device string) {
 			return
 
 		default:
-			//Attendo un tempo random per evitare di fare troppe query insieme
+			// Attendo un tempo random per evitare di fare troppe query insieme
+			// se sono attive le goroutines.
 			randomdelay := rand.Intn(100)
 			time.Sleep(time.Duration(randomdelay) * time.Millisecond)
 
@@ -215,7 +216,7 @@ func nasppp2(ctx context.Context, device string) {
 			var sigma float64
 			sigma = configuration.Sigma
 
-			//Recupera le credenziali per IPDOM
+			// Recupera le credenziali per IPDOM
 			username := configuration.IPDOMUser
 			password := configuration.IPDOMPassword
 
@@ -223,9 +224,11 @@ func nasppp2(ctx context.Context, device string) {
 
 			req, _ := http.NewRequest("GET", url, nil)
 
-			//qui su costringe il client ad accettare anche certificati https non validi o scaduti, non anrebbe fatto ma bisogna fare di necessità virtù
+			// Costringe il client ad accettare anche certificati https non validi
+			// o scaduti.
 			transCfg := &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+				// Ignora certificati SSL scaduti.
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			}
 
 			//req.Header.Add("content-type", "application/json;charset=UTF-8")
@@ -246,8 +249,8 @@ func nasppp2(ctx context.Context, device string) {
 				os.Exit(1)
 			}
 			defer res.Body.Close()
-			//fmt.Println(res)
-			//	fmt.Println(string(body))
+			// fmt.Println(res)
+			// fmt.Println(string(body))
 			var result []interface{}
 			err = json.Unmarshal(body, &result)
 			if err != nil {
@@ -266,19 +269,19 @@ func nasppp2(ctx context.Context, device string) {
 			d := result[0].(map[string]interface{})
 			dp := d["dps"].(map[string]interface{})
 
-			//Metti i tempi in ordine
+			// Mette i timestamps in ordine
 			tempi := make([]string, 0)
 			for t := range dp {
 				tempi = append(tempi, t)
 			}
-			//Ordina i tempi in maniera crescente
+			// Ordina i timestamps in maniera crescente
 			sort.Strings(tempi)
 
-			//Crea variabili da'appoggio
+			// Crea variabili di appoggio
 			var seriepppvalue []float64
 			var serieppptime []float64
 
-			//Cicla i tempi
+			// Cicla i tempi
 			for _, t := range tempi {
 				tint, _ := strconv.Atoi(t)
 				serieppptime = append(serieppptime, float64(tint))
@@ -286,13 +289,13 @@ func nasppp2(ctx context.Context, device string) {
 				//fmt.Println("orario: ", t, "valore: ", dp[t])
 			}
 
-			//Se non ci sono abbastanza valori per la serie esci
+			// Se non ci sono abbastanza valori per la serie esce
 			if len(seriepppvalue) < 300 {
 				log.Printf("%s Error Non ci sono abbastanza dati per elaborare statistiche", device)
 				return
 			}
 
-			// Mofifica serie che sia elaborata
+			// Mofifica serie prima che sia elaborata
 
 			// Elimino il trend
 			xdet, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
@@ -302,10 +305,10 @@ func nasppp2(ctx context.Context, device string) {
 
 			// Calcolo statistiche sulla serie elaborata
 			mean, stdev := stat.MeanStdDev(y, nil)
-			//log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev)
+			// log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev) // debug
 
 			for i := 10; i < len(y); i++ {
-				// Individuo un Jerk
+				// Individuo se è avvenuto un Jerk
 				if y[i] < mean-sigma*stdev {
 					unixtimeUTC := time.Unix(int64(xdet[i]/1000), 0)
 					// Serve per avere il timestamp di quando c'è stato il problema
@@ -319,7 +322,7 @@ func nasppp2(ctx context.Context, device string) {
 						if i+l > numvalori-1 {
 							break
 						}
-						// nomiNasSet.Strings()erifica i valori dopo il jerk
+						// Verifica i valori dopo il jerk
 						limite := (seriepppvalue[i] - seriepppvalue[i+l]) / seriepppvalue[i]
 
 						// Se il limite è negativo non ci interessa
@@ -334,14 +337,14 @@ func nasppp2(ctx context.Context, device string) {
 						if limite > configuration.Soglia {
 							summary := fmt.Sprintf("abbassamento sessioni ppp superiore al %2.0f%%\n", configuration.Soglia*100)
 							// Attenzione NON usare log.Print perchè serve printare il timestamp non attuale ma di quando si è verificato il problema
-							fmt.Printf("%s %s Alert, %s\n", unixtimeinRFC3339, device, summary)
+							fmt.Printf("%s Alert %s, %s\n", unixtimeinRFC3339, device, summary)
 
-							// Mandamail solo se siamo negli ultimi 6 valori
+							// Mandamail di notifica solo se siamo negli ultimi 6 valori
 							if i > (numvalori - 6) {
 								mandamailAlert(configuration.SmtpFrom, configuration.SmtpTo, device)
 								err := Creatrap(device, "sessioni ppp", summary, listanasip[device], 1, 5)
 								if err != nil {
-									log.Printf("%s Error Impossibile inviare trap\n", device)
+									log.Printf("Error %s Impossibile inviare trap\n", device)
 								}
 								nastrappati[device] = true
 							}
