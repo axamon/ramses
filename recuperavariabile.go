@@ -11,5 +11,6 @@ func recuperavariabile(variabile string) (result string, err error) {
 	}
 	err = fmt.Errorf("la variabile %s non esiste o è vuota", variabile)
 	fmt.Fprintln(os.Stderr, err.Error())
+
 	return
 }

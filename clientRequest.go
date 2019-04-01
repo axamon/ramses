@@ -11,7 +11,10 @@ import (
 
 func clientRequest(url, username, password, device string) (result []interface{}) {
 
-	req, _ := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Printf("Error Get new request %s\n", err.Error())
+	}
 
 	// Costringe il client ad accettare anche certificati https non validi
 	// o scaduti.
@@ -29,12 +32,12 @@ func clientRequest(url, username, password, device string) (result []interface{}
 	res, err := client.Do(req)
 	//res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Println(err.Error(), device)
+		log.Printf("Error HTTP Client Do impossibile raggiungere %s: %s\n", device, err.Error())
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Println(err.Error(), device)
+		log.Printf("Error impossibile ricevere HTTP body per %s, %s\n", device, err.Error())
 		os.Exit(1)
 	}
 	defer res.Body.Close()
@@ -42,7 +45,7 @@ func clientRequest(url, username, password, device string) (result []interface{}
 	// fmt.Println(string(body))
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		log.Println(err.Error(), device)
+		log.Printf("Error unmarshal impossibile per %s, %s\n", device, err.Error())
 		return result
 	}
 	if len(result) < 1 {

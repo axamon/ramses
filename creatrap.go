@@ -121,7 +121,7 @@ func CreaTrap(device, argomento, summary, ipdevice string, specific, severity in
 
 	_, err = g.Default.SendTrap(trap)
 	if err != nil {
-		log.Printf("SendTrap() err: %v\n", err)
+		log.Printf("Error SendTrap() err: %s\n", err.Error())
 	}
 
 	return err
