@@ -1,5 +1,9 @@
 # ramses
 
+
+[![Maintainability](https://api.codeclimate.com/v1/badges/55cbc6bd7cdf6afd7c52/maintainability)](https://codeclimate.com/github/axamon/ramses/maintainability)
+
+
 Attingendo ai dati di IPDOM Ramses elabora un grafico delle ultime 10 ore per tutte le interfacce del device passato come argomento e identifica se negli ultimi 15 minuti ci sono stati dei valori che si sono discostati di oltre due deviazioni standard in più o in meno rispetto alla media mobile degli ultimi 20 punti.
 
 Ramses inoltre monitora un sottoinsieme dei NAS esistenti ogni 5 minuti e allerta via mail se ci 
