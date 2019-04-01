@@ -47,7 +47,7 @@ func clientRequest(url, username, password, device string) (result []interface{}
 	}
 	if len(result) < 1 {
 		log.Printf("Error %s Non ci sono abbastanza info\n", device)
-		err := Creatrap(device, "No data ppp", "Assenza dati sulle sessioni ppp", listanasip[device], 2, 4)
+		err := CreaTrap(device, "No data ppp", "Assenza dati sulle sessioni ppp", listanasip[device], 2, 4)
 		if err != nil {
 			log.Printf("Error %s Impossibile inviare Trap\n", device)
 		}

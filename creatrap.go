@@ -9,16 +9,25 @@ import (
 )
 
 /*
+	pdu := g.SnmpPDU{
+		Name:  "1.3.6.1.2.1.1.6",
+		Type:  g.OctetString,
+		Value: "Oval Office",
+	}
+*/
+
+/*
 device := "r-al900"
 argomento := "sessioni ppp"
 severity := 5
 summary := "Forte abbassamento sessioni ppp"
 */
 
-//Creatrap invia trap snmp v1 per notificare gli eventi
-func Creatrap(device, argomento, summary, ipdevice string, specific, severity int) (err error) {
+//CreaTrap invia trap snmp v1 per notificare gli eventi
+func CreaTrap(device, argomento, summary, ipdevice string, specific, severity int) (err error) {
 
-	//se si tratta di inviare trap per mancanza di dati (specific =1 e severity > 0)
+	// Se si tratta di inviare trap per mancanza di dati
+	// (specific =1 e severity > 0)
 	if specific == 1 && severity > 0 {
 		//aggiungo il device alla lista per 8 ore
 		nientedatippp.AddWithTTL(device, true, 8*time.Hour)
@@ -67,17 +76,9 @@ func Creatrap(device, argomento, summary, ipdevice string, specific, severity in
 
 	err = g.Default.Connect()
 	if err != nil {
-		log.Printf("Connect() err: %v\n", err)
+		log.Printf("Error Connect() err: %s\n", err.Error())
 	}
 	defer g.Default.Conn.Close()
-
-	/*
-		pdu := g.SnmpPDU{
-			Name:  "1.3.6.1.2.1.1.6",
-			Type:  g.OctetString,
-			Value: "Oval Office",
-		}
-	*/
 
 	pdu1 := g.SnmpPDU{
 		Name:  "1.3.6.1.4.1.8888.200.34.34.1.1",
