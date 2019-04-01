@@ -6,6 +6,7 @@ import (
 )
 
 func estraiSerie(result []interface{}) (serieppptime, seriepppvalue []float64) {
+
 	// Estraggo serie dati dal risultato query http
 	d := result[0].(map[string]interface{})
 	dp := d["dps"].(map[string]interface{})
@@ -17,10 +18,6 @@ func estraiSerie(result []interface{}) (serieppptime, seriepppvalue []float64) {
 	}
 	// Ordina i timestamps in maniera crescente
 	sort.Strings(tempi)
-
-	// Crea variabili di appoggio
-	//var seriepppvalue []float64
-	//var serieppptime []float64
 
 	// Cicla i tempi
 	for _, t := range tempi {

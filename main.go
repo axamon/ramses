@@ -40,9 +40,10 @@ func main() {
 	log.Printf("Avvio Ramses %s\n", version)
 
 	// Recupera valori dal file di configurazione passato come argomento
-	err := gonfig.GetConf(os.Args[1], &configuration)
+	file := os.Args[1]
+	err := gonfig.GetConf(file, &configuration)
 	if err != nil {
-		log.Printf("errore: %s", err.Error())
+		log.Printf("Error Impossibile recupere valori da %s: %s\n", file, err.Error())
 		os.Exit(1)
 	}
 

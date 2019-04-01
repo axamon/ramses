@@ -12,3 +12,4 @@ config
 bot.exe
 *.zip
 trap
+algoritmi/anomaly/anomaly
