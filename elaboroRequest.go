@@ -3,12 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"sort"
-	"strconv"
 	"time"
-
-	"github.com/axamon/ramses/algoritmi"
-	"gonum.org/v1/gonum/stat"
 )
 
 var sigma = configuration.Sigma
@@ -17,29 +12,7 @@ var eventi Jerks
 
 func elaboroRequest(result []interface{}, device string) {
 
-	// Estraggo serie dati dal risultato query http
-	d := result[0].(map[string]interface{})
-	dp := d["dps"].(map[string]interface{})
-
-	// Mette i timestamps in ordine
-	tempi := make([]string, 0)
-	for t := range dp {
-		tempi = append(tempi, t)
-	}
-	// Ordina i timestamps in maniera crescente
-	sort.Strings(tempi)
-
-	// Crea variabili di appoggio
-	var seriepppvalue []float64
-	var serieppptime []float64
-
-	// Cicla i tempi
-	for _, t := range tempi {
-		tint, _ := strconv.Atoi(t)
-		serieppptime = append(serieppptime, float64(tint))
-		seriepppvalue = append(seriepppvalue, dp[t].(float64))
-		//fmt.Println("orario: ", t, "valore: ", dp[t])
-	}
+	serieppptime, seriepppvalue := estraiSerie(result)
 
 	// Se non ci sono abbastanza valori per la serie esce
 	if len(seriepppvalue) < 300 {
@@ -47,17 +20,7 @@ func elaboroRequest(result []interface{}, device string) {
 		return
 	}
 
-	// Mofifica serie prima che sia elaborata
-
-	// Elimino il trend
-	xdet, ydet := algoritmi.Detrend(serieppptime, seriepppvalue)
-
-	// Applico Derivata terza
-	y, _ := algoritmi.Derive3(ydet)
-
-	// Calcolo statistiche sulla serie elaborata
-	mean, stdev := stat.MeanStdDev(y, nil)
-	// log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev) // debug
+	mean, stdev, xdet, y := elaboraSerie(serieppptime, seriepppvalue)
 
 	for i := 10; i < len(y); i++ {
 
@@ -89,10 +52,6 @@ func elaboroRequest(result []interface{}, device string) {
 				if limite < 0 {
 					continue
 				}
-
-				//log.Println(seriepppvalue[1-1], seriepppvalue[i], limite)
-				//fmt.Printf("%s %s Jerk Ultimovalore: %2.f, Penultimovalore: %2.f, Limite: %.4f, %v\n", unixtimeinRFC3339, device, seriepppvalue[i], seriepppvalue[i+l], limite, l)
-				//fmt.Printf("%s Info media: %2.f stdev: %2.f , Penultimovalore: %2.f, Differenza: %2.f\n", device, mean, stdev, seriepppvalue[i-1], seriepppvalue[i]-seriepppvalue[i-1])
 
 				if limite > configuration.Soglia {
 					summary := fmt.Sprintf("abbassamento sessioni ppp superiore al %2.0f%%\n", configuration.Soglia*100)
