@@ -3,14 +3,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:8fda70c57919d8b3eda9806c43d26ad27efd6049571b838f6351d4c4b9dd5767"
-  name = "github.com/ajstarks/svgo"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "6ce6a3bcf6cde6c5007887677ebd148ec30f42a4"
-
-[[projects]]
-  branch = "master"
   digest = "1:8cefca256f294fed7323c1fab1fe1acd27aa1af1d8c29550b7589aa0bcacf8cd"
   name = "github.com/axamon/stringset"
   packages = ["."]
@@ -26,18 +18,6 @@
   revision = "f69e9f02317ee9608f7b224ce1fc63a8602d0785"
 
 [[projects]]
-  branch = "master"
-  digest = "1:7a6377256f670508711c56c25556d639e673c0fa0f519c5a758fdcbfc8af9ac8"
-  name = "github.com/golang/freetype"
-  packages = [
-    ".",
-    "raster",
-    "truetype",
-  ]
-  pruneopts = "UT"
-  revision = "e2365dfdc4a05e4b8299a783240d4a7d5a65d4e4"
-
-[[projects]]
   digest = "1:b60efdeb75d3c0ceed88783ac2495256aba3491a537d0f31401202579fd62a94"
   name = "github.com/golang/mock"
   packages = ["gomock"]
@@ -46,40 +26,12 @@
   version = "v1.2.0"
 
 [[projects]]
-  digest = "1:db23aee6f0ff15fbcd0559d660f91d6b738baeeca46d953396b2fdcec93e1260"
-  name = "github.com/jung-kurt/gofpdf"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "14c1db30737a138f8d9797cffea58783892b2fae"
-  version = "v1.0.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:79d2dd4ecf0c5b24e0a372768fd523242098338ab4453b3422bfe6ef15627b88"
-  name = "github.com/llgcode/draw2d"
-  packages = [
-    ".",
-    "draw2dbase",
-    "draw2dimg",
-  ]
-  pruneopts = "UT"
-  revision = "f52c8a71aff06ab8df41843d33ab167b36c971cd"
-
-[[projects]]
   branch = "master"
   digest = "1:6fd2b97e0c34869f1bb7bc8fd5432b2d8545b6a068d38cf79ec0f9a52d936830"
   name = "github.com/lytics/anomalyzer"
   packages = ["."]
   pruneopts = "UT"
   revision = "13cee106170131d4088721db299d09b42db508ac"
-
-[[projects]]
-  digest = "1:890cec8089afb525c56940f50f21d22cc89ba74c99325d03820f90963486afa5"
-  name = "github.com/mxmCherry/movavg"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "409878dc0217b30656458b56ab1eb0843e346a99"
-  version = "v1.1.0"
 
 [[projects]]
   branch = "master"
@@ -107,29 +59,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:47bcbdf2a60a0bdd142f07f60771078857310fd1ededeb03956add7c7f6bef33"
-  name = "golang.org/x/exp"
-  packages = ["rand"]
-  pruneopts = "UT"
-  revision = "42ba7d4b6eb299bf56fcfc4f0541a857ad0e2da3"
-
-[[projects]]
-  branch = "master"
-  digest = "1:cf4b554093dbce6983059e6dfaeef0cb4bf9e83e41ac0986c4cbe18a4e0c9b79"
-  name = "golang.org/x/image"
-  packages = [
-    "draw",
-    "font",
-    "math/f64",
-    "math/fixed",
-    "tiff",
-    "tiff/lzw",
-  ]
-  pruneopts = "UT"
-  revision = "991ec62608f3c0da01d400756917825d1e2fd528"
-
-[[projects]]
-  branch = "master"
   digest = "1:70cfa9b14bc9fd6e32f6133f6ecda76774816f225e65b06f5d2e0c7bfc3673e6"
   name = "gonum.org/v1/gonum"
   packages = [
@@ -149,27 +78,6 @@
   ]
   pruneopts = "UT"
   revision = "f0982070f509ee139841ca385c44dc22a77c8da8"
-
-[[projects]]
-  branch = "master"
-  digest = "1:67780051ad1fe4c6f3f8588cd76d19fda92c35e84425845293ba94459594c970"
-  name = "gonum.org/v1/plot"
-  packages = [
-    ".",
-    "palette",
-    "plotter",
-    "plotutil",
-    "tools/bezier",
-    "vg",
-    "vg/draw",
-    "vg/fonts",
-    "vg/vgeps",
-    "vg/vgimg",
-    "vg/vgpdf",
-    "vg/vgsvg",
-  ]
-  pruneopts = "UT"
-  revision = "5f3c436ce602d80b13f2936b6bf149515198d6a4"
 
 [[projects]]
   branch = "v3"
@@ -193,15 +101,10 @@
   input-imports = [
     "github.com/axamon/stringset",
     "github.com/lytics/anomalyzer",
-    "github.com/mxmCherry/movavg",
     "github.com/remeh/sizedwaitgroup",
     "github.com/soniah/gosnmp",
     "github.com/tkanos/gonfig",
     "gonum.org/v1/gonum/stat",
-    "gonum.org/v1/plot",
-    "gonum.org/v1/plot/plotter",
-    "gonum.org/v1/plot/plotutil",
-    "gonum.org/v1/plot/vg",
     "gopkg.in/gomail.v2",
   ]
   solver-name = "gps-cdcl"

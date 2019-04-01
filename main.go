@@ -1,69 +1,54 @@
 package main
 
 import (
-	"flag"
-	"fmt"
 	"log"
-	"strings"
+	"os"
+	"time"
 
 	"github.com/remeh/sizedwaitgroup"
+	"github.com/tkanos/gonfig"
 )
 
-const (
-	ipdomainurl string = "https://ipw.telecomitalia.it/ipwmetrics/api/v1/metrics/"
-)
-
-var metriche = []string{
-	"net.volume.in",
-	"net.volume.out",
-	"net.errors.in",
-	"net.errors.out",
-	"net.discards.in",
-	"net.discards.out",
-	"net.throughput.in",
-	"net.throughput.out"}
-
-//Dove salvere il nome delle interfacce
-var listainterfacce []string
-
-//Waitgroupche gestisce il throtteling
+// wg è un Waitgroup che gestisce il throtteling
 var wg = sizedwaitgroup.New(80)
 
-//var wg waitgroup //waitgroup vecchio stile
+// Canale per invio messaggi
+var msg = make(chan string, 1)
 
-//Gestione sigma
-var sigma float64
+// Obsoleto canale per salvare grafici
+var image = make(chan string, 1)
 
-func init() {
-	flag.Float64Var(&sigma, "s", 2, "imposta il numero di deviazioni standard da considerare")
+// RiceviResult riceve una stringa e la invia a telegram //OBSOLETO
+func RiceviResult(result string) {
+	msg <- result
+	return
 }
+
+// Crea variabile con le configurazioni del file passato come argomento
+var configuration Configuration
+
+// Crea delle mappe a tempo per storicizzare avventimenti
+var antistorm = NewTTLMap(24 * time.Hour)
+var violazioni = NewTTLMap(24 * time.Hour)
+var nientedatippp = NewTTLMap(12 * time.Hour)
+
+var version = "version: 4"
 
 func main() {
 
-	flag.Parse()
-	args := flag.Args()
+	// Scrive su standard output la versione di Ramses
+	log.Printf("Avvio Ramses %s\n", version)
 
-	if len(args) == 0 {
-		fmt.Println("Sintassi: -s=<sigma da usare> <device da controllare>")
-		return
+	// Recupera valori dal file di configurazione passato come argomento
+	err := gonfig.GetConf(os.Args[1], &configuration)
+	if err != nil {
+		log.Printf("errore: %s", err.Error())
+		os.Exit(1)
 	}
 
-	var device string
+	// GatherInfo recupera informazioni di sevizio sul funzionamento dell'APP
+	GatherInfo()
 
-	for _, arg := range args {
-		if strings.HasPrefix(arg, "-") {
-			continue
-		}
-		device = arg
-	}
+	nasppp()
 
-	fmt.Println(sigma, device)
-
-	log.Printf("Elaborazione per %s Iniziata\n", device)
-
-	//	ifnames := ifNames(device)
-
-	recuperajson(device)
-
-	log.Printf("Elaborazione per %s terminata\n", device)
 }
