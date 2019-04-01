@@ -1,6 +1,6 @@
 # ramses
 
-
+[![Build Status](https://travis-ci.org/axamon/ramses.svg?branch=master)](https://travis-ci.org/axamon/ramses)
 [![Maintainability](https://api.codeclimate.com/v1/badges/55cbc6bd7cdf6afd7c52/maintainability)](https://codeclimate.com/github/axamon/ramses/maintainability)
 
 

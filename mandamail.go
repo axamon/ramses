@@ -11,24 +11,26 @@ import (
 
 func mandamailAlert(from, to, device string) {
 
-	//verifica che device non sia nella mappa, se c'è esce
+	// Verifica che device non sia nella mappa antistorm, se c'è esce
 	elements := antistorm.GetAll()
 	for el := range elements {
 		if el == device {
-			log.Printf("%s Error Segnalazione già inviata recentemente.", device)
+			log.Printf("Error %s Segnalazione già inviata recentemente.\n", device)
 			return
 		}
 	}
 
-	//se device non è nella mappa antistorm allora lo inserisce
+	// Se device non è nella mappa antistorm allora lo inserisce
 	antistorm.AddWithTTL(device, true, 30*time.Minute)
 
+	// Setta l'oggetto della mail
 	subject := "Allarme ppp su " + device
-	//body := "Ciao <b>Gringo</b> <hr> rilevato abbassamento anomalo sessioni ppp su " + device
 
+	// Crea il contenuto della mail
 	grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
-	body := fmt.Sprintf("Alert su %s, forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
+	body := fmt.Sprintf("Alert %s Forte abbassamento sessioni ppp, %s\n", device, grafanaurl)
 
+	// Aggiunge i destinatari in to
 	tomultiplo := strings.Split(to, ",")
 
 	t := make(map[string][]string)
@@ -53,8 +55,8 @@ func mandamailAlert(from, to, device string) {
 
 func mandamailUpdate(from, to string) (err error) {
 
-	subject := "Ramses - Avvio applicazione"
-	body := "Ramses è attivo"
+	subject := "Ramses - applicazione attiva"
+	body := "Ramses è ancora attivo"
 
 	tomultiplo := strings.Split(to, ",")
 
@@ -74,7 +76,7 @@ func mandamailUpdate(from, to string) (err error) {
 
 	errdialandsend := d.DialAndSend(m)
 	if errdialandsend != nil {
-		err = fmt.Errorf("Ramses Error Impossibile inviare mail %s", errdialandsend.Error())
+		err = fmt.Errorf("Error Impossibile inviare mail %s", errdialandsend.Error())
 	}
 	return err
 }
@@ -102,7 +104,7 @@ func mandamailAvvio(from, to string) (err error) {
 
 	errdialandsend := d.DialAndSend(m)
 	if errdialandsend != nil {
-		err = fmt.Errorf("Ramses Error Impossibile inviare mail %s", errdialandsend.Error())
+		err = fmt.Errorf("Error Impossibile inviare mail %s", errdialandsend.Error())
 	}
 	return err
 }
@@ -130,7 +132,7 @@ func mandamailChiusura(from, to string) (err error) {
 
 	errdialandsend := d.DialAndSend(m)
 	if errdialandsend != nil {
-		err = fmt.Errorf("Ramses Error Impossibile inviare mail %s", errdialandsend.Error())
+		err = fmt.Errorf("Error Impossibile inviare mail %s", errdialandsend.Error())
 	}
 	return err
 }
