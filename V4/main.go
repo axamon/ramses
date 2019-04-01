@@ -18,7 +18,7 @@ var msg = make(chan string, 1)
 // Obsoleto canale per salvare grafici
 var image = make(chan string, 1)
 
-// Obsoleto RiceviResult riceve una stringa e la invia a telegram
+// RiceviResult riceve una stringa e la invia a telegram //OBSOLETO
 func RiceviResult(result string) {
 	msg <- result
 	return
