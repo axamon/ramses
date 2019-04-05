@@ -13,3 +13,4 @@ bot.exe
 *.zip
 trap
 algoritmi/anomaly/anomaly
+!configurationExample.json

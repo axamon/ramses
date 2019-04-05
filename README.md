@@ -17,6 +17,7 @@ Per configure l'applicativo bisogna compilare i campi di un file json di configu
     "IPDOMPassword": "fdsfdsf",
     "IPDOMSnmpReceiver": "127.0.0.1",
     "IPDOMSnmpPort": 162,
+    "IPDOMSnmpCommunity": "public",
     "NasDaIgnorare": "nasDaIgnorare.json",
     "NasInventory": "nasInventory.json",
     "Sigma": 2.5,
