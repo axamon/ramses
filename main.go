@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"time"
 
 	"github.com/remeh/sizedwaitgroup"
@@ -25,11 +27,27 @@ var version = "version: 4"
 
 func main() {
 	// Creo il contesto inziale che verrà propagato alle go-routine
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	defer func() {
+		signal.Stop(c)
+		cancel()
+	}()
+	go func() {
+		select {
+		case <-c:
+			fmt.Println("Spengo Ramses")
+			mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura", eventi)
+			cancel()
+			os.Exit(0)
+		case <-ctx.Done():
+		}
+	}()
 
 	// Prima di terminare la funzione invia una mail
-	defer mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura", eventi)
-
+	defer
 	// Scrive su standard output la versione di Ramses
 	log.Printf("Avvio Ramses %s\n", version)
 

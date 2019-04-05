@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"time"
@@ -10,7 +11,7 @@ var sigma = configuration.Sigma
 
 var eventi Jerks
 
-func elaboroRequest(result []interface{}, device string) {
+func elaboroRequest(ctx context.Context, result []interface{}, device string) {
 
 	serieppptime, seriepppvalue := estraiSerie(result)
 
