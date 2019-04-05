@@ -1,15 +1,15 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 )
 
-func clientRequest(url, username, password, device string) (result []interface{}) {
+func clientRequest(ctx context.Context, url, username, password, device string) (result []interface{}) {
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -26,6 +26,7 @@ func clientRequest(url, username, password, device string) (result []interface{}
 	//req.Header.Add("content-type", "application/json;charset=UTF-8")
 	req.SetBasicAuth(username, password)
 	req.Header.Add("cache-control", "no-cache")
+	req.WithContext(ctx)
 
 	client := &http.Client{Transport: transCfg}
 
@@ -33,12 +34,18 @@ func clientRequest(url, username, password, device string) (result []interface{}
 	//res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Printf("Error HTTP Client Do impossibile raggiungere %s: %s\n", device, err.Error())
+		return nil
+	}
+
+	if res.StatusCode > 300 {
+		log.Printf("Error Ricevuto un errore http: %d\n", res.StatusCode)
+		return nil
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Printf("Error impossibile ricevere HTTP body per %s, %s\n", device, err.Error())
-		os.Exit(1)
+		// os.Exit(1)
 	}
 	defer res.Body.Close()
 	// fmt.Println(res)

@@ -1,11 +1,17 @@
 package main
 
 import (
+	"log"
 	"sort"
 	"strconv"
 )
 
 func estraiSerie(result []interface{}) (serieppptime, seriepppvalue []float64) {
+
+	if result == nil {
+		log.Printf("Error nessun risultato passato al estraiSerie")
+		return nil, nil
+	}
 
 	// Estraggo serie dati dal risultato query http
 	d := result[0].(map[string]interface{})

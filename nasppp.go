@@ -35,7 +35,7 @@ func nasppp(ctx context.Context) {
 	time.Sleep(3 * time.Second)
 
 	// recuperaSessioniPPP è una funzione che recupera i dati ppp dei nas
-	recuperaSessioniPPP := func() {
+	recuperaSessioniPPP := func(ctx context.Context) {
 		// Espando il contesto inziale inserendo un timeout
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
 
@@ -66,7 +66,7 @@ func nasppp(ctx context.Context) {
 	}
 
 	// Prima esecuzione del recupero dati dall'avvio dell'applicazione
-	recuperaSessioniPPP()
+	recuperaSessioniPPP(ctx)
 
 	// Attende che tutte le richieste siano terminate prima di proseguire
 	wgppp.Wait()
@@ -83,7 +83,7 @@ func nasppp(ctx context.Context) {
 			mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Update", eventi)
 		case <-c:
 			// Ogni tot fa partire il recupero dei dati di sessione PPP
-			recuperaSessioniPPP()
+			recuperaSessioniPPP(ctx)
 			wgppp.Wait()
 			// <-t:
 			//	fmt.Println(".")
@@ -126,9 +126,9 @@ func nasppp2(ctx context.Context, device string) {
 
 			url := configuration.URLSessioniPPP + device + configuration.URLTail7d
 
-			result := clientRequest(url, username, password, device)
+			result := clientRequest(ctx, url, username, password, device)
 
-			elaboroRequest(result, device)
+			elaboroRequest(ctx, result, device)
 
 			return
 		}
