@@ -23,7 +23,7 @@ severity := 5
 summary := "Forte abbassamento sessioni ppp"
 */
 
-//CreaTrap invia trap snmp v1 per notificare gli eventi
+// CreaTrap invia trap snmp v1 per notificare gli eventi
 func CreaTrap(device, argomento, summary, ipdevice string, specific, severity int) (err error) {
 
 	// Se si tratta di inviare trap per mancanza di dati

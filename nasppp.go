@@ -26,7 +26,7 @@ func nasppp() {
 	// Prima di terminare la funzione invia una mail
 	defer mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura", eventi)
 
-	// Verifica l'avvio di mail. Se non riesce a mandare mail esce.
+	// Verifica l'avvio delle mail. Se non riesce a mandare mail esce.
 	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio", eventi)
 	if err != nil {
 		log.Printf("Error Impossibile inviare mail: %s\n", err.Error())
