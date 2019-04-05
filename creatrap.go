@@ -56,7 +56,7 @@ func CreaTrap(device, argomento, summary, ipdevice string, specific, severity in
 	}
 
 	// Se invece si deve comunicare la risoluzione di un problema di tipo
-	// mancanza dati (specific=1e severity=0) non importa a che ora si risolve
+	// mancanza dati (specific=1 e severity=0) non importa a che ora si risolve
 	// e se la variabile trapMancanoDatiInviata è falsa vuol dire che
 	// non è stata notificata la trap del problema
 	if specific == 1 && severity == 0 && trapMancanoDatiInviata == false {
@@ -71,7 +71,7 @@ func CreaTrap(device, argomento, summary, ipdevice string, specific, severity in
 	g.Default.Target = configuration.IPDOMSnmpReceiver
 	g.Default.Port = configuration.IPDOMSnmpPort
 	g.Default.Version = g.Version1
-	g.Default.Community = "public"
+	g.Default.Community = configuration.IPDOMSnmpCommunity
 	g.Default.Logger = log.New(os.Stdout, "", 0)
 
 	err = g.Default.Connect()
