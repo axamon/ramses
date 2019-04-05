@@ -18,6 +18,7 @@ type Configuration struct {
 	IPDOMUser         string
 	IPDOMPassword     string
 	IPDOMSnmpReceiver string
+	IPDOMSnmpPort     uint16
 	Sigma             float64
 	Soglia            float64
 	NasInventory      string

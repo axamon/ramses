@@ -69,7 +69,7 @@ func CreaTrap(device, argomento, summary, ipdevice string, specific, severity in
 	// Default is a pointer to a GoSNMP struct that contains sensible defaults
 	// eg port 161, community public, etc
 	g.Default.Target = configuration.IPDOMSnmpReceiver
-	g.Default.Port = 162
+	g.Default.Port = configuration.IPDOMSnmpPort
 	g.Default.Version = g.Version1
 	g.Default.Community = "public"
 	g.Default.Logger = log.New(os.Stdout, "", 0)
