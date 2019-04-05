@@ -4,33 +4,19 @@ import (
 	"crypto/tls"
 
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-	"reflect"
-	"strconv"
 )
-
-const urlricerca = "https://ipw.telecomitalia.it/ipwinventory/api/v1/devices/?limit=1000skip=1000&name="
 
 func recuperaNAS() (nasList [][]TNAS) {
 
 	//var bjson []byte
 
-	username, err := recuperavariabile("username")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	username := configuration.IPDOMUser
+	password := configuration.IPDOMPassword
 
-	//Recupera la variabile d'ambiente
-	password, err := recuperavariabile("password")
-	if err != nil {
-		log.Fatal(err)
-		return
-	}
+	urlricerca := configuration.IPDOMUrlRicerca
 
 	sigle := []string{"AG", "AL", "AN", "AO", "AR", "AP", "AT", "AV", "BA", "BT", "BL", "BN", "BG", "BI", "BO", "BZ", "BS", "BR", "CA", "CL", "CB", "CI", "CE", "CT", "CZ", "CH", "CO", "CS", "CR", "KR", "CN", "EN", "FM", "FE", "FI", "FG", "FC", "FR", "GE", "GO", "GR", "IM", "IS", "SP", "AQ", "LT", "LE", "LC", "LI", "LO", "LU", "MC", "MN", "MS", "MT", "ME", "MI", "MO", "MB", "NA", "NO", "NU", "OT", "OR", "PD", "PA", "PR", "PV", "PG", "PU", "PE", "PC", "PI", "PT", "PN", "PZ", "PO", "RG", "RA", "RC", "RE", "RI", "RN", "RM", "RO", "SA", "VS", "SS", "SV", "SI", "SR", "SO", "TA", "TE", "TR", "TO", "OG", "TP", "TN", "TV", "TS", "UD", "VA", "VE", "VB", "VC", "VR", "VV", "VI", "VT"}
 
@@ -55,9 +41,15 @@ func recuperaNAS() (nasList [][]TNAS) {
 		}
 
 		client := &http.Client{Transport: transCfg}
-		res, _ := client.Do(req)
+		res, err := client.Do(req)
+		if err != nil {
+			log.Fatalf("Error Impossibile eseguire il client http: %s", err.Error())
+		}
 
-		body, _ := ioutil.ReadAll(res.Body)
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			log.Fatalf("Error Impossibile leggere risposta client http: %s", err.Error())
+		}
 		//err = ioutil.WriteFile(sigla+"nasInventory.json", body, 0644) //scrive i dati su file json
 		defer res.Body.Close()
 		//check(err)
@@ -71,26 +63,26 @@ func recuperaNAS() (nasList [][]TNAS) {
 
 		err = json.Unmarshal(body, &nasholder)
 		if err != nil {
-			fmt.Println(err)
+			log.Fatalf("Error Impossibile eseguire unmarshal dei dati: %s", err.Error())
 		}
 
 		nasList = append(nasList, nasholder)
 
 	}
-	inventory := &nasList
-	b, err := json.Marshal(inventory)
+	//inventory := &nasList
+	/* b, err := json.Marshal(inventory)
 	if err != nil {
 		log.Println(err.Error())
 	}
 	err = ioutil.WriteFile("nasInventory.json", b, 0644) //scrive i dati su file json
 	if err != nil {
 		log.Println(err.Error())
-	}
-	return
+	} */
+	return nasList
 }
 
 // NasInventory2Csv write a nas list to a csv file
-func NasInventory2Csv(nasList []TNAS, filename string) {
+/* func NasInventory2Csv(nasList []TNAS, filename string) {
 	// var auxNas TNAS
 	// sn := reflect.ValueOf(&auxNas).Elem()
 	//	tnasType := sn.Type()
@@ -148,9 +140,4 @@ func NasInventory2Csv(nasList []TNAS, filename string) {
 
 	return
 }
-
-func check(e error) {
-	if e != nil {
-		panic(e)
-	}
-}
+*/

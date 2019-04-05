@@ -17,6 +17,7 @@ type Jerks []Jerk
 type Configuration struct {
 	IPDOMUser          string
 	IPDOMPassword      string
+	IPDOMUrlRicerca    string
 	IPDOMSnmpReceiver  string
 	IPDOMSnmpPort      uint16
 	IPDOMSnmpCommunity string

@@ -42,7 +42,7 @@ func CreaTrap(device, argomento, summary, ipdevice string, specific, severity in
 	elements := nientedatippp.GetAll()
 	for el := range elements {
 		if el == device {
-			// Sse è presente cambio la variabile trapMancanoDatiInviata
+			// Se è presente cambio la variabile trapMancanoDatiInviata
 			// su true vuol dire che è stata inviata una trap di problema
 			// nelle 8 ore precedenti.
 			trapMancanoDatiInviata = true
