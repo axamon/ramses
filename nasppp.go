@@ -19,9 +19,7 @@ var listanasip = make(map[string]string)
 // Creo la mappa dei NAS per cui è stata inviata una trap
 var nastrappati = make(map[string]bool)
 
-func nasppp() {
-	// Creo il contesto inziale che verrà propagato alle go-routine
-	ctx := context.Background()
+func nasppp(ctx context.Context) {
 
 	// Prima di terminare la funzione invia una mail
 	defer mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura", eventi)

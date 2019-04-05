@@ -36,7 +36,7 @@ func NewTTLMapWithCallback(ttl time.Duration, callback RemoveCallback) *TTLMap {
 	}
 }
 
-// clearSchedule removes expired entries from the schedule
+// ClearSchedule removes expired entries from the schedule
 func (ttlmap *TTLMap) clearSchedule(key interface{}) {
 	ttlmap.sMutex.Lock()
 	defer ttlmap.sMutex.Unlock()

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 	"time"
@@ -11,18 +12,6 @@ import (
 
 // wg è un Waitgroup che gestisce il throtteling
 var wg = sizedwaitgroup.New(80)
-
-// Canale per invio messaggi
-var msg = make(chan string, 1)
-
-// Obsoleto canale per salvare grafici
-var image = make(chan string, 1)
-
-// RiceviResult riceve una stringa e la invia a telegram //OBSOLETO
-func RiceviResult(result string) {
-	msg <- result
-	return
-}
 
 // Crea variabile con le configurazioni del file passato come argomento
 var configuration Configuration
@@ -39,6 +28,9 @@ func main() {
 	// Scrive su standard output la versione di Ramses
 	log.Printf("Avvio Ramses %s\n", version)
 
+	// Creo il contesto inziale che verrà propagato alle go-routine
+	ctx := context.Background()
+
 	// Recupera valori dal file di configurazione passato come argomento
 	file := os.Args[1]
 	err := gonfig.GetConf(file, &configuration)
@@ -50,6 +42,6 @@ func main() {
 	// GatherInfo recupera informazioni di sevizio sul funzionamento dell'APP
 	GatherInfo()
 
-	nasppp()
+	nasppp(ctx)
 
 }
