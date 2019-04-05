@@ -16,7 +16,7 @@ var configuration ramses.Configuration
 func TestMain(m *testing.M) {
 
 	// Recupera valori dal file di configurazione passato come argomento
-	file := "configurationDev.json"
+	file := "configurationExample.json"
 	err := gonfig.GetConf(file, &configuration)
 	if err != nil {
 		log.Printf("Error Impossibile recupere valori da %s: %s\n", file, err.Error())

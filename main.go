@@ -24,12 +24,14 @@ var nientedatippp = NewTTLMap(12 * time.Hour)
 var version = "version: 4"
 
 func main() {
+	// Creo il contesto inziale che verrà propagato alle go-routine
+	ctx := context.Background()
+
+	// Prima di terminare la funzione invia una mail
+	defer mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura", eventi)
 
 	// Scrive su standard output la versione di Ramses
 	log.Printf("Avvio Ramses %s\n", version)
-
-	// Creo il contesto inziale che verrà propagato alle go-routine
-	ctx := context.Background()
 
 	// Recupera valori dal file di configurazione passato come argomento
 	file := os.Args[1]

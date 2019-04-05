@@ -21,9 +21,6 @@ var nastrappati = make(map[string]bool)
 
 func nasppp(ctx context.Context) {
 
-	// Prima di terminare la funzione invia una mail
-	defer mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura", eventi)
-
 	// Verifica l'avvio delle mail. Se non riesce a mandare mail esce.
 	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio", eventi)
 	if err != nil {
