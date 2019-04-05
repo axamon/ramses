@@ -15,23 +15,24 @@ type Jerks []Jerk
 
 // Configuration tiene gli elementi di configurazione
 type Configuration struct {
-	IPDOMUser         string
-	IPDOMPassword     string
-	IPDOMSnmpReceiver string
-	IPDOMSnmpPort     uint16
-	Sigma             float64
-	Soglia            float64
-	NasInventory      string
-	NasDaIgnorare     string
-	URLSessioniPPP    string
-	URLTail7d         string
-	SmtpPort          int
-	SmtpServer        string
-	SmtpUser          string
-	SmtpPassword      string
-	SmtpSender        string
-	SmtpFrom          string
-	SmtpTo            string
+	IPDOMUser          string
+	IPDOMPassword      string
+	IPDOMSnmpReceiver  string
+	IPDOMSnmpPort      uint16
+	IPDOMSnmpCommunity string
+	Sigma              float64
+	Soglia             float64
+	NasInventory       string
+	NasDaIgnorare      string
+	URLSessioniPPP     string
+	URLTail7d          string
+	SmtpPort           int
+	SmtpServer         string
+	SmtpUser           string
+	SmtpPassword       string
+	SmtpSender         string
+	SmtpFrom           string
+	SmtpTo             string
 }
 
 // TNAS is a structure Type for contain NAS interface
