@@ -2,14 +2,15 @@ package main
 
 import (
 	"crypto/tls"
-
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-func recuperaNAS() (nasList [][]TNAS) {
+// recuperaNAS si connette a IPDOM per scaricare TUTTE le info sui nas.
+func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 
 	//var bjson []byte
 
@@ -21,7 +22,7 @@ func recuperaNAS() (nasList [][]TNAS) {
 	sigle := []string{"AG", "AL", "AN", "AO", "AR", "AP", "AT", "AV", "BA", "BT", "BL", "BN", "BG", "BI", "BO", "BZ", "BS", "BR", "CA", "CL", "CB", "CI", "CE", "CT", "CZ", "CH", "CO", "CS", "CR", "KR", "CN", "EN", "FM", "FE", "FI", "FG", "FC", "FR", "GE", "GO", "GR", "IM", "IS", "SP", "AQ", "LT", "LE", "LC", "LI", "LO", "LU", "MC", "MN", "MS", "MT", "ME", "MI", "MO", "MB", "NA", "NO", "NU", "OT", "OR", "PD", "PA", "PR", "PV", "PG", "PU", "PE", "PC", "PI", "PT", "PN", "PZ", "PO", "RG", "RA", "RC", "RE", "RI", "RN", "RM", "RO", "SA", "VS", "SS", "SV", "SI", "SR", "SO", "TA", "TE", "TR", "TO", "OG", "TP", "TN", "TV", "TS", "UD", "VA", "VE", "VB", "VC", "VR", "VV", "VI", "VT"}
 
 	for _, sigla := range sigle {
-		//creo un contenitore per il nuovo NAS
+		// Creo un contenitore per il nuovo NAS
 		var nasholder []TNAS
 
 		nas := "^r-" + sigla
@@ -32,6 +33,7 @@ func recuperaNAS() (nasList [][]TNAS) {
 		//Header che forse potrebbero essere tolti ma male non fanno
 		req.Header.Add("content-type", "application/json")
 		req.Header.Add("cache-control", "no-cache")
+		req.WithContext(ctx)
 
 		//***************************************************************************
 		//------- read from ipdom --------
@@ -43,12 +45,14 @@ func recuperaNAS() (nasList [][]TNAS) {
 		client := &http.Client{Transport: transCfg}
 		res, err := client.Do(req)
 		if err != nil {
-			log.Fatalf("Error Impossibile eseguire il client http: %s", err.Error())
+			log.Printf("Error Impossibile eseguire il client http: %s", err.Error())
+			return nil, err
 		}
 
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			log.Fatalf("Error Impossibile leggere risposta client http: %s", err.Error())
+			log.Printf("Error Impossibile leggere risposta client http: %s", err.Error())
+			return nil, err
 		}
 		//err = ioutil.WriteFile(sigla+"nasInventory.json", body, 0644) //scrive i dati su file json
 		defer res.Body.Close()
@@ -63,7 +67,8 @@ func recuperaNAS() (nasList [][]TNAS) {
 
 		err = json.Unmarshal(body, &nasholder)
 		if err != nil {
-			log.Fatalf("Error Impossibile eseguire unmarshal dei dati: %s", err.Error())
+			log.Printf("Error Impossibile eseguire unmarshal dei dati: %s", err.Error())
+			return nil, err
 		}
 
 		nasList = append(nasList, nasholder)
@@ -78,7 +83,7 @@ func recuperaNAS() (nasList [][]TNAS) {
 	if err != nil {
 		log.Println(err.Error())
 	} */
-	return nasList
+	return nasList, nil
 }
 
 // NasInventory2Csv write a nas list to a csv file

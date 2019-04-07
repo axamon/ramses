@@ -17,6 +17,7 @@ func selezionaNas() (nomiNasSet *stringset.StringSet) {
 
 	// TODO: creare il file con i nomi NAS dinamicamente
 
+
 	// Identifico il file json con le informazioni da parsare
 	filelistapparati := configuration.NasInventory
 
