@@ -10,24 +10,18 @@ import (
 	"time"
 )
 
-// wgpp è un waitgroup per sincronizzare le goroutines
+// wgpp è un waitgroup per sincronizzare le goroutines.
 var wgppp sync.WaitGroup
 
-// Creo la mappa dove mettere nas name e ip insieme
+// Creo la mappa dove mettere nas name e ip insieme.
 var listanasip = make(map[string]string)
 
-// Creo la mappa dei NAS per cui è stata inviata una trap
+// Creo la mappa dei NAS per cui è stata inviata una trap.
 var nastrappati = make(map[string]bool)
 
 func nasppp(ctx context.Context) {
 
-	// Verifica l'avvio delle mail. Se non riesce a mandare mail esce.
-	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio", eventi)
-	if err != nil {
-		log.Printf("Error Impossibile inviare mail: %s\n", err.Error())
-		os.Exit(1)
-	}
-
+	// Dalla lista NAS seleziona quelli da considerare.
 	nomiNasSet := selezionaNas()
 
 	// Loggo il numero di NAS identificati
@@ -70,6 +64,16 @@ func nasppp(ctx context.Context) {
 
 	// Attende che tutte le richieste siano terminate prima di proseguire
 	wgppp.Wait()
+
+	// Verifica l'avvio delle mail. Se non riesce a mandare mail esce.
+	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio", eventi)
+	if err != nil {
+		log.Printf("Error Impossibile inviare mail: %s\n", err.Error())
+		os.Exit(1)
+	}
+	log.Printf("INFO Mail di avvio inviata.\n")
+
+
 	fmt.Println("Dopo primo run") //debug
 
 	// Imposta un refesh ogni tot minuti
