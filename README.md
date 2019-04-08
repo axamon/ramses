@@ -15,6 +15,7 @@ Per configure l'applicativo bisogna compilare i campi di un file json di configu
 {
     "IPDOMUser": "user",
     "IPDOMPassword": "fdsfdsf",
+    "IPDOMUrlRicerca": "https://ipw.telecomitalia.it/ipwinventory/api/v1/devices/?limit=1000skip=1000&name=",
     "IPDOMSnmpReceiver": "127.0.0.1",
     "IPDOMSnmpPort": 162,
     "IPDOMSnmpCommunity": "public",
