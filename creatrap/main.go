@@ -94,12 +94,12 @@ func CreaTrap(device, argomento, summary, ipdevice string, specific, severity in
 	if err != nil {
 		log.Printf("Error SendTrap() err: %s\n", err.Error())
 	}
-	for _, value := range trap.Variables {
-		fmt.Println(value.Name, value.Value)
-	}
+	//	for _, value := range trap.Variables {
+	//		fmt.Println(value.Name, value.Value)
+	//	}
 	if result.Error != 0 {
 		return nil, fmt.Errorf("Errore nell'invio della trap")
 	}
-	fmt.Println(result.Error)
+	// fmt.Println(result.Error)
 	return result, err
 }

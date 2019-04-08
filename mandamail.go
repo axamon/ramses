@@ -28,7 +28,7 @@ func mandamailAlert(from, to, device string, evento *Jerk) {
 
 	// Crea il contenuto della mail
 	grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
-	body := fmt.Sprintf("Alert %s Forte abbassamento sessioni ppp, valore riscontrato %f alle %v %s\n", device, evento.pppValue, evento.Timestamp, grafanaurl)
+	body := fmt.Sprintf("Alert %s Forte abbassamento sessioni ppp, valore riscontrato %d alle %v %s\n", device, int(evento.pppValue), evento.Timestamp.UTC(), grafanaurl)
 
 	// Aggiunge i destinatari in to
 	tomultiplo := strings.Split(to, ",")
@@ -55,18 +55,28 @@ func mandamailAlert(from, to, device string, evento *Jerk) {
 
 func mandamail(from, to, scopo string, eventi Jerks) (err error) {
 
+	var listaeventi []string
+	for _, evento := range eventi {
+		singoloevento := fmt.Sprintf(`
+		%s %s %d
+		`, evento.Timestamp.UTC().Format("20060102T15:04"), evento.NasName, int(evento.pppValue))
+		listaeventi = append(listaeventi, singoloevento)
+	}
+
 	var subject, body string
+
+	eventianomali := strings.Join(listaeventi, "\n")
 
 	switch scopo {
 	case "Avvio":
 		subject = "Ramses - Avvio applicazione"
-		body = "Ramses avviato " + fmt.Sprintf("%v", eventi)
+		body = fmt.Sprintf("Ramses avviato\n%s\n", eventianomali)
 	case "Update":
 		subject = "Ramses - applicazione attiva"
-		body = "Ramses è ancora attivo" + fmt.Sprintf("%v", eventi)
+		body = fmt.Sprintf("Ramses è ancora attivo\n%s\n", eventianomali)
 	case "Chiusura":
 		subject = "Ramses - Arresto applicazione"
-		body = "Ramses arrestato" + fmt.Sprintf("%v", eventi)
+		body = fmt.Sprintf("Ramses arrestato\n%s\n", eventianomali)
 	}
 
 	tomultiplo := strings.Split(to, ",")

@@ -19,14 +19,7 @@ var listanasip = make(map[string]string)
 // Creo la mappa dei NAS per cui è stata inviata una trap.
 var nastrappati = make(map[string]bool)
 
-func nasppp(ctx context.Context) {
-
-	// Dalla lista NAS seleziona quelli da considerare.
-	nomiNasSet := selezionaNas()
-
-	// Loggo il numero di NAS identificati
-	log.Printf("%v INFO numero di NAS trovati\n", nomiNasSet.Len())
-	time.Sleep(3 * time.Second)
+func nasppp(ctx context.Context, nomiNas []string) {
 
 	// recuperaSessioniPPP è una funzione che recupera i dati ppp dei nas
 	recuperaSessioniPPP := func(ctx context.Context) {
@@ -47,7 +40,7 @@ func nasppp(ctx context.Context) {
 			// finchè non si raggiunge il timeout viene eseguito il codice di default
 			default:
 
-				for _, device := range nomiNasSet.Strings() {
+				for _, device := range nomiNas {
 					wgppp.Add(1)
 					//log.Printf("%s Info Inzio verifica device\n", device)
 					//go nasppp2(device)
@@ -65,14 +58,14 @@ func nasppp(ctx context.Context) {
 	// Attende che tutte le richieste siano terminate prima di proseguire
 	wgppp.Wait()
 
-	// Verifica l'avvio delle mail. Se non riesce a mandare mail esce.
+	// Verifica l'avvio delle mail.
+	// Se non riesce a mandare mail esce.
 	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio", eventi)
 	if err != nil {
 		log.Printf("Error Impossibile inviare mail: %s\n", err.Error())
 		os.Exit(1)
 	}
 	log.Printf("INFO Mail di avvio inviata.\n")
-
 
 	fmt.Println("Dopo primo run") //debug
 
@@ -107,7 +100,7 @@ func nasppp2(ctx context.Context, device string) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Printf("%s Error Superato tempo massimo per raccolta dati\n", device)
+			log.Printf("Error %s Superato tempo massimo per raccolta dati\n", device)
 			return
 
 		default:
