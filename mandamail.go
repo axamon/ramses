@@ -58,23 +58,25 @@ func mandamail(from, to, scopo string, eventi Jerks) (err error) {
 	var listaeventi []string
 	for _, evento := range eventi {
 		singoloevento := fmt.Sprintf(`
-		%s %s %d\n
+		%s %s %d
 		`, evento.Timestamp.UTC().Format("20060102T15:04"), evento.NasName, int(evento.pppValue))
 		listaeventi = append(listaeventi, singoloevento)
 	}
 
 	var subject, body string
 
+	eventianomali := strings.Join(listaeventi, "\n")
+
 	switch scopo {
 	case "Avvio":
 		subject = "Ramses - Avvio applicazione"
-		body = fmt.Sprintf("Ramses avviato\n%v\n", listaeventi)
+		body = fmt.Sprintf("Ramses avviato\n%s\n", eventianomali)
 	case "Update":
 		subject = "Ramses - applicazione attiva"
-		body = fmt.Sprintf("Ramses è ancora attivo\n%v\n", listaeventi)
+		body = fmt.Sprintf("Ramses è ancora attivo\n%s\n", eventianomali)
 	case "Chiusura":
 		subject = "Ramses - Arresto applicazione"
-		body = fmt.Sprintf("Ramses arrestato\n%v\n", listaeventi)
+		body = fmt.Sprintf("Ramses arrestato\n%s\n", eventianomali)
 	}
 
 	tomultiplo := strings.Split(to, ",")
