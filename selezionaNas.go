@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -57,8 +56,8 @@ func selezionaNas() (nomiNas []string, err error) {
 
 	// listalistanas è una lista di liste quindi bisogna fare un doppio ciclo for
 	for _, listanas := range listalistanas {
-		for n, nas := range listanas {
-			fmt.Println(n, nas.Name) //debug
+		for _, nas := range listanas {
+			// fmt.Println(n, nas.Name) //debug
 
 			// Escludo i NAS in da ignorare
 			//if _, ok := ignora[nas.Name]; ok {

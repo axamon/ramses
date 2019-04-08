@@ -27,8 +27,8 @@ summary := "Forte abbassamento sessioni ppp"
 func CreaTrap(device, argomento, summary, ipdevice string, specific, severity int) (err error) {
 
 	// Se si tratta di inviare trap per mancanza di dati
-	// (specific =1 e severity > 0)
-	if specific == 1 && severity > 0 {
+	// (specific = 1 e severity > 0)
+	if specific == 2 && severity > 0 {
 		//aggiungo il device alla lista per 8 ore
 		nientedatippp.AddWithTTL(device, true, 8*time.Hour)
 	}
@@ -51,12 +51,12 @@ func CreaTrap(device, argomento, summary, ipdevice string, specific, severity in
 
 	// Se vuoi inviare una trap per mancanza di dati e non sono le 10 di mattina
 	// oppure il problema è stato già notificato allora esce.
-	if specific == 1 && severity > 0 && adesso.Hour() != 10 && trapMancanoDatiInviata == true {
+	if specific == 2 && severity > 0 && adesso.Hour() != 10 && trapMancanoDatiInviata == true {
 		return
 	}
 
 	// Se invece si deve comunicare la risoluzione di un problema di tipo
-	// mancanza dati (specific=1 e severity=0) non importa a che ora si risolve
+	// mancanza dati (specific = 1 e severity = 0) non importa a che ora si risolve
 	// e se la variabile trapMancanoDatiInviata è falsa vuol dire che
 	// non è stata notificata la trap del problema
 	if specific == 1 && severity == 0 && trapMancanoDatiInviata == false {

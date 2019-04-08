@@ -27,16 +27,9 @@ func elaboroRequest(ctx context.Context, result []interface{}, device string) {
 
 		// Individuo se è avvenuto un Jerk
 		if y[i] < mean-sigma*stdev {
-			evento := new(Jerk)
-			evento.NasName = device
-			evento.pppValue = y[i]
-
 			unixtimeUTC := time.Unix(int64(xdet[i]/1000), 0)
 			// Serve per avere il timestamp di quando c'è stato il problema
 			unixtimeinRFC3339 := unixtimeUTC.Format(time.RFC3339)
-			evento.Timestamp = unixtimeUTC
-
-			eventi = append(eventi, *evento)
 
 			// Devo verificare se valori futuri dopo il Jerk hanno avuto problemi
 			numvalori := len(seriepppvalue)
@@ -58,6 +51,12 @@ func elaboroRequest(ctx context.Context, result []interface{}, device string) {
 					summary := fmt.Sprintf("abbassamento sessioni ppp superiore al %2.0f%%\n", configuration.Soglia*100)
 					// Attenzione NON usare log.Print perchè serve printare il timestamp non attuale ma di quando si è verificato il problema
 					fmt.Printf("%s Alert %s, %s\n", unixtimeinRFC3339, device, summary)
+
+					evento := new(Jerk)
+					evento.NasName = device
+					evento.pppValue = seriepppvalue[i]
+					evento.Timestamp = unixtimeUTC
+					eventi = append(eventi, *evento)
 
 					// Mandamail di notifica solo se siamo negli ultimi 6 valori
 					if i > (numvalori - 6) {

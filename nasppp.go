@@ -58,7 +58,8 @@ func nasppp(ctx context.Context, nomiNas []string) {
 	// Attende che tutte le richieste siano terminate prima di proseguire
 	wgppp.Wait()
 
-	// Verifica l'avvio delle mail. Se non riesce a mandare mail esce.
+	// Verifica l'avvio delle mail.
+	// Se non riesce a mandare mail esce.
 	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio", eventi)
 	if err != nil {
 		log.Printf("Error Impossibile inviare mail: %s\n", err.Error())
@@ -99,7 +100,7 @@ func nasppp2(ctx context.Context, device string) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Printf("Error  %s Superato tempo massimo per raccolta dati\n", device)
+			log.Printf("Error %s Superato tempo massimo per raccolta dati\n", device)
 			return
 
 		default:
