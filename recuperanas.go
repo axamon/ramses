@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sort"
 	"time"
 )
 
@@ -31,61 +32,68 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 		"TE", "TR", "TO", "OG", "TP", "TN", "TV", "TS", "UD", "VA", "VE", "VB",
 		"VC", "VR", "VV", "VI", "VT"}
 
+	sort.Strings(sigle)
+
 	for _, sigla := range sigle {
-		// Creo un contenitore per il nuovo NAS
-		var nasholder []TNAS
+		wg.Add()
+		go func() {
+			defer wg.Done()
+			// Creo un contenitore per il nuovo NAS
+			var nasholder []TNAS
 
-		// Attende un secondo per non sovraccaricare IPDOM
-		time.Sleep(1 * time.Second)
+			// Attende un secondo per non sovraccaricare IPDOM
+			time.Sleep(1 * time.Second)
 
-		nas := "^r-" + sigla
-		log.Printf("INFO Inizio recupero inormazioni NAS provincia %s\n", sigla)
-		url := urlricerca + nas
-		req, _ := http.NewRequest("GET", url, nil)
-		req.SetBasicAuth(username, password)
+			nas := "^r-" + sigla
+			log.Printf("INFO Inizio recupero inormazioni NAS provincia %s\n", sigla)
+			url := urlricerca + nas
+			req, _ := http.NewRequest("GET", url, nil)
+			req.SetBasicAuth(username, password)
 
-		//Header che forse potrebbero essere tolti ma male non fanno
-		req.Header.Add("content-type", "application/json")
-		req.Header.Add("cache-control", "no-cache")
-		req.WithContext(ctx)
+			//Header che forse potrebbero essere tolti ma male non fanno
+			req.Header.Add("content-type", "application/json")
+			req.Header.Add("cache-control", "no-cache")
+			req.WithContext(ctx)
 
-		//***************************************************************************
-		//------- read from ipdom --------
-		//qui su costringe il client ad accettare anche certificati https non validi o scaduti, non anrebbe fatto ma bisogna fare di necessità virtù
-		transCfg := &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
-		}
+			//***************************************************************************
+			//------- read from ipdom --------
+			//qui su costringe il client ad accettare anche certificati https non validi o scaduti, non anrebbe fatto ma bisogna fare di necessità virtù
+			transCfg := &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+			}
 
-		client := &http.Client{Transport: transCfg}
-		res, err := client.Do(req)
-		if err != nil {
-			log.Printf("Error Impossibile eseguire il client http: %s", err.Error())
-			return nil, err
-		}
+			client := &http.Client{Transport: transCfg}
+			res, err := client.Do(req)
+			if err != nil {
+				log.Printf("Error Impossibile eseguire il client http: %s", err.Error())
+				return //nil, err
+			}
 
-		body, err := ioutil.ReadAll(res.Body)
-		if err != nil {
-			log.Printf("Error Impossibile leggere risposta client http: %s", err.Error())
-			return nil, err
-		}
-		//err = ioutil.WriteFile(sigla+"nasInventory.json", body, 0644) //scrive i dati su file json
-		defer res.Body.Close()
-		//check(err)
+			body, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				log.Printf("Error Impossibile leggere risposta client http: %s", err.Error())
+				return //nil, err
+			}
+			//err = ioutil.WriteFile(sigla+"nasInventory.json", body, 0644) //scrive i dati su file json
+			defer res.Body.Close()
+			//check(err)
 
-		// ------ read from file -------
-		//bjson, err = ioutil.ReadFile("nasInventory.json")
-		// -------------------
-		// *****************************************************************************
-		//recupera il risultato della query a ipdom
-		//	var d []TNAS
+			// ------ read from file -------
+			//bjson, err = ioutil.ReadFile("nasInventory.json")
+			// -------------------
+			// *****************************************************************************
+			//recupera il risultato della query a ipdom
+			//	var d []TNAS
 
-		err = json.Unmarshal(body, &nasholder)
-		if err != nil {
-			log.Printf("Error Impossibile eseguire unmarshal dei dati per %s: %s", sigla, err.Error())
-			// return nil, err
-		}
+			err = json.Unmarshal(body, &nasholder)
+			if err != nil {
+				log.Printf("Error Impossibile eseguire unmarshal dei dati per %s: %s", sigla, err.Error())
+				// return nil, err
+			}
 
-		nasList = append(nasList, nasholder)
+			nasList = append(nasList, nasholder)
+		}()
+		wg.Wait()
 
 	}
 	inventory := &nasList

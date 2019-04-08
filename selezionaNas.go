@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/axamon/stringset"
 )
 
-func selezionaNas() (nomiNasSet *stringset.StringSet) {
+func selezionaNas() (nomiNasSet *stringset.StringSet, err error) {
 
 	// Creo la variabile dove accodare i nomi dei nas
 	devices := stringset.NewStringSet()
@@ -58,8 +59,8 @@ func selezionaNas() (nomiNasSet *stringset.StringSet) {
 
 	// listalistanas è una lista di liste quindi bisogna fare un doppio ciclo for
 	for _, listanas := range listalistanas {
-		for _, nas := range listanas {
-			// fmt.Println(n, nas.Name) //debug
+		for n, nas := range listanas {
+			fmt.Println(n, nas.Name) //debug
 
 			// Escludo i NAS in da ignorare
 			//if _, ok := ignora[nas.Name]; ok {
@@ -67,7 +68,7 @@ func selezionaNas() (nomiNasSet *stringset.StringSet) {
 			//	continue
 			//}
 
-			// Cnsidero solo gli apparati che abbiano "NAS" all'inzio del campo Service
+			// Considero solo gli apparati che abbiano "NAS" all'inzio del campo Service
 			// e EDGE_BRAS come dominio
 			// e MX960 come chassis
 			if strings.HasPrefix(nas.Service, "NAS") && strings.Contains(nas.Domain, "EDGE_BRAS") &&
@@ -87,6 +88,6 @@ func selezionaNas() (nomiNasSet *stringset.StringSet) {
 	// Tolgo dal set devices i nas da ignorare e salvo in nomiNasSet
 	//nomiNasSet = devices.Difference(ignoraNasSet)
 
-	return nomiNasSet
+	return nomiNasSet, nil
 
 }

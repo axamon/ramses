@@ -8,12 +8,14 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/axamon/stringset"
+
 	"github.com/remeh/sizedwaitgroup"
 	"github.com/tkanos/gonfig"
 )
 
 // wg è un Waitgroup che gestisce il throtteling
-var wg = sizedwaitgroup.New(80)
+var wg = sizedwaitgroup.New(10)
 
 // Crea variabile con le configurazioni del file passato come argomento
 var configuration Configuration
@@ -23,8 +25,9 @@ var antistorm = NewTTLMap(24 * time.Hour)
 var violazioni = NewTTLMap(24 * time.Hour)
 var nientedatippp = NewTTLMap(12 * time.Hour)
 var listalistanas [][]TNAS
+var nomiNasSet stringset.StringSet
 
-var version = "version: 4.1"
+var version = "version: 4.3"
 
 func main() {
 	// Creo il contesto inziale che verrà propagato alle go-routine
@@ -74,12 +77,22 @@ func main() {
 	listalistanas, err = recuperaNAS(ctx)
 	if err != nil {
 		log.Printf("Impossibile recuperare NAS da IPDOM %s\n", err.Error())
-		// cancel()
-		// os.Exit(1)
+		cancel()
+		os.Exit(1)
 	}
 	if err == nil {
 		log.Printf("INFO Recuperati dati NAS da IPDOM\n")
 	}
+
+	// Dalla lista NAS seleziona quelli da considerare.
+	nomiNasSet, err := selezionaNas()
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	// Loggo il numero di NAS identificati
+	log.Printf("%v INFO numero di NAS trovati\n", nomiNasSet.Len())
+	time.Sleep(3 * time.Second)
 
 	nasppp(ctx)
 

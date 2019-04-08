@@ -21,13 +21,6 @@ var nastrappati = make(map[string]bool)
 
 func nasppp(ctx context.Context) {
 
-	// Dalla lista NAS seleziona quelli da considerare.
-	nomiNasSet := selezionaNas()
-
-	// Loggo il numero di NAS identificati
-	log.Printf("%v INFO numero di NAS trovati\n", nomiNasSet.Len())
-	time.Sleep(3 * time.Second)
-
 	// recuperaSessioniPPP è una funzione che recupera i dati ppp dei nas
 	recuperaSessioniPPP := func(ctx context.Context) {
 		// Espando il contesto inziale inserendo un timeout
