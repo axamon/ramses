@@ -3,14 +3,12 @@ package main
 import (
 	"fmt"
 	"strings"
-
-	"github.com/axamon/stringset"
 )
 
-func selezionaNas() (nomiNasSet *stringset.StringSet, err error) {
+func selezionaNas() (nomiNas []string, err error) {
 
 	// Creo la variabile dove accodare i nomi dei nas
-	devices := stringset.NewStringSet()
+	//var devices []string
 
 	// TODO: creare il file con i nomi NAS dinamicamente
 
@@ -75,7 +73,7 @@ func selezionaNas() (nomiNasSet *stringset.StringSet, err error) {
 				strings.Contains(nas.ChassisName, "MX960") {
 
 				//Appendo in devices il nome nas trovato
-				devices.Add(nas.Name)
+				nomiNas = append(nomiNas, nas.Name)
 
 				//Per inviare trap serve conoscere l'ip di management del NAS uffa che barba che noia
 				listanasip[nas.Name] = nas.ManIPAddress
@@ -88,6 +86,6 @@ func selezionaNas() (nomiNasSet *stringset.StringSet, err error) {
 	// Tolgo dal set devices i nas da ignorare e salvo in nomiNasSet
 	//nomiNasSet = devices.Difference(ignoraNasSet)
 
-	return nomiNasSet, nil
+	return nomiNas, nil
 
 }

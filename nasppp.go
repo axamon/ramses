@@ -19,7 +19,7 @@ var listanasip = make(map[string]string)
 // Creo la mappa dei NAS per cui è stata inviata una trap.
 var nastrappati = make(map[string]bool)
 
-func nasppp(ctx context.Context) {
+func nasppp(ctx context.Context, nomiNas []string) {
 
 	// recuperaSessioniPPP è una funzione che recupera i dati ppp dei nas
 	recuperaSessioniPPP := func(ctx context.Context) {
@@ -40,7 +40,7 @@ func nasppp(ctx context.Context) {
 			// finchè non si raggiunge il timeout viene eseguito il codice di default
 			default:
 
-				for _, device := range nomiNasSet.Strings() {
+				for _, device := range nomiNas {
 					wgppp.Add(1)
 					//log.Printf("%s Info Inzio verifica device\n", device)
 					//go nasppp2(device)

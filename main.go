@@ -8,14 +8,12 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/axamon/stringset"
-
 	"github.com/remeh/sizedwaitgroup"
 	"github.com/tkanos/gonfig"
 )
 
 // wg è un Waitgroup che gestisce il throtteling
-var wg = sizedwaitgroup.New(10)
+var wg = sizedwaitgroup.New(30)
 
 // Crea variabile con le configurazioni del file passato come argomento
 var configuration Configuration
@@ -25,7 +23,6 @@ var antistorm = NewTTLMap(24 * time.Hour)
 var violazioni = NewTTLMap(24 * time.Hour)
 var nientedatippp = NewTTLMap(12 * time.Hour)
 var listalistanas [][]TNAS
-var nomiNasSet stringset.StringSet
 
 var version = "version: 4.3"
 
@@ -85,15 +82,15 @@ func main() {
 	}
 
 	// Dalla lista NAS seleziona quelli da considerare.
-	nomiNasSet, err := selezionaNas()
+	nomiNas, err := selezionaNas()
 	if err != nil {
 		log.Println(err.Error())
 	}
 
 	// Loggo il numero di NAS identificati
-	log.Printf("%v INFO numero di NAS trovati\n", nomiNasSet.Len())
+	log.Printf("INFO numero di NAS trovati: %d\n", len(nomiNas))
 	time.Sleep(3 * time.Second)
 
-	nasppp(ctx)
+	nasppp(ctx, nomiNas)
 
 }
