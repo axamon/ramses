@@ -62,7 +62,7 @@ func clientRequest(ctx context.Context, url, username, password, device string) 
 			log.Printf("Error %s Impossibile inviare Trap\n", device)
 		}
 		nastrappati[device] = true
-		return result
+		result = nil
 	}
 	return result
 

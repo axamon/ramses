@@ -1,12 +1,13 @@
 package main
 
 import (
-	"crypto/tls"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
 
 // recuperaNAS si connette a IPDOM per scaricare TUTTE le info sui nas.
@@ -19,13 +20,26 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 
 	urlricerca := configuration.IPDOMUrlRicerca
 
-	sigle := []string{"AG", "AL", "AN", "AO", "AR", "AP", "AT", "AV", "BA", "BT", "BL", "BN", "BG", "BI", "BO", "BZ", "BS", "BR", "CA", "CL", "CB", "CI", "CE", "CT", "CZ", "CH", "CO", "CS", "CR", "KR", "CN", "EN", "FM", "FE", "FI", "FG", "FC", "FR", "GE", "GO", "GR", "IM", "IS", "SP", "AQ", "LT", "LE", "LC", "LI", "LO", "LU", "MC", "MN", "MS", "MT", "ME", "MI", "MO", "MB", "NA", "NO", "NU", "OT", "OR", "PD", "PA", "PR", "PV", "PG", "PU", "PE", "PC", "PI", "PT", "PN", "PZ", "PO", "RG", "RA", "RC", "RE", "RI", "RN", "RM", "RO", "SA", "VS", "SS", "SV", "SI", "SR", "SO", "TA", "TE", "TR", "TO", "OG", "TP", "TN", "TV", "TS", "UD", "VA", "VE", "VB", "VC", "VR", "VV", "VI", "VT"}
+	sigle := []string{"AG", "AL", "AN", "AO", "AR", "AP", "AT", "AV", "BA",
+		"BT", "BL", "BN", "BG", "BI", "BO", "BZ", "BS", "BR", "CA", "CL", "CB",
+		"CI", "CE", "CT", "CZ", "CH", "CO", "CS", "CR", "KR", "CN", "EN", "FM",
+		"FE", "FI", "FG", "FC", "FR", "GE", "GO", "GR", "IM", "IS", "SP", "AQ",
+		"LT", "LE", "LC", "LI", "LO", "LU", "MC", "MN", "MS", "MT", "ME", "MI",
+		"MO", "MB", "NA", "NO", "NU", "OT", "OR", "PD", "PA", "PR", "PV", "PG",
+		"PU", "PE", "PC", "PI", "PT", "PN", "PZ", "PO", "RG", "RA", "RC", "RE",
+		"RI", "RN", "RM", "RO", "SA", "VS", "SS", "SV", "SI", "SR", "SO", "TA",
+		"TE", "TR", "TO", "OG", "TP", "TN", "TV", "TS", "UD", "VA", "VE", "VB",
+		"VC", "VR", "VV", "VI", "VT"}
 
 	for _, sigla := range sigle {
 		// Creo un contenitore per il nuovo NAS
 		var nasholder []TNAS
 
+		// Attende un secondo per non sovraccaricare IPDOM
+		time.Sleep(1 * time.Second)
+
 		nas := "^r-" + sigla
+		log.Printf("INFO Inizio recupero inormazioni NAS provincia %s\n", sigla)
 		url := urlricerca + nas
 		req, _ := http.NewRequest("GET", url, nil)
 		req.SetBasicAuth(username, password)
@@ -67,22 +81,22 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 
 		err = json.Unmarshal(body, &nasholder)
 		if err != nil {
-			log.Printf("Error Impossibile eseguire unmarshal dei dati: %s", err.Error())
-			return nil, err
+			log.Printf("Error Impossibile eseguire unmarshal dei dati per %s: %s", sigla, err.Error())
+			// return nil, err
 		}
 
 		nasList = append(nasList, nasholder)
 
 	}
-	//inventory := &nasList
-	/* b, err := json.Marshal(inventory)
+	inventory := &nasList
+	b, err := json.Marshal(inventory)
 	if err != nil {
 		log.Println(err.Error())
 	}
-	err = ioutil.WriteFile("nasInventory.json", b, 0644) //scrive i dati su file json
+	err = ioutil.WriteFile("nasInventoryNew.json", b, 0644) //scrive i dati su file json
 	if err != nil {
 		log.Println(err.Error())
-	} */
+	}
 	return nasList, nil
 }
 

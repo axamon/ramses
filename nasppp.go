@@ -73,7 +73,6 @@ func nasppp(ctx context.Context) {
 	}
 	log.Printf("INFO Mail di avvio inviata.\n")
 
-
 	fmt.Println("Dopo primo run") //debug
 
 	// Imposta un refesh ogni tot minuti
@@ -107,7 +106,7 @@ func nasppp2(ctx context.Context, device string) {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Printf("%s Error Superato tempo massimo per raccolta dati\n", device)
+			log.Printf("Error  %s Superato tempo massimo per raccolta dati\n", device)
 			return
 
 		default:

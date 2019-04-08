@@ -24,7 +24,6 @@ var violazioni = NewTTLMap(24 * time.Hour)
 var nientedatippp = NewTTLMap(12 * time.Hour)
 var listalistanas [][]TNAS
 
-
 var version = "version: 4.1"
 
 func main() {
@@ -36,16 +35,18 @@ func main() {
 	c := make(chan os.Signal, 1)
 	// Notifica al canale c i tipi di segnali di interrupt.
 	signal.Notify(c, os.Interrupt)
-	
+
 	defer func() {
 		signal.Stop(c) // Ipedisce a c di ricevere ulteriori segnalazioni.
-		cancel() // Avvia la funzione di chiusura.
+		cancel()       // Avvia la funzione di chiusura.
 	}()
 	// Avvia una go-routine in background in ascolto sul canale c.
 	go func() {
 		select {
 		case <-c: // Se arriva qualche segnale in c.
-			fmt.Println("Spengo Ramses")
+			fmt.Println()
+			fmt.Println("Spengo Ramses, docilmente...")
+			log.Println("INFO Invio mail per comunicare spegnimento Ramses")
 			mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura", eventi)
 			cancel()
 			os.Exit(0)
@@ -54,7 +55,7 @@ func main() {
 	}()
 
 	// Prima di terminare la funzione invia una mail
-	
+
 	// Scrive su standard output la versione di Ramses
 	log.Printf("Avvio Ramses %s\n", version)
 
@@ -69,13 +70,16 @@ func main() {
 	// GatherInfo recupera informazioni di sevizio sul funzionamento dell'APP
 	GatherInfo()
 
-	_, err = recuperaNAS(ctx)
+	log.Printf("INFO Inizio recupero informazioni NAS su IPDOM\n")
+	listalistanas, err = recuperaNAS(ctx)
 	if err != nil {
 		log.Printf("Impossibile recuperare NAS da IPDOM %s\n", err.Error())
 		// cancel()
 		// os.Exit(1)
 	}
-	log.Printf("INFO Recuperati dati NAS da IPDOM\n")
+	if err == nil {
+		log.Printf("INFO Recuperati dati NAS da IPDOM\n")
+	}
 
 	nasppp(ctx)
 
