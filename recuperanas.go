@@ -41,7 +41,6 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 			defer wg.Done()
 			// Avvio conteggio tempo
 			start := time.Now()
-			defer log.Printf("INFO Finito recupero informazioni NAS provincia %s, tempo impiegato: %v", sigla, time.Since(start))
 			// Creo un contenitore per il nuovo NAS
 			var nasholder []TNAS
 
@@ -49,7 +48,7 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 			time.Sleep(1 * time.Second)
 
 			nas := "^r-" + sigla
-			log.Printf("INFO Inizio recupero informazioni NAS provincia %s\n", sigla)
+			// log.Printf("INFO Inizio recupero informazioni NAS provincia %s\n", sigla)
 			url := urlricerca + nas
 			req, _ := http.NewRequest("GET", url, nil)
 			req.SetBasicAuth(username, password)
@@ -96,6 +95,8 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 			}
 
 			nasList = append(nasList, nasholder)
+			log.Printf("INFO Finito recupero informazioni NAS provincia %s, tempo impiegato: %v", sigla, time.Since(start))
+
 			runtime.Gosched()
 		}(sigla)
 	}
