@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"runtime"
 	"sort"
 	"time"
 )
@@ -36,8 +37,11 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 
 	for _, sigla := range sigle {
 		wg.Add()
-		go func() {
+		go func(sigla string) {
 			defer wg.Done()
+			// Avvio conteggio tempo
+			start := time.Now()
+			defer log.Printf("INFO Finito recupero informazioni NAS provincia %s, tempo impiegato: %v", sigla, time.Since(start))
 			// Creo un contenitore per il nuovo NAS
 			var nasholder []TNAS
 
@@ -45,7 +49,7 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 			time.Sleep(1 * time.Second)
 
 			nas := "^r-" + sigla
-			log.Printf("INFO Inizio recupero inormazioni NAS provincia %s\n", sigla)
+			log.Printf("INFO Inizio recupero informazioni NAS provincia %s\n", sigla)
 			url := urlricerca + nas
 			req, _ := http.NewRequest("GET", url, nil)
 			req.SetBasicAuth(username, password)
@@ -92,11 +96,12 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 			}
 
 			nasList = append(nasList, nasholder)
-		}()
-		wg.Wait()
-
+			runtime.Gosched()
+		}(sigla)
 	}
-	inventory := &nasList
+	wg.Wait()
+
+	/* inventory := &nasList
 	b, err := json.Marshal(inventory)
 	if err != nil {
 		log.Println(err.Error())
@@ -104,7 +109,7 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 	err = ioutil.WriteFile("nasInventoryNew.json", b, 0644) //scrive i dati su file json
 	if err != nil {
 		log.Println(err.Error())
-	}
+	} */
 	return nasList, nil
 }
 

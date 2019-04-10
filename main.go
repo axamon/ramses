@@ -13,7 +13,7 @@ import (
 )
 
 // wg è un Waitgroup che gestisce il throtteling
-var wg = sizedwaitgroup.New(30)
+var wg = sizedwaitgroup.New(5)
 
 // Crea variabile con le configurazioni del file passato come argomento
 var configuration Configuration
@@ -68,7 +68,7 @@ func main() {
 	}
 
 	// GatherInfo recupera informazioni di sevizio sul funzionamento dell'APP
-	GatherInfo()
+	GatherInfo(ctx)
 
 	log.Printf("INFO Inizio recupero informazioni NAS su IPDOM\n")
 	listalistanas, err = recuperaNAS(ctx)
