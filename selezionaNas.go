@@ -2,6 +2,8 @@ package main
 
 import (
 	"strings"
+
+	"github.com/axamon/stringset"
 )
 
 func selezionaNas() (nomiNas []string, err error) {
@@ -71,12 +73,12 @@ func selezionaNas() (nomiNas []string, err error) {
 			if strings.HasPrefix(nas.Service, "NAS") && strings.Contains(nas.Domain, "EDGE_BRAS") &&
 				strings.Contains(nas.ChassisName, "MX960") {
 
-				//Appendo in devices il nome nas trovato
+				// Appendo in nomiNAs il nome nas trovato
 				nomiNas = append(nomiNas, nas.Name)
 
-				//Per inviare trap serve conoscere l'ip di management del NAS uffa che barba che noia
+				// Per inviare trap serve conoscere l'ip di management del NAS uffa che barba che noia
 				listanasip[nas.Name] = nas.ManIPAddress
-				//log.Printf("Info %v ignorato\n", devices) //debug
+				// log.Printf("Info %v ignorato\n", devices) //debug
 
 			}
 		}
@@ -84,7 +86,13 @@ func selezionaNas() (nomiNas []string, err error) {
 
 	// Tolgo dal set devices i nas da ignorare e salvo in nomiNasSet
 	//nomiNasSet = devices.Difference(ignoraNasSet)
+	nomiNasSet := stringset.NewStringSet()
+	for _, nome := range nomiNas {
+		nomiNasSet.Add(nome)
+	}
 
-	return nomiNas, nil
+	listaNomiNas := nomiNasSet.Strings()
+
+	return listaNomiNas, nil
 
 }
