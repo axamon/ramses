@@ -24,10 +24,11 @@ var violazioni = NewTTLMap(24 * time.Hour)
 var nientedatippp = NewTTLMap(12 * time.Hour)
 var listalistanas [][]TNAS
 
-var version = "version: 4.4"
+var version = "version: 4.5"
 
 func main() {
 	// Creo il contesto inziale che verrà propagato alle go-routine
+	// con la funzione cancel per uscire dal programma in modo pulito.
 	ctx, cancel := context.WithCancel(context.Background())
 
 	// Creo il canale c di buffer 1 per gestire i segnali di tipo CTRT+
