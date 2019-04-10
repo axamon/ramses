@@ -24,7 +24,7 @@ var violazioni = NewTTLMap(24 * time.Hour)
 var nientedatippp = NewTTLMap(12 * time.Hour)
 var listalistanas [][]TNAS
 
-var version = "version: 4.3"
+var version = "version: 4.4"
 
 func main() {
 	// Creo il contesto inziale che verrà propagato alle go-routine
