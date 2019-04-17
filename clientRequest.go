@@ -9,7 +9,9 @@ import (
 	"net/http"
 )
 
-func clientRequest(ctx context.Context, url, username, password, device string) (result []interface{}) {
+func clientRequest(
+	ctx context.Context, url, username, password, device string) (
+	result []interface{}) {
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -33,18 +35,26 @@ func clientRequest(ctx context.Context, url, username, password, device string) 
 	res, err := client.Do(req)
 	//res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Printf("Error HTTP Client Do impossibile raggiungere %s: %s\n", device, err.Error())
+		log.Printf(
+			"Error HTTP Client Do impossibile raggiungere %s: %s\n",
+			device,
+			err.Error())
 		return nil
 	}
 
 	if res.StatusCode > 300 {
-		log.Printf("Error Ricevuto un errore http: %d\n", res.StatusCode)
+		log.Printf(
+			"Error Ricevuto un errore http: %d\n",
+			res.StatusCode)
 		return nil
 	}
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Printf("Error impossibile ricevere HTTP body per %s, %s\n", device, err.Error())
+		log.Printf(
+			"Error impossibile ricevere HTTP body per %s, %s\n",
+			device,
+			err.Error())
 		// os.Exit(1)
 	}
 	defer res.Body.Close()
@@ -52,14 +62,27 @@ func clientRequest(ctx context.Context, url, username, password, device string) 
 	// fmt.Println(string(body))
 	err = json.Unmarshal(body, &result)
 	if err != nil {
-		log.Printf("Error unmarshal impossibile per %s, %s\n", device, err.Error())
+		log.Printf(
+			"Error unmarshal impossibile per %s, %s\n",
+			device,
+			err.Error())
 		return result
 	}
 	if len(result) < 1 {
-		log.Printf("Error %s Non ci sono abbastanza info\n", device)
-		err := CreaTrap(device, "No data ppp", "Assenza dati sulle sessioni ppp", listanasip[device], 2, 4)
+		log.Printf(
+			"Error %s Non ci sono abbastanza info\n",
+			device)
+		err := CreaTrap(
+			device,
+			"No data ppp",
+			"Assenza dati sulle sessioni ppp",
+			listanasip[device],
+			2,
+			4)
 		if err != nil {
-			log.Printf("Error %s Impossibile inviare Trap\n", device)
+			log.Printf(
+				"Error %s Impossibile inviare Trap\n",
+				device)
 		}
 		nastrappati[device] = true
 		result = nil

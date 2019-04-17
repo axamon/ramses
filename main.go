@@ -12,19 +12,20 @@ import (
 	"github.com/tkanos/gonfig"
 )
 
-// wg è un Waitgroup che gestisce il throtteling
+// Versione attuale di Ramses.
+var version = "version: 4.5"
+
+// wg è un Waitgroup che gestisce quante richieste contemporanee fare a IPDOM
 var wg = sizedwaitgroup.New(5)
 
 // Crea variabile con le configurazioni del file passato come argomento
 var configuration Configuration
 
-// Crea delle mappe a tempo per storicizzare avventimenti
+// Crea delle mappe a tempo per storicizzare avvenimenti
 var antistorm = NewTTLMap(24 * time.Hour)
 var violazioni = NewTTLMap(24 * time.Hour)
 var nientedatippp = NewTTLMap(12 * time.Hour)
 var listalistanas [][]TNAS
-
-var version = "version: 4.5"
 
 func main() {
 	// Creo il contesto inziale che verrà propagato alle go-routine
@@ -40,6 +41,7 @@ func main() {
 		signal.Stop(c) // Ipedisce a c di ricevere ulteriori segnalazioni.
 		cancel()       // Avvia la funzione di chiusura.
 	}()
+
 	// Avvia una go-routine in background in ascolto sul canale c.
 	go func() {
 		select {
@@ -47,6 +49,7 @@ func main() {
 			fmt.Println()
 			fmt.Println("Spengo Ramses, docilmente...")
 			log.Println("INFO Invio mail per comunicare spegnimento Ramses")
+			// Prima di terminare la funzione invia una mail
 			mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura", eventi)
 			cancel()
 			os.Exit(0)
@@ -54,14 +57,13 @@ func main() {
 		}
 	}()
 
-	// Prima di terminare la funzione invia una mail
-
-	// Scrive su standard output la versione di Ramses
+	// Scrive su standard output la versione di Ramses.
 	log.Printf("Avvio Ramses %s\n", version)
 
 	// Recupera valori dal file di configurazione passato come argomento.
 	file := os.Args[1]
 	err := gonfig.GetConf(file, &configuration)
+	// Se ci sono errori nel recuperare le informazioni l'applicazione viene chiusa.
 	if err != nil {
 		log.Printf("Error Impossibile recupere valori da %s: %s\n", file, err.Error())
 		os.Exit(1)
@@ -71,7 +73,9 @@ func main() {
 	GatherInfo(ctx)
 
 	log.Printf("INFO Inizio recupero informazioni NAS su IPDOM\n")
+
 	listalistanas, err = recuperaNAS(ctx)
+	// Se ci sono errori nel recuperare le informazioni l'applicazione viene chiusa.
 	if err != nil {
 		log.Printf("Impossibile recuperare NAS da IPDOM %s\n", err.Error())
 		cancel()

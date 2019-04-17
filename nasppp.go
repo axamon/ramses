@@ -13,7 +13,7 @@ import (
 // wgpp è un waitgroup per sincronizzare le goroutines.
 var wgppp sync.WaitGroup
 
-// Creo la mappa dove mettere nas name e ip insieme.
+// Creo la mappa dove mettere nas name e ip di management insieme.
 var listanasip = make(map[string]string)
 
 // Creo la mappa dei NAS per cui è stata inviata una trap.
@@ -59,31 +59,33 @@ func nasppp(ctx context.Context, nomiNas []string) {
 	wgppp.Wait()
 
 	// Verifica l'avvio delle mail.
-	// Se non riesce a mandare mail esce.
+	// Se non riesce a mandare mail l'applicativo esce con errore.
 	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio", eventi)
 	if err != nil {
 		log.Printf("Error Impossibile inviare mail: %s\n", err.Error())
 		os.Exit(1)
 	}
+
 	log.Printf("INFO Mail di avvio inviata.\n")
 
 	fmt.Println("Dopo primo run") //debug
 
-	// Imposta un refesh ogni tot minuti
-	// t := time.Tick(30 * time.Second)
+	// c imposta l'intervallo di verifica delle sessioni nas.
 	c := time.Tick(5 * time.Minute)
+
+	// update imposta l'intervallo di inoltro della mail di notifica
+	// per far sapere che Ramses è ancora attivo.
 	update := time.Tick(24 * time.Hour)
+
 	for {
 		select {
 		case <-update:
-			// Ogni tot invia mail per far sapere che il sistema è attivo
+			// Ogni tot specificato dal canale update invia mail per far sapere che il sistema è attivo.
 			mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Update", eventi)
 		case <-c:
-			// Ogni tot fa partire il recupero dei dati di sessione PPP
+			// Ogni tot specificato dal canale c fa partire il recupero dei dati di sessione PPP.
 			recuperaSessioniPPP(ctx)
 			wgppp.Wait()
-			// <-t:
-			//	fmt.Println(".")
 		}
 	}
 
@@ -121,6 +123,7 @@ func nasppp2(ctx context.Context, device string) {
 			username := configuration.IPDOMUser
 			password := configuration.IPDOMPassword
 
+			// Ricompongo la URL di IPDOM con il nome del NAS all'interno.
 			url := configuration.URLSessioniPPP + device + configuration.URLTail7d
 
 			result := clientRequest(ctx, url, username, password, device)

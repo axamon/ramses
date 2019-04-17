@@ -6,7 +6,8 @@ import (
 	"strconv"
 )
 
-func estraiSerie(result []interface{}) (serieppptime, seriepppvalue []float64) {
+func estraiSerie(result []interface{}) (
+	serieppptime, seriepppvalue []float64) {
 
 	if result == nil {
 		log.Printf("Error nessun risultato passato al estraiSerie")

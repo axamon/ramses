@@ -48,7 +48,8 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 			time.Sleep(1 * time.Second)
 
 			nas := "^r-" + sigla
-			// log.Printf("INFO Inizio recupero informazioni NAS provincia %s\n", sigla)
+			// log.Printf(
+			//	"INFO Inizio recupero informazioni NAS provincia %s\n", sigla)
 			url := urlricerca + nas
 			req, _ := http.NewRequest("GET", url, nil)
 			req.SetBasicAuth(username, password)
@@ -58,44 +59,57 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 			req.Header.Add("cache-control", "no-cache")
 			req.WithContext(ctx)
 
-			//***************************************************************************
-			//------- read from ipdom --------
-			//qui su costringe il client ad accettare anche certificati https non validi o scaduti, non anrebbe fatto ma bisogna fare di necessità virtù
+			// Ignora certificati https scaduti o errati
 			transCfg := &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // ignore expired SSL certificates
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			}
 
 			client := &http.Client{Transport: transCfg}
 			res, err := client.Do(req)
 			if err != nil {
-				log.Printf("Error Impossibile eseguire il client http: %s", err.Error())
+				log.Printf(
+					"Error Impossibile eseguire il client http: %s",
+					err.Error())
 				return //nil, err
 			}
 
 			body, err := ioutil.ReadAll(res.Body)
 			if err != nil {
-				log.Printf("Error Impossibile leggere risposta client http: %s", err.Error())
+				log.Printf(
+					"Error Impossibile leggere risposta client http: %s",
+					err.Error())
 				return //nil, err
 			}
-			//err = ioutil.WriteFile(sigla+"nasInventory.json", body, 0644) //scrive i dati su file json
+
+			// Scrive i dati su file json.
+			// err = ioutil.WriteFile(sigla+"nasInventory.json", body, 0644)
+
+			// Chiude il corpo della response quando la funzione finisce.
 			defer res.Body.Close()
 			//check(err)
 
 			// ------ read from file -------
 			//bjson, err = ioutil.ReadFile("nasInventory.json")
 			// -------------------
-			// *****************************************************************************
+			// ****************************************************************
 			//recupera il risultato della query a ipdom
 			//	var d []TNAS
 
 			err = json.Unmarshal(body, &nasholder)
 			if err != nil {
-				log.Printf("Error Impossibile eseguire unmarshal dei dati per %s: %s", sigla, err.Error())
+				log.Printf(
+					"Error Impossibile eseguire unmarshal dei dati per %s: %s",
+					sigla,
+					err.Error())
 				// return nil, err
 			}
 
 			nasList = append(nasList, nasholder)
-			log.Printf("INFO Finito recupero informazioni NAS provincia %s, tempo impiegato: %v", sigla, time.Since(start))
+
+			log.Printf(
+				"INFO Finito recupero informazioni NAS provincia %s, tempo impiegato: %v",
+				sigla,
+				time.Since(start))
 
 			runtime.Gosched()
 		}(sigla)

@@ -15,20 +15,28 @@ func mandamailAlert(from, to, device string, evento *Jerk) {
 	elements := antistorm.GetAll()
 	for el := range elements {
 		if el == device {
-			log.Printf("Error %s Segnalazione già inviata recentemente.\n", device)
+			log.Printf(
+				"Error %s Segnalazione già inviata recentemente.\n", device)
 			return
 		}
 	}
 
-	// Se device non è nella mappa antistorm allora lo inserisce
+	// Se device non è nella mappa antistorm allora lo inserisce.
 	antistorm.AddWithTTL(device, true, 30*time.Minute)
 
 	// Setta l'oggetto della mail
 	subject := "Allarme ppp su " + device
 
-	// Crea il contenuto della mail
-	grafanaurl := "https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" + device
-	body := fmt.Sprintf("Alert %s Forte abbassamento sessioni ppp, valore riscontrato %d alle %v %s\n", device, int(evento.pppValue), evento.Timestamp.UTC(), grafanaurl)
+	// Crea la URL di IPDOM da includere nella mail.
+	grafanaurl :=
+		"https://ipw.telecomitalia.it/grafana/dashboard/db/bnas?orgId=1&var-device=" +
+			device
+
+	// Crea il contenuto della mail.
+	body :=
+		fmt.Sprintf(
+			"Alert %s Forte abbassamento sessioni ppp, valore riscontrato %d alle %v %s\n",
+			device, int(evento.pppValue), evento.Timestamp.UTC(), grafanaurl)
 
 	// Aggiunge i destinatari in to
 	tomultiplo := strings.Split(to, ",")
@@ -41,12 +49,20 @@ func mandamailAlert(from, to, device string, evento *Jerk) {
 	m.SetHeader("From", from)
 	//m.SetHeader("To", to)
 	m.SetHeaders(t)
-	m.SetAddressHeader("Cc", "alberto.bregliano@telecomitalia.it", "Alberto Bregliano")
+	m.SetAddressHeader(
+		"Cc", "alberto.bregliano@telecomitalia.it",
+		"Alberto Bregliano",
+	)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)
 	//m.Attach("/home/Alex/lolcat.jpg")
 
-	d := gomail.NewPlainDialer(configuration.SmtpServer, configuration.SmtpPort, configuration.SmtpUser, configuration.SmtpPassword)
+	d := gomail.NewPlainDialer(
+		configuration.SmtpServer,
+		configuration.SmtpPort,
+		configuration.SmtpUser,
+		configuration.SmtpPassword,
+	)
 
 	if err := d.DialAndSend(m); err != nil {
 		log.Printf("impossibile inviare mail %s\n", err.Error())
@@ -57,7 +73,9 @@ func mandamail(from, to, scopo string, eventi Jerks) (err error) {
 
 	var listaeventi []string
 	for _, evento := range eventi {
-		singoloevento := fmt.Sprintln(evento.Timestamp.UTC().Format("20060102T15:04"), evento.NasName, int(evento.pppValue))
+		singoloevento := fmt.Sprintln(evento.Timestamp.UTC().
+			Format("20060102T15:04"), evento.NasName, int(evento.pppValue))
+
 		listaeventi = append(listaeventi, singoloevento)
 	}
 
@@ -91,15 +109,26 @@ func mandamail(from, to, scopo string, eventi Jerks) (err error) {
 	m.SetHeader("From", from)
 	//m.SetHeader("To", to)
 	m.SetHeaders(t)
-	m.SetAddressHeader("Cc", "alberto.bregliano@telecomitalia.it", "Alberto Bregliano")
+	m.SetAddressHeader(
+		"Cc",
+		"alberto.bregliano@telecomitalia.it",
+		"Alberto Bregliano",
+	)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", body)
 
-	d := gomail.NewPlainDialer(configuration.SmtpServer, configuration.SmtpPort, configuration.SmtpUser, configuration.SmtpPassword)
+	d := gomail.NewPlainDialer(
+		configuration.SmtpServer,
+		configuration.SmtpPort,
+		configuration.SmtpUser,
+		configuration.SmtpPassword,
+	)
 
 	errdialandsend := d.DialAndSend(m)
 	if errdialandsend != nil {
-		err = fmt.Errorf("Error Impossibile inviare mail %s", errdialandsend.Error())
+		err = fmt.Errorf(
+			"Error Impossibile inviare mail %s",
+			errdialandsend.Error())
 	}
 	return err
 }

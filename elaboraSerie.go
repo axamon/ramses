@@ -5,7 +5,9 @@ import (
 	"github.com/gonum/stat"
 )
 
-func elaboraSerie(serieppptime, seriepppvalue []float64) (mean, stdev float64, xdet, y []float64) {
+func elaboraSerie(
+	serieppptime, seriepppvalue []float64) (
+	mean, stdev float64, xdet, y []float64) {
 
 	// Mofifica serie prima che sia elaborata
 	// Elimino il trend
@@ -16,7 +18,7 @@ func elaboraSerie(serieppptime, seriepppvalue []float64) (mean, stdev float64, x
 
 	// Calcolo statistiche sulla serie elaborata
 	mean, stdev = stat.MeanStdDev(y, nil)
-	// log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev) // debug
+	// log.Printf("%s Info media: %2.f stdev: %2.f", device, mean, stdev)
 
 	return mean, stdev, xdet, y
 }

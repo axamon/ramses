@@ -24,7 +24,9 @@ summary := "Forte abbassamento sessioni ppp"
 */
 
 // CreaTrap invia trap snmp v1 per notificare gli eventi
-func CreaTrap(device, argomento, summary, ipdevice string, specific, severity int) (err error) {
+func CreaTrap(
+	device, argomento, summary, ipdevice string, specific,
+	severity int) (err error) {
 
 	// Se si tratta di inviare trap per mancanza di dati
 	// (specific = 1 e severity > 0)
@@ -49,14 +51,17 @@ func CreaTrap(device, argomento, summary, ipdevice string, specific, severity in
 		}
 	}
 
-	// Se vuoi inviare una trap per mancanza di dati e non sono le 10 di mattina
+	// Se vuoi inviare una trap per mancanza di dati
+	// e non sono le 10 di mattina
 	// oppure il problema è stato già notificato allora esce.
-	if specific == 2 && severity > 0 && adesso.Hour() != 10 && trapMancanoDatiInviata == true {
+	if specific == 2 && severity > 0 && adesso.Hour() != 10 &&
+		trapMancanoDatiInviata == true {
 		return
 	}
 
 	// Se invece si deve comunicare la risoluzione di un problema di tipo
-	// mancanza dati (specific = 1 e severity = 0) non importa a che ora si risolve
+	// mancanza dati (specific = 1 e severity = 0)
+	// non importa a che ora si risolve
 	// e se la variabile trapMancanoDatiInviata è falsa vuol dire che
 	// non è stata notificata la trap del problema
 	if specific == 1 && severity == 0 && trapMancanoDatiInviata == false {

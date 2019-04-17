@@ -9,8 +9,8 @@ import (
 	"runtime/pprof"
 )
 
-var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to `file`")
-var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+var cpuprofile = flag.String("cpuprofile", "", "write profile to `file`")
+var memprofile = flag.String("memprofile", "", "write profile to `file`")
 
 // GatherInfo gathers info on running app
 func GatherInfo(ctx context.Context) {

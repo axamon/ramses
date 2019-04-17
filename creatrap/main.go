@@ -23,7 +23,13 @@ summary := "Forte abbassamento sessioni ppp"
 */
 
 func main() {
-	result, err := CreaTrap("finto", "sessioni_ppp", "Forte abbassamento sessioni ppp", "10.10.10.10", 1, 5)
+	result, err := CreaTrap(
+		"finto",
+		"sessioni_ppp",
+		"Forte abbassamento sessioni ppp",
+		"10.10.10.10",
+		1,
+		5)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -33,7 +39,10 @@ func main() {
 }
 
 // CreaTrap invia trap snmp v1 per notificare gli eventi
-func CreaTrap(device, argomento, summary, ipdevice string, specific, severity int) (result *g.SnmpPacket, err error) {
+func CreaTrap(
+	device, argomento, summary, ipdevice string,
+	specific, severity int) (
+	result *g.SnmpPacket, err error) {
 
 	// In tutti gli altri casi si può inviare la trap
 

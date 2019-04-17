@@ -19,7 +19,8 @@ func TestMain(m *testing.M) {
 	file := "configurationExample.json"
 	err := gonfig.GetConf(file, &configuration)
 	if err != nil {
-		log.Printf("Error Impossibile recupere valori da %s: %s\n", file, err.Error())
+		log.Printf(
+			"Error Impossibile recupere valori da %s: %s\n", file, err.Error())
 		os.Exit(1)
 	}
 	flag.Parse()

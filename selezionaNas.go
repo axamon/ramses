@@ -36,14 +36,20 @@ func selezionaNas() (nomiNas []string, err error) {
 	// Leggo il file in memoria
 	//ignoranasbody, errignoranas := ioutil.ReadFile(filelistaNasDaIgnorare)
 	//if errignoranas != nil {
-	//	log.Printf("Error Impossibile recuperare lista dei nas da ignorare %s %s\n", filelistaNasDaIgnorare, errignoranas.Error())
+	//	log.Printf(
+	//	"Error Impossibile recuperare lista dei nas da ignorare %s %s\n",
+	//	 filelistaNasDaIgnorare,
+	//	  errignoranas.Error())
 	//}
 
 	// Creo variabile che contiene lista nas da ignorare
 	//var listaNasDaIgnorare map[string][]string
 	//errjsonNasdaignorare := json.Unmarshal(ignoranasbody, &listaNasDaIgnorare)
 	//if errjsonNasdaignorare != nil {
-	//	log.Printf("Error Impossibile parsare dati %s , %s\n", listaNasDaIgnorare, errjsonNasdaignorare.Error())
+	//	log.Printf(
+	//	"Error Impossibile parsare dati %s , %s\n",
+	//	 listaNasDaIgnorare,
+	//	  errjsonNasdaignorare.Error())
 	//}
 	//fmt.Println(listaNasDaIgnorare)
 
@@ -67,16 +73,19 @@ func selezionaNas() (nomiNas []string, err error) {
 			//	continue
 			//}
 
-			// Considero solo gli apparati che abbiano "NAS" all'inzio del campo Service
+			// Considero solo gli apparati che abbiano
+			// "NAS" all'inzio del campo Service
 			// e EDGE_BRAS come dominio
 			// e MX960 come chassis
-			if strings.HasPrefix(nas.Service, "NAS") && strings.Contains(nas.Domain, "EDGE_BRAS") &&
+			if strings.HasPrefix(nas.Service, "NAS") &&
+				strings.Contains(nas.Domain, "EDGE_BRAS") &&
 				strings.Contains(nas.ChassisName, "MX960") {
 
 				// Appendo in nomiNAs il nome nas trovato
 				nomiNas = append(nomiNas, nas.Name)
 
-				// Per inviare trap serve conoscere l'ip di management del NAS uffa che barba che noia
+				// Per inviare trap serve conoscere
+				// l'ip di management del NAS
 				listanasip[nas.Name] = nas.ManIPAddress
 				// log.Printf("Info %v ignorato\n", devices) //debug
 
@@ -85,7 +94,7 @@ func selezionaNas() (nomiNas []string, err error) {
 	}
 
 	// Tolgo dal set devices i nas da ignorare e salvo in nomiNasSet
-	//nomiNasSet = devices.Difference(ignoraNasSet)
+	// nomiNasSet = devices.Difference(ignoraNasSet)
 	nomiNasSet := stringset.NewStringSet()
 	for _, nome := range nomiNas {
 		nomiNasSet.Add(nome)
