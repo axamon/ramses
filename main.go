@@ -13,7 +13,7 @@ import (
 )
 
 // Versione attuale di Ramses.
-var version = "version: 4.5"
+var version = "version: 4.6"
 
 // wg è un Waitgroup che gestisce quante richieste contemporanee fare a IPDOM
 var wg = sizedwaitgroup.New(5)
@@ -28,12 +28,14 @@ var nientedatippp = NewTTLMap(12 * time.Hour)
 var listalistanas [][]TNAS
 
 func main() {
+
 	// Creo il contesto inziale che verrà propagato alle go-routine
 	// con la funzione cancel per uscire dal programma in modo pulito.
 	ctx, cancel := context.WithCancel(context.Background())
 
-	// Creo il canale c di buffer 1 per gestire i segnali di tipo CTRT+
+	// Creo il canale c di buffer 1 per gestire i segnali di tipo CTRT+.
 	c := make(chan os.Signal, 1)
+
 	// Notifica al canale c i tipi di segnali di interrupt.
 	signal.Notify(c, os.Interrupt)
 
@@ -50,7 +52,11 @@ func main() {
 			fmt.Println("Spengo Ramses, docilmente...")
 			log.Println("INFO Invio mail per comunicare spegnimento Ramses")
 			// Prima di terminare la funzione invia una mail
-			mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Chiusura", eventi)
+			mandamail(
+				configuration.SmtpFrom,
+				configuration.SmtpTo,
+				"Chiusura",
+				eventi)
 			cancel()
 			os.Exit(0)
 		case <-ctx.Done(): // Se il contesto ctx viene terminato.
@@ -60,24 +66,36 @@ func main() {
 	// Scrive su standard output la versione di Ramses.
 	log.Printf("Avvio Ramses %s\n", version)
 
+	// file è il file di configurazione.
+	file := os.Args[1] // TODO: creare flag
+
 	// Recupera valori dal file di configurazione passato come argomento.
-	file := os.Args[1]
 	err := gonfig.GetConf(file, &configuration)
-	// Se ci sono errori nel recuperare le informazioni l'applicazione viene chiusa.
+
+	// Se ci sono errori nel recuperare le informazioni
+	// l'applicazione viene chiusa.
 	if err != nil {
-		log.Printf("Error Impossibile recupere valori da %s: %s\n", file, err.Error())
+		log.Printf(
+			"Error Impossibile recupere valori da %s: %s\n",
+			file,
+			err.Error())
 		os.Exit(1)
 	}
 
-	// GatherInfo recupera informazioni di sevizio sul funzionamento dell'APP
+	// GatherInfo recupera informazioni di sevizio sul funzionamento dell'APP.
 	GatherInfo(ctx)
 
 	log.Printf("INFO Inizio recupero informazioni NAS su IPDOM\n")
 
+	// Crea la lista di lista di nas.
 	listalistanas, err = recuperaNAS(ctx)
-	// Se ci sono errori nel recuperare le informazioni l'applicazione viene chiusa.
+
+	// Se ci sono errori nel recuperare le informazioni
+	// l'applicazione viene chiusa.
 	if err != nil {
-		log.Printf("Impossibile recuperare NAS da IPDOM %s\n", err.Error())
+		log.Printf(
+			"Impossibile recuperare NAS da IPDOM %s\n",
+			err.Error())
 		cancel()
 		os.Exit(1)
 	}
@@ -91,8 +109,12 @@ func main() {
 		log.Println(err.Error())
 	}
 
-	// Loggo il numero di NAS identificati
-	log.Printf("INFO numero di NAS trovati: %d\n", len(nomiNas))
+	// Loggo il numero di NAS identificati.
+	log.Printf(
+		"INFO numero di NAS trovati: %d\n",
+		len(nomiNas))
+
+	// Dorme per 3 secondi.
 	time.Sleep(3 * time.Second)
 
 	nasppp(ctx, nomiNas)

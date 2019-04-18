@@ -21,29 +21,31 @@ var nastrappati = make(map[string]bool)
 
 func nasppp(ctx context.Context, nomiNas []string) {
 
-	// recuperaSessioniPPP è una funzione che recupera i dati ppp dei nas
+	// recuperaSessioniPPP è una funzione che recupera i dati ppp dei nas.
 	recuperaSessioniPPP := func(ctx context.Context) {
-		// Espando il contesto inziale inserendo un timeout
+		// Espando il contesto inziale inserendo un timeout.
 		ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
 
-		// Prima di chiudere vengono rilasciate tutte le risorse
+		// Prima di chiudere vengono rilasciate tutte le risorse.
 		defer cancel()
 
-		// Avvio un ciclo infinito
+		// Avvio un ciclo infinito.
 		for {
 			select {
-			// Se viene raggiunto il timeout la funzione viene killata
+			// Se viene raggiunto il timeout la funzione viene killata.
 			case <-ctx.Done():
-				log.Printf("Error All Tempo per completare recupero dati terminato\n")
+				log.Printf(
+					"Error All Tempo per completare recupero dati terminato\n")
 				return
 
-			// finchè non si raggiunge il timeout viene eseguito il codice di default
+			// Finchè non si raggiunge il timeout
+			// viene eseguito il codice di default.
 			default:
 
 				for _, device := range nomiNas {
 					wgppp.Add(1)
-					//log.Printf("%s Info Inzio verifica device\n", device)
-					//go nasppp2(device)
+					// log.Printf("%s Info Inzio verifica device\n", device)
+					// go nasppp2(device)
 					nasppp2(ctx, device)
 				}
 				return
@@ -52,17 +54,24 @@ func nasppp(ctx context.Context, nomiNas []string) {
 
 	}
 
-	// Prima esecuzione del recupero dati dall'avvio dell'applicazione
+	// Prima esecuzione del recupero dati dall'avvio dell'applicazione.
 	recuperaSessioniPPP(ctx)
 
-	// Attende che tutte le richieste siano terminate prima di proseguire
+	// Attende che tutte le richieste siano terminate prima di proseguire.
 	wgppp.Wait()
 
 	// Verifica l'avvio delle mail.
 	// Se non riesce a mandare mail l'applicativo esce con errore.
-	err := mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Avvio", eventi)
+	err := mandamail(
+		configuration.SmtpFrom,
+		configuration.SmtpTo,
+		"Avvio",
+		eventi)
+
 	if err != nil {
-		log.Printf("Error Impossibile inviare mail: %s\n", err.Error())
+		log.Printf(
+			"Error Impossibile inviare mail: %s\n",
+			err.Error())
 		os.Exit(1)
 	}
 
@@ -80,10 +89,16 @@ func nasppp(ctx context.Context, nomiNas []string) {
 	for {
 		select {
 		case <-update:
-			// Ogni tot specificato dal canale update invia mail per far sapere che il sistema è attivo.
-			mandamail(configuration.SmtpFrom, configuration.SmtpTo, "Update", eventi)
+			// Ogni tot specificato dal canale update invia mail
+			// per far sapere che il sistema è attivo.
+			mandamail(
+				configuration.SmtpFrom,
+				configuration.SmtpTo,
+				"Update",
+				eventi)
 		case <-c:
-			// Ogni tot specificato dal canale c fa partire il recupero dei dati di sessione PPP.
+			// Ogni tot specificato dal canale c fa partire
+			// il recupero dei dati di sessione PPP.
 			recuperaSessioniPPP(ctx)
 			wgppp.Wait()
 		}
@@ -92,26 +107,34 @@ func nasppp(ctx context.Context, nomiNas []string) {
 }
 
 func nasppp2(ctx context.Context, device string) {
-	// Riceve il contesto padre e aggiunge un timeout
+
+	// Riceve il contesto padre e aggiunge un timeout.
 	// massimo per terminare la richiesta dati.
 	ctx, cancel := context.WithTimeout(ctx, 6*time.Second)
+
+	// Esegue cancel a fine procedura.
 	defer cancel()
+
 	//defer log.Printf("%s Info Recupero dati terminato\n", device)
 	defer wgppp.Done()
 
 	for {
 		select {
 		case <-ctx.Done():
-			log.Printf("Error %s Superato tempo massimo per raccolta dati\n", device)
+			log.Printf(
+				"Error %s Superato tempo massimo per raccolta dati\n",
+				device)
 			return
 
 		default:
-			// Attendo un tempo random per evitare di fare troppe query insieme
+			// Attendo un tempo random per evitare troppe query insieme.
 			// se sono attive le goroutines.
 			randomdelay := rand.Intn(100)
-			time.Sleep(time.Duration(randomdelay) * time.Millisecond)
+			time.Sleep(
+				time.Duration(randomdelay) * time.Millisecond)
 
-			//Ripulisce eventiali impostazioni di proxy a livello di sistema
+			// Ripulisce eventiali impostazioni di proxy
+			// a livello di sistema.
 			os.Setenv("HTTP_PROXY", "")
 			os.Setenv("HTTPS_PROXY", "")
 			fmt.Println(os.Getenv("HTTP_PROXY"))
@@ -119,15 +142,18 @@ func nasppp2(ctx context.Context, device string) {
 
 			//fmt.Println(device)
 
-			// Recupera le credenziali per IPDOM
+			// Recupera le credenziali per IPDOM.
 			username := configuration.IPDOMUser
 			password := configuration.IPDOMPassword
 
 			// Ricompongo la URL di IPDOM con il nome del NAS all'interno.
-			url := configuration.URLSessioniPPP + device + configuration.URLTail7d
+			url := configuration.URLSessioniPPP +
+				device + configuration.URLTail7d
 
+			// Avvia la richiesta web.
 			result := clientRequest(ctx, url, username, password, device)
 
+			// Elabora il risulatato della richiesta web.
 			elaboroRequest(ctx, result, device)
 
 			return
