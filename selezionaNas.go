@@ -67,7 +67,7 @@ func selezionaNas() (nomiNas []string, err error) {
 
 	// Tolgo dal set devices i nas da ignorare e salvo in nomiNasSet
 	ignoraNas()
-	log.Printf("INFO Lista NAS ignorati: &s\n", ignoraNasSet.Strings())
+	log.Printf("INFO Lista NAS ignorati: %s\n", ignoraNasSet.Strings())
 	nomiNasSet = nomiNasSet.Difference(ignoraNasSet)
 
 	// listaNomiNas è una slice di stringhe con tutti i nomi nas.
