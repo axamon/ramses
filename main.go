@@ -13,7 +13,7 @@ import (
 )
 
 // Versione attuale di Ramses.
-var version = "version: 4.6"
+var version = "version: 4.7"
 
 // wg è un Waitgroup che gestisce quante richieste contemporanee fare a IPDOM
 var wg = sizedwaitgroup.New(5)

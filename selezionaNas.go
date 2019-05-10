@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"strings"
 
 	"github.com/axamon/stringset"
@@ -10,8 +11,6 @@ func selezionaNas() (nomiNas []string, err error) {
 
 	// Creo la variabile dove accodare i nomi dei nas
 	//var devices []string
-
-	// TODO: creare il file con i nomi NAS dinamicamente
 
 	// Identifico il file json con le informazioni da parsare
 	//filelistapparati := configuration.NasInventory
@@ -29,49 +28,16 @@ func selezionaNas() (nomiNas []string, err error) {
 	//	log.Printf("Error Impossibile parsare dati %s\n", filelistapparati)
 	//}
 
-	// Identifico il file json con la lista NAS da ignorare
-	//filelistaNasDaIgnorare := configuration.NasDaIgnorare
-	//log.Println(filelistaNasDaIgnorare) //debug
-
-	// Leggo il file in memoria
-	//ignoranasbody, errignoranas := ioutil.ReadFile(filelistaNasDaIgnorare)
-	//if errignoranas != nil {
-	//	log.Printf(
-	//	"Error Impossibile recuperare lista dei nas da ignorare %s %s\n",
-	//	 filelistaNasDaIgnorare,
-	//	  errignoranas.Error())
-	//}
-
-	// Creo variabile che contiene lista nas da ignorare
-	//var listaNasDaIgnorare map[string][]string
-	//errjsonNasdaignorare := json.Unmarshal(ignoranasbody, &listaNasDaIgnorare)
-	//if errjsonNasdaignorare != nil {
-	//	log.Printf(
-	//	"Error Impossibile parsare dati %s , %s\n",
-	//	 listaNasDaIgnorare,
-	//	  errjsonNasdaignorare.Error())
-	//}
-	//fmt.Println(listaNasDaIgnorare)
-
-	// Creo set di Nas da ignorare
-	//ignoraNasSet := stringset.NewStringSet()
-
-	//var ignora = make(map[string]bool)
-	//for _, nasignorato := range listaNasDaIgnorare["nasdaignorare"] {
-	//	ignora[nasignorato] = true
-	//	ignoraNasSet.Add(nasignorato)
-	//}
-
 	// listalistanas è una lista di liste quindi bisogna fare un doppio ciclo for
 	for _, listanas := range listalistanas {
 		for _, nas := range listanas {
 			// fmt.Println(n, nas.Name) //debug
 
 			// Escludo i NAS in da ignorare
-			//if _, ok := ignora[nas.Name]; ok {
-			//	log.Printf("INFO %s ignorato\n", nas.Name)
-			//	continue
-			//}
+			/* if _, ok := ignora[nas.Name]; ok {
+			log.Printf("INFO %s ignorato\n", nas.Name)
+			continue
+			} */
 
 			// Considero solo gli apparati che abbiano
 			// "NAS" all'inzio del campo Service
@@ -93,13 +59,18 @@ func selezionaNas() (nomiNas []string, err error) {
 		}
 	}
 
-	// Tolgo dal set devices i nas da ignorare e salvo in nomiNasSet
-	// nomiNasSet = devices.Difference(ignoraNasSet)
 	nomiNasSet := stringset.NewStringSet()
+
 	for _, nome := range nomiNas {
 		nomiNasSet.Add(nome)
 	}
 
+	// Tolgo dal set devices i nas da ignorare e salvo in nomiNasSet
+	ignoraNas()
+	log.Printf("INFO Lista NAS ignorati: &s\n", ignoraNasSet.Strings())
+	nomiNasSet = nomiNasSet.Difference(ignoraNasSet)
+
+	// listaNomiNas è una slice di stringhe con tutti i nomi nas.
 	listaNomiNas := nomiNasSet.Strings()
 
 	return listaNomiNas, nil
