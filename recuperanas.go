@@ -33,38 +33,67 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 		"TE", "TR", "TO", "OG", "TP", "TN", "TV", "TS", "UD", "VA", "VE", "VB",
 		"VC", "VR", "VV", "VI", "VT"}
 
+	// Riordina le sigle in ordine alfabetico.
 	sort.Strings(sigle)
 
+	// Cicla le sigle.
 	for _, sigla := range sigle {
+
+		// Aggiunge uno al waitgroup wg.
 		wg.Add()
+
+		// Avvia la go routine.
 		go func(sigla string) {
+
+			// A fine funzione diminuisce di uno il wg.
 			defer wg.Done()
-			// Avvio conteggio tempo
+
+			// Avvio conteggio tempo.
 			start := time.Now()
-			// Creo un contenitore per il nuovo NAS
+
+			// Creo un contenitore per il nuovo NAS.
 			var nasholder []TNAS
 
-			// Attende un secondo per non sovraccaricare IPDOM
+			// Attende un secondo per non sovraccaricare IPDOM.
 			time.Sleep(1 * time.Second)
 
+			// Crea lan regex da passare nella url.
 			nas := "^r-" + sigla
+
 			// log.Printf(
 			//	"INFO Inizio recupero informazioni NAS provincia %s\n", sigla)
+
+			// Crea la url definitiva.
 			url := urlricerca + nas
-			req, _ := http.NewRequest("GET", url, nil)
+
+			// Crea la web request da inviare.
+			req, err := http.NewRequest("GET", url, nil)
+
+			if err != nil {
+				log.Printf(
+					"Error Impossibile creare web request per provincia %s\n",
+					sigla)
+			}
+
+			// Configura credenziale accesso web a IPDOM.
 			req.SetBasicAuth(username, password)
 
-			//Header che forse potrebbero essere tolti ma male non fanno
+			// Aggiunge header per gestione json.
 			req.Header.Add("content-type", "application/json")
+
+			// Aggiunge header per evitare di recuperare dati obsoleti.
 			req.Header.Add("cache-control", "no-cache")
+
+			// Aggiunge contesto alla web request.
 			req.WithContext(ctx)
 
-			// Ignora certificati https scaduti o errati
+			// Ignora certificati https scaduti o errati.
 			transCfg := &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			}
 
 			client := &http.Client{Transport: transCfg}
+
 			res, err := client.Do(req)
 			if err != nil {
 				log.Printf(
@@ -86,6 +115,7 @@ func recuperaNAS(ctx context.Context) (nasList [][]TNAS, err error) {
 
 			// Chiude il corpo della response quando la funzione finisce.
 			defer res.Body.Close()
+
 			//check(err)
 
 			// ------ read from file -------

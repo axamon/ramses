@@ -25,7 +25,7 @@ func clientRequest(
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 
-	//req.Header.Add("content-type", "application/json;charset=UTF-8")
+	// req.Header.Add("content-type", "application/json;charset=UTF-8")
 	req.SetBasicAuth(username, password)
 	req.Header.Add("cache-control", "no-cache")
 	req.WithContext(ctx)
@@ -33,7 +33,7 @@ func clientRequest(
 	client := &http.Client{Transport: transCfg}
 
 	res, err := client.Do(req)
-	//res, err := http.DefaultClient.Do(req)
+
 	if err != nil {
 		log.Printf(
 			"Error HTTP Client Do impossibile raggiungere %s: %s\n",
