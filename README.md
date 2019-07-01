@@ -38,3 +38,4 @@ Per configure l'applicativo bisogna compilare i campi di un file json di configu
 # Sintassi
 
     ramses filediconfigurazione.json
+"# nefertiti" 
